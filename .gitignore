@@ -18,3 +18,6 @@ data/uploads/
 .idea/
 .vscode/
 wasted/
+*.pcm
+*.wav
+*.mp3
