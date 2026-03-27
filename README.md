@@ -6,7 +6,7 @@
 
 - **多阶段面试流程**：开场破冰 → 简历深挖 → JD 技术考察 → 编程题 → 总结评估
 - **GraphRAG 混合检索**：GLiNER 实体抽取 + BM25 + 向量检索（bge-m3）+ RRF 融合，精准匹配技术知识图谱节点
-- **知识图谱**：68 个技术节点、140 条关系边，覆盖 LLM、Agent、RAG、推理优化等 AI 工程领域
+- **知识图谱**：覆盖 LLM、Agent、RAG、推理优化等 AI 工程领域的技术知识图谱
 - **Function Calling**：4 个 Agent Tool 按面试阶段分配，驱动图谱检索与题库召回
 - **多模态支持**：DashScope TTS 语音合成 + FunASR 实时语音识别
 - **LangSmith 监控**：全链路 trace/span 级可观测性
