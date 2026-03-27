@@ -1,0 +1,128 @@
+[
+  {
+    "question": "请解释 Transformer 中 Attention 机制的 Q、K、V 分别代表什么，以及为什么要对点积结果除以 √d_k？",
+    "answer": "Q(Query)代表当前位置的查询向量，K(Key)代表所有位置的键向量，V(Value)代表对应的值向量。计算流程：score = QKᵀ/√d_k，softmax后得到权重，加权求和V。除以√d_k是因为当d_k较大时点积结果方差变大，softmax会进入饱和区导致梯度消失，缩放后使分布回到方差为1的范围。",
+    "topic": "Transformer",
+    "difficulty": "medium",
+    "question_type": "conceptual"
+  },
+  {
+    "question": "Multi-Head Attention 相比单头 Attention 的优势是什么？多个 head 学到的是同一种注意力模式吗？",
+    "answer": "MHA将Q/K/V投影到h个不同的低维子空间分别计算attention，再拼接。优势：不同head可以关注不同粒度的语义关系（如一个head关注句法，另一个关注语义）。实验表明各head确实学到不同模式，但也存在冗余head（可被剪枝），这是Attention Head Pruning的依据。",
+    "topic": "Transformer",
+    "difficulty": "medium",
+    "question_type": "conceptual"
+  },
+  {
+    "question": "Self-Attention 的时间和空间复杂度是多少？在长序列场景下有哪些主流优化方案？",
+    "answer": "时间复杂度O(n²d)，空间复杂度O(n²)，n为序列长度。主流优化：1) FlashAttention：IO感知的分块计算，不存储完整attention矩阵，显存O(n)；2) GQA(Group Query Attention)：多个Query共享一组K/V，减少KV Cache；3) Sparse Attention：只计算局部或固定模式的attention；4) Linformer：将K/V投影到低秩矩阵。",
+    "topic": "Transformer",
+    "difficulty": "hard",
+    "question_type": "practical"
+  },
+  {
+    "question": "Pre-LN 和 Post-LN 的区别是什么？为什么现代 LLM 普遍使用 Pre-LN？",
+    "answer": "Post-LN(原始Transformer)：LayerNorm在残差连接之后；Pre-LN：LayerNorm在子层输入之前。Pre-LN训练更稳定，梯度不易爆炸/消失，不需要warm-up就能收敛，适合深层网络。但Post-LN的最终性能可能更高（梯度流更直接），DeepNet等工作尝试通过初始化缩放恢复Post-LN的稳定性。",
+    "topic": "Transformer",
+    "difficulty": "hard",
+    "question_type": "conceptual"
+  },
+  {
+    "question": "RoPE（旋转位置编码）相比原始正弦位置编码解决了什么问题？其数学原理是什么？",
+    "answer": "原始绝对位置编码无法外推到训练长度之外。RoPE通过对Q/K向量施加旋转变换编码位置信息，使得<q_m, k_n>的内积只依赖相对位置(m-n)，天然支持相对位置感知，且对序列长度没有硬限制。数学上：将向量分成2D对，第i对旋转θ_i = m/10000^(2i/d)角度，LLaMA/Qwen系列均采用此方案。",
+    "topic": "Transformer",
+    "difficulty": "hard",
+    "question_type": "conceptual"
+  },
+  {
+    "question": "LLM 的预训练目标 CLM（因果语言建模）是什么？为什么 Next Token Prediction 能让模型涌现推理能力？",
+    "answer": "CLM的训练目标：最大化P(x_t | x_1,...,x_{t-1})，即给定前缀预测下一个token。之所以能涌现推理：为了准确预测下一个token，模型必须隐式学会世界知识、因果关系、代码语法等。规模足够大时（>10B参数）出现相变，CoT、few-shot等能力突然出现，称为涌现(Emergence)。这与压缩假说有关：完美预测 = 完美压缩 = 理解。",
+    "topic": "LLM",
+    "difficulty": "hard",
+    "question_type": "conceptual"
+  },
+  {
+    "question": "RLHF 的完整训练流程是什么？PPO 在其中的角色是什么？",
+    "answer": "RLHF三阶段：1) SFT：用高质量指令数据监督微调；2) 奖励模型训练：收集人类对比偏好数据(A比B好)，训练RM打分；3) PPO优化：以RM为环境，用PPO强化学习算法更新LLM策略，同时加KL散度惩罚防止偏离SFT太远。PPO的clip机制防止策略更新步长过大导致训练崩溃。近年DPO(Direct Preference Optimization)绕开RM，直接从偏好数据优化，更简单稳定。",
+    "topic": "LLM",
+    "difficulty": "hard",
+    "question_type": "conceptual"
+  },
+  {
+    "question": "KV Cache 是什么？它如何加速推理？会带来什么问题？",
+    "answer": "KV Cache：自回归生成时，历史token的K/V矩阵无需重复计算，缓存起来直接使用。加速原理：生成第t个token时只需计算新token的Q，与缓存的全部K/V做attention，计算量从O(t²)降为O(t)。问题：显存随序列长度线性增长，长序列+大batch时OOM。解决方案：PagedAttention(vLLM)分页管理KV内存；GQA/MQA减少KV head数量；量化KV Cache为FP8/INT8。",
+    "topic": "LLM",
+    "difficulty": "medium",
+    "question_type": "practical"
+  },
+  {
+    "question": "RAG 相比直接微调 LLM，各自的适用场景是什么？如何选型？",
+    "answer": "RAG适合：知识频繁更新(实时性)、知识库超大无法全部注入、需要引用溯源。优点：知识可更新、可解释。缺点：依赖检索质量，多跳推理弱。Fine-tuning适合：任务风格/格式固定、需要改变模型行为/口吻、特定领域词汇理解。两者可组合：先微调让模型理解领域语言，再用RAG提供实时知识，即RAG+FT架构。判断依据：知识是否频繁变化→RAG；是否需要改变模型行为→FT。",
+    "topic": "RAG",
+    "difficulty": "medium",
+    "question_type": "practical"
+  },
+  {
+    "question": "RAG 中 Chunking 策略如何设计？chunk size 如何权衡？",
+    "answer": "核心矛盾：chunk太大→检索精度低但上下文完整；chunk太小→检索精准但丢失上下文。常见策略：1) 固定大小(512 token)+overlap(64)，简单但忽略语义；2) 语义分割：按段落/标题切，保留结构；3) Hierarchical Chunking：同时索引小chunk(精确召回)和大chunk(完整上下文)，召回小chunk后拼接父chunk喂给LLM；4) Late Chunking：先embed整篇文档再切，保留跨chunk语义。实践中Hierarchical效果最稳定。",
+    "topic": "RAG",
+    "difficulty": "hard",
+    "question_type": "practical"
+  },
+  {
+    "question": "向量检索中 HNSW 算法的原理是什么？相比暴力搜索有什么代价？",
+    "answer": "HNSW(分层可导航小世界)：构建多层图，高层稀疏用于快速定位，低层密集用于精细搜索。查询时从高层入口点出发，贪心导航到最近邻。近似最近邻(ANN)，非精确。代价：1) 构建时间长；2) 内存占用大(图结构)；3) 有recall损失(通常95-99%)。参数ef_construction和M控制精度-速度权衡。对于高精度要求场景可用HNSW+暴力验证(re-scoring)。",
+    "topic": "RAG",
+    "difficulty": "hard",
+    "question_type": "conceptual"
+  },
+  {
+    "question": "Lost-in-the-Middle 问题是什么？在 RAG 中如何缓解？",
+    "answer": "Liu et al.研究发现LLM对长上下文的利用呈U型：首尾信息关注度高，中间段落被严重忽视，即使相关内容在中间位置也会导致回答错误。缓解方案：1) 减少chunk数量，只保留top-3最相关；2) 将最重要的chunk放在首尾；3) 使用Reranker二次排序后再截取；4) 使用支持long context的模型(如128k context)；5) Map-Reduce：分段总结后再综合。",
+    "topic": "RAG",
+    "difficulty": "medium",
+    "question_type": "pitfall"
+  },
+  {
+    "question": "LoRA 的数学原理是什么？rank 值如何选取？",
+    "answer": "LoRA假设权重更新矩阵ΔW是低秩的，将其分解为ΔW=BA，其中B∈R^{d×r}，A∈R^{r×k}，r≪min(d,k)。训练时冻结原始权重W，只训练B和A，参数量从d×k降为r×(d+k)。推理时合并：W'=W+αBA/r，无额外延迟。rank选取：任务越复杂、数据越多，rank可以越大(8-64)；简单任务rank=4-8足够。过大的rank可能过拟合，且丧失参数高效性的优势。",
+    "topic": "Fine-tuning",
+    "difficulty": "hard",
+    "question_type": "conceptual"
+  },
+  {
+    "question": "灾难性遗忘是什么？LoRA/QLoRA 是否能完全避免它？",
+    "answer": "灾难性遗忘：神经网络在新任务上训练后，对旧任务的表现急剧下降，因为参数被覆盖。LoRA能大幅缓解但不能完全避免：原始权重冻结，新知识存在低秩矩阵中，原有能力保留更好。但若训练数据分布极为单一，模型回答风格仍会退化。检测方法：训练后在通用benchmark(MMLU/HellaSwag)上测试，与基础模型对比。完全解决需：数据配比(混入通用数据)、更小的learning rate、更少的epoch。",
+    "topic": "Fine-tuning",
+    "difficulty": "medium",
+    "question_type": "pitfall"
+  },
+  {
+    "question": "ReAct 模式和纯 CoT 的区别是什么？什么情况下 ReAct 会失效？",
+    "answer": "CoT只有推理(Thought)，在模型内部完成；ReAct交替进行Thought-Action-Observation，每个Action触发真实工具调用，Observation是工具返回值，再决定下一步。ReAct失效场景：1) 工具返回格式不稳定导致解析失败，Agent进入重试循环；2) LLM对工具描述理解有误，反复调错工具；3) 任务需要超出max_iterations的步数；4) 中间状态过多超出context window。解决：设定合理的max_iterations，出错时fallback到备用策略。",
+    "topic": "LLM Agent",
+    "difficulty": "medium",
+    "question_type": "practical"
+  },
+  {
+    "question": "Prompt Injection 攻击是什么？在 Agent 系统中为什么危害更大？如何防御？",
+    "answer": "Prompt Injection：攻击者在用户输入或工具返回值中注入指令，覆盖系统提示词，劫持模型行为。在Agent中危害更大：因为Agent有工具调用权限(发邮件、执行代码、访问DB)，被劫持后可执行真实破坏性操作，称为间接注入(Indirect Injection，如恶意网页内容被Agent读取后执行指令)。防御：1) 输入净化，区分数据和指令；2) 特权分离，工具调用需二次确认；3) 沙箱执行；4) 监控异常工具调用模式；5) 宪法AI等对齐手段。",
+    "topic": "LLM Agent",
+    "difficulty": "hard",
+    "question_type": "pitfall"
+  },
+  {
+    "question": "对比学习训练 Embedding 模型的核心思路是什么？负样本的质量为什么关键？",
+    "answer": "对比学习：正例对(语义相似的句子)在向量空间拉近，负例对(语义无关或矛盾)推远。损失函数通常用InfoNCE/NT-Xent。负样本质量至关重要：随机负样本太容易，模型学不到细粒度语义区分；Hard Negative(语义相近但实际不相关)才能迫使模型学习精细边界。构造Hard Negative方法：BM25检索的top结果(词汇相似但语义不同)、同主题不同答案。MTEB榜单上顶级模型均使用精心构造的Hard Negative训练。",
+    "topic": "Embedding",
+    "difficulty": "hard",
+    "question_type": "conceptual"
+  },
+  {
+    "question": "Chain of Thought 为什么能提升 LLM 的推理准确率？Zero-shot CoT 和 Few-shot CoT 怎么选？",
+    "answer": "CoT让模型生成中间推理步骤再给答案，而非直接输出。原因：1)中间步骤充当'草稿纸'，分解复杂推理；2)自回归模型在生成答案前有更多token计算过程，相当于更多'思考时间'；3)减少shortcut learning。Zero-shot CoT('think step by step')适合没有示例的新任务，效果略弱；Few-shot CoT提供示例推理链，效果更稳定，适合有标准流程的任务(数学/代码)。复杂推理任务优先Few-shot，资源受限或快速验证用Zero-shot。",
+    "topic": "Prompt Engineering",
+    "difficulty": "medium",
+    "question_type": "conceptual"
+  }
+]

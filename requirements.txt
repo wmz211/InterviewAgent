@@ -1,0 +1,69 @@
+# ================================================================
+# AI Virtual Interview Coach - Dependencies
+# Python 3.10+
+# ================================================================
+
+# --- Web Framework ---
+fastapi==0.115.6
+uvicorn[standard]==0.32.1
+python-multipart==0.0.20      # File upload support
+websockets==14.1               # WebSocket protocol
+
+# --- Pydantic & Config ---
+pydantic==2.10.4
+pydantic-settings==2.7.0
+python-dotenv==1.0.1
+
+# --- LangChain Ecosystem ---
+langchain==0.3.14
+langchain-core==0.3.29
+langchain-community==0.3.14
+langgraph==0.2.65             # State machine / agent orchestration
+langchain-openai==0.2.14      # OpenAI-compatible LLM (Qwen via DashScope)
+
+# --- Vector DB ---
+chromadb
+langchain-chroma==0.1.4
+
+# --- Graph DB ---
+neo4j==5.27.0                 # Neo4j Python driver
+networkx==3.4.2               # Local graph (fallback / lightweight mode)
+py2neo==2021.2.4              # Higher-level Neo4j OGM (optional)
+
+# --- Embeddings ---
+sentence-transformers==3.3.1  # Local embedding models
+# openai sdk also provides embedding support via DashScope
+
+# --- Document Parsing ---
+pdfplumber==0.11.4            # PDF parsing (better than PyPDF2 for layout)
+python-docx==1.1.2            # .docx resume parsing
+unstructured[pdf,docx]==0.16.11  # Unified document parser
+chardet==5.2.0                # Encoding detection
+
+# --- Audio Processing ---
+webrtcvad-wheels==2.0.14      # Voice Activity Detection (VAD)
+soundfile==0.12.1             # Audio file I/O
+numpy==1.26.4                 # Audio array processing
+scipy==1.14.1                 # Signal processing utilities
+aiofiles==24.1.0              # Async file I/O for audio streaming
+
+# --- HTTP & Async ---
+httpx==0.28.1                 # Async HTTP client (DashScope TTS/ASR API)
+aiohttp==3.11.11              # Async HTTP (WebRTC signaling)
+tenacity==9.0.0               # Retry logic for API calls
+
+# --- LLM Provider SDKs ---
+openai==1.59.6                # OpenAI-compatible client (Qwen via base_url override)
+dashscope==1.22.1             # Alibaba DashScope SDK (Qwen TTS/ASR native)
+tiktoken==0.8.0               # Token counting
+
+# --- Data & Utilities ---
+pandas==2.2.3
+python-dateutil==2.9.0
+loguru==0.7.3                 # Structured logging
+rich==13.9.4                  # Pretty console output
+
+# --- Dev / Testing ---
+pytest==8.3.4
+pytest-asyncio==0.25.0
+httpx                         # Also used for TestClient in FastAPI tests
