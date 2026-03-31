@@ -294,17 +294,21 @@ class Neo4jKnowledgeGraph:
 
     # ── Hybrid retrieval index ─────────────────────────────────────
 
-    def _load_all_node_texts(self) -> list[tuple[str, str]]:
-        """Return [(node_id, label + aliases text), ...] for all KG nodes."""
+    def _load_all_node_texts(self) -> list[tuple[str, str, str]]:
+        """Return [(node_id, label + aliases, label + aliases + description), ...] for all KG nodes."""
         with self._session() as s:
             rows = s.run(
                 "MATCH (n) WHERE NOT n:ResumeProject "
-                "RETURN n.id AS id, n.label AS label, n.aliases AS aliases"
+                "RETURN n.id AS id, n.label AS label, n.aliases AS aliases, n.description AS description"
             ).data()
-        return [
-            (r["id"], (r["label"] or "") + " " + " ".join(r["aliases"] or []))
-            for r in rows if r["id"]
-        ]
+        result = []
+        for r in rows:
+            if not r["id"]:
+                continue
+            alias_text = (r["label"] or "") + " " + " ".join(r["aliases"] or [])
+            vector_text = alias_text + " " + (r["description"] or "")
+            result.append((r["id"], alias_text, vector_text))
+        return result
 
     def build_bm25_index(self) -> None:
         try:
@@ -315,43 +319,50 @@ class Neo4jKnowledgeGraph:
             return
         node_texts = self._load_all_node_texts()
         self._bm25_node_ids: list[str] = [t[0] for t in node_texts]
-        corpus = [list(jieba.cut(t[1])) for t in node_texts]
+        corpus = [list(jieba.cut(t[1])) for t in node_texts]  # BM25 用 label+aliases
         self._bm25 = BM25Okapi(corpus)
         logger.info(f"BM25 index built: {len(self._bm25_node_ids)} nodes")
 
-    def bm25_search(self, terms: list[str]) -> dict[str, float]:
+    def bm25_search(self, terms: list[str], top_k: int = 5) -> list[list[str]]:
+        """每个 term 独立检索，返回各自 Top-K 排名列表，共 N 路输入 RRF。"""
         if not hasattr(self, "_bm25") or not terms:
-            return {}
+            return []
         import jieba
-        query_tokens = [tok for term in terms for tok in jieba.cut(term)]
-        scores = self._bm25.get_scores(query_tokens)
-        return {self._bm25_node_ids[i]: float(scores[i])
-                for i in range(len(self._bm25_node_ids))}
+        rankings = []
+        for term in terms:
+            tokens = list(jieba.cut(term))
+            scores = self._bm25.get_scores(tokens)
+            top_indices = sorted(range(len(self._bm25_node_ids)),
+                                 key=lambda i: -scores[i])[:top_k]
+            ranking = [self._bm25_node_ids[i] for i in top_indices if scores[i] > 0]
+            if ranking:
+                rankings.append(ranking)
+        return rankings
 
     def build_vector_index(self) -> None:
         embed = _get_embed_model()
         if embed is None:
             return
-        import numpy as np
         node_texts = self._load_all_node_texts()
         self._vector_node_ids: list[str] = [t[0] for t in node_texts]
-        texts = [t[1] for t in node_texts]
+        texts = [t[2] for t in node_texts]  # 向量索引用 label+aliases+description
         self._node_matrix = embed.encode(texts, batch_size=32, show_progress_bar=False)
         logger.info(f"Vector index built: {len(self._vector_node_ids)} nodes, dim={self._node_matrix.shape[1]}")
 
-    def vector_search(self, terms: list[str]) -> dict[str, float]:
+    def vector_search(self, terms: list[str], top_k: int = 5) -> list[list[str]]:
+        """每个 term 独立检索，返回各自 Top-K 排名列表，共 N 路输入 RRF。"""
         embed = _get_embed_model()
         if embed is None or not hasattr(self, "_node_matrix") or not terms:
-            return {}
-        import numpy as np
+            return []
         from sklearn.metrics.pairwise import cosine_similarity
-        scores: dict[str, float] = {}
+        rankings = []
         for term in terms:
             vec = embed.encode(term).reshape(1, -1)
             sims = cosine_similarity(vec, self._node_matrix)[0]
-            for i, nid in enumerate(self._vector_node_ids):
-                scores[nid] = max(scores.get(nid, 0.0), float(sims[i]))
-        return scores
+            top_indices = sorted(range(len(self._vector_node_ids)),
+                                 key=lambda i: -sims[i])[:top_k]
+            rankings.append([self._vector_node_ids[i] for i in top_indices])
+        return rankings
 
     def delete_session_nodes(self, session_id: str) -> int:
         """Delete all ResumeProject nodes (and their MENTIONS edges) for a session."""
@@ -487,11 +498,13 @@ class NetworkXKnowledgeGraph:
 
     # ── Hybrid retrieval index ─────────────────────────────────────
 
-    def _get_all_node_texts(self) -> list[tuple[str, str]]:
-        return [
-            (nid, node.label + " " + " ".join(node.aliases))
-            for nid, node in self._nodes.items()
-        ]
+    def _get_all_node_texts(self) -> list[tuple[str, str, str]]:
+        result = []
+        for nid, node in self._nodes.items():
+            alias_text = node.label + " " + " ".join(node.aliases)
+            vector_text = alias_text + " " + (node.description or "")
+            result.append((nid, alias_text, vector_text))
+        return result
 
     def build_bm25_index(self) -> None:
         try:
@@ -502,43 +515,50 @@ class NetworkXKnowledgeGraph:
             return
         node_texts = self._get_all_node_texts()
         self._bm25_node_ids: list[str] = [t[0] for t in node_texts]
-        corpus = [list(jieba.cut(t[1])) for t in node_texts]
+        corpus = [list(jieba.cut(t[1])) for t in node_texts]  # BM25 用 label+aliases
         self._bm25 = BM25Okapi(corpus)
         logger.info(f"BM25 index built (NetworkX): {len(self._bm25_node_ids)} nodes")
 
-    def bm25_search(self, terms: list[str]) -> dict[str, float]:
+    def bm25_search(self, terms: list[str], top_k: int = 5) -> list[list[str]]:
+        """每个 term 独立检索，返回各自 Top-K 排名列表，共 N 路输入 RRF。"""
         if not hasattr(self, "_bm25") or not terms:
-            return {}
+            return []
         import jieba
-        query_tokens = [tok for term in terms for tok in jieba.cut(term)]
-        scores = self._bm25.get_scores(query_tokens)
-        return {self._bm25_node_ids[i]: float(scores[i])
-                for i in range(len(self._bm25_node_ids))}
+        rankings = []
+        for term in terms:
+            tokens = list(jieba.cut(term))
+            scores = self._bm25.get_scores(tokens)
+            top_indices = sorted(range(len(self._bm25_node_ids)),
+                                 key=lambda i: -scores[i])[:top_k]
+            ranking = [self._bm25_node_ids[i] for i in top_indices if scores[i] > 0]
+            if ranking:
+                rankings.append(ranking)
+        return rankings
 
     def build_vector_index(self) -> None:
         embed = _get_embed_model()
         if embed is None:
             return
-        import numpy as np
         node_texts = self._get_all_node_texts()
         self._vector_node_ids: list[str] = [t[0] for t in node_texts]
-        texts = [t[1] for t in node_texts]
+        texts = [t[2] for t in node_texts]  # 向量索引用 label+aliases+description
         self._node_matrix = embed.encode(texts, batch_size=32, show_progress_bar=False)
         logger.info(f"Vector index built (NetworkX): {len(self._vector_node_ids)} nodes")
 
-    def vector_search(self, terms: list[str]) -> dict[str, float]:
+    def vector_search(self, terms: list[str], top_k: int = 5) -> list[list[str]]:
+        """每个 term 独立检索，返回各自 Top-K 排名列表，共 N 路输入 RRF。"""
         embed = _get_embed_model()
         if embed is None or not hasattr(self, "_node_matrix") or not terms:
-            return {}
-        import numpy as np
+            return []
         from sklearn.metrics.pairwise import cosine_similarity
-        scores: dict[str, float] = {}
+        rankings = []
         for term in terms:
             vec = embed.encode(term).reshape(1, -1)
             sims = cosine_similarity(vec, self._node_matrix)[0]
-            for i, nid in enumerate(self._vector_node_ids):
-                scores[nid] = max(scores.get(nid, 0.0), float(sims[i]))
-        return scores
+            top_indices = sorted(range(len(self._vector_node_ids)),
+                                 key=lambda i: -sims[i])[:top_k]
+            rankings.append([self._vector_node_ids[i] for i in top_indices])
+        return rankings
 
     def create_resume_project(self, *args, **kwargs):
         logger.warning("NetworkX backend: ResumeProject not persisted (in-memory only)")

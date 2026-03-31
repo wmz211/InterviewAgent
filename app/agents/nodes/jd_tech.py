@@ -91,15 +91,12 @@ def _build_jd_chain(jd_text: str) -> list[dict]:
     terms = _extract_entities(jd_text)
     logger.info(f"JD entity terms: {terms}")
 
-    # ── 2. 双路召回 ──────────────────────────────────────────────────
-    bm25_scores   = kg.bm25_search(terms)   if terms else {}
-    vector_scores = kg.vector_search(terms) if terms else {}
-
-    bm25_ranking   = sorted(bm25_scores,   key=lambda x: -bm25_scores[x])
-    vector_ranking = sorted(vector_scores, key=lambda x: -vector_scores[x])
+    # ── 2. 双路召回：每个 term 独立检索，各自返回 Top-5，共 2N 路进 RRF ──
+    bm25_rankings   = kg.bm25_search(terms, top_k=5)   if terms else []
+    vector_rankings = kg.vector_search(terms, top_k=5) if terms else []
 
     # ── 降级：两路都空时用 Lucene fulltext ──────────────────────────
-    if not bm25_ranking and not vector_ranking:
+    if not bm25_rankings and not vector_rankings:
         logger.warning("BM25 and vector both empty; fallback to Lucene fulltext")
         seen: set[str] = set()
         fallback: dict[str, int] = {}
@@ -109,10 +106,10 @@ def _build_jd_chain(jd_text: str) -> list[dict]:
                 if nid not in seen:
                     fallback[nid] = fallback.get(nid, 0) + 1
                     seen.add(nid)
-        bm25_ranking = sorted(fallback, key=lambda x: -fallback[x])
+        bm25_rankings = [sorted(fallback, key=lambda x: -fallback[x])]
 
     # ── 3. RRF 融合，取 top5 ─────────────────────────────────────────
-    active_rankings = [r for r in [bm25_ranking, vector_ranking] if r]
+    active_rankings = [r for r in bm25_rankings + vector_rankings if r]
     final_scores = rrf_merge(active_rankings)
     top_ids = sorted(final_scores, key=lambda x: -final_scores[x])[:5]
     logger.info(f"JD top nodes after RRF: {top_ids}")
