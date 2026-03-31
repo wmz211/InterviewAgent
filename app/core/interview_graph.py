@@ -13,6 +13,7 @@ from __future__ import annotations
 from langgraph.graph import StateGraph, START, END
 
 from app.core.state import InterviewState
+from app.agents.nodes.base          import detect_exit_intent
 from app.agents.nodes.greeting      import greeting_node
 from app.agents.nodes.resume_dive   import resume_dive_node
 from app.agents.nodes.jd_tech       import jd_tech_node
@@ -33,7 +34,13 @@ ALL_PHASES = [
 ]
 
 
-def dispatch(state: InterviewState) -> dict:
+async def dispatch(state: InterviewState) -> dict:
+    """意图检测：用户若表达退出意图则直接路由到 wrap_up。"""
+    if await detect_exit_intent(state):
+        from loguru import logger
+        logger.info(f"Exit intent detected — jumping to wrap_up "
+                    f"(was: {state.get('current_node')})")
+        return {"current_node": "wrap_up", "phase_turn_count": 0}
     return {}
 
 

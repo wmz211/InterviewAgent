@@ -3,7 +3,7 @@ Shared utilities for all interview phase nodes.
 """
 from __future__ import annotations
 
-from langchain_core.messages import SystemMessage, ToolMessage
+from langchain_core.messages import HumanMessage, SystemMessage, ToolMessage
 from langchain_openai import ChatOpenAI
 
 from app.config import get_settings
@@ -37,6 +37,52 @@ ANTI_SIMULATION_RULE = """
 - 每次输出后立即停止，等待候选人的真实回应
 - 每轮只问一个问题，不要一次堆砌多个问题
 """
+
+
+# 关键词预筛：命中后才调 LLM，正常对话零开销
+_EXIT_KEYWORDS = ["结束", "不想答", "不想继续", "跳过所有", "退出", "终止面试", "结束面试", "不想面了", "放弃"]
+
+# 不触发退出检测的阶段（已经在收尾或刚开始）
+_NO_EXIT_PHASES = {"greeting", "wrap_up"}
+
+
+async def detect_exit_intent(state: InterviewState) -> bool:
+    """
+    判断用户最新消息是否表达了提前结束面试的意图。
+    先做关键词预筛，命中后再用 LLM 做语义确认，避免每轮额外 LLM 开销。
+    """
+    current_node = state.get("current_node", "greeting")
+    if current_node in _NO_EXIT_PHASES:
+        return False
+
+    messages = state.get("messages", [])
+    if not messages:
+        return False
+
+    # 取最新一条 HumanMessage
+    user_text = ""
+    for msg in reversed(messages):
+        if type(msg).__name__ == "HumanMessage":
+            user_text = getattr(msg, "content", "")
+            break
+    if not user_text:
+        return False
+
+    # 关键词预筛：无命中直接返回，不调 LLM
+    if not any(kw in user_text for kw in _EXIT_KEYWORDS):
+        return False
+
+    # LLM 语义确认，避免"结束这个话题换下一题"之类误触发
+    llm = make_llm(temperature=0)
+    resp = await llm.ainvoke([
+        SystemMessage(content=(
+            "判断候选人的输入是否表达了想要立即结束整个面试、退出所有剩余环节的意图。"
+            "注意区分：'换个问题'/'跳过这题' 不算结束面试。"
+            "只回答 yes 或 no，不要解释。"
+        )),
+        HumanMessage(content=user_text),
+    ])
+    return resp.content.strip().lower().startswith("y")
 
 
 def make_llm(temperature: float = 0.7) -> ChatOpenAI:
