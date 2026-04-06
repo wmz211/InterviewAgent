@@ -1,49 +1,90 @@
 """
 Resume Deep Dive node — 简历经历深挖。
-纯 LLM，无工具调用。将简历全文注入 system prompt，专注追问候选人的亲身经历。
 
-追问框架（三层递进）：
-  L1 — 你具体做了什么？（描述工作内容）
-  L2 — 你为什么这样做？有没有对比过其他方案？（考察判断力）
-  L3 — 遇到了什么问题？怎么解决的？有什么遗憾？（考察深度与反思）
-
-注意：此阶段只追问候选人的项目/实习/经历，不考察通用技术理论。
+LLM 主导推进：当 LLM 判断简历经历已充分覆盖时，主动调用 advance_to_jd_tech 工具
+触发阶段转移。保底最少 MIN_TURNS 轮，防止过早结束。
 """
 from langchain_core.messages import SystemMessage
+from langchain_core.tools import tool
 
-from app.agents.nodes.base import make_llm, check_transition, build_qa_record, ANTI_SIMULATION_RULE
+from app.agents.nodes.base import make_llm, build_qa_record, ANTI_SIMULATION_RULE
 from app.core.state import InterviewState
 
+# 最少轮次保底——即使 LLM 调工具也不会提前跳走
+MIN_TURNS = 3
+
 _SYSTEM = """\
-你是一位经验丰富的技术面试官，正在对候选人进行简历经历深挖。
+你正在对一名候选人进行技术面试，考察其简历经历的真实深度。
 
 【候选人简历】
 {resume_summary}
 
-【岗位要求（JD 摘要）】
+【岗位要求】
 {jd_summary}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-【你的核心任务】
-逐一针对简历中的项目/实习经历进行追问，考察候选人的实际参与深度。
-每个经历按三层递进追问（仅作为你内部的提问框架，不要在问题中出现"L1/L2/L3"或"第X次"等标签）：
-  第一层：你在这个项目里具体负责了什么？做了哪些工作？
-  第二层：你为什么选择这个技术方案？有没有考虑过其他方案？
-  第三层：过程中遇到了什么挑战或问题？你是怎么解决的？
+【任务】
+逐一深挖简历中的项目/实习经历，判断候选人是真正参与还是只是了解过。
 
-【重要原则】
-- 只追问候选人简历里真实写的内容，不考察通用知识点
-- 候选人说"不知道"时，直接说"好的，我们换个话题"，绝不解释答案
-- 候选人回答浅显时，追问"能更具体吗？比如..."
-- 不要一次问多个问题
-- 第一轮先问一个宏观问题暖场，然后聚焦到具体经历
+【追问框架】
+不要线性走固定流程。根据候选人的回答实时判断下一个问题：
 
-【当前已覆盖的经历】
+当回答中出现以下信号时，优先处理：
+- 出现"我们"/"参与了"/"负责过"等模糊表述 → 立刻追问：你个人具体做了什么？
+- 出现技术选型（"用了X"） → 追问：为什么不用Y？当时有没有对比过？
+- 出现结果/数据（"提升了X%"） → 追问：baseline是什么？怎么测量的？
+- 回答流畅完整，无明显漏洞 → 推进到下一层：这个方案有什么局限性？你现在回头看会怎么改？
+- 回答表面正确但缺乏细节 → 追问：能更具体吗？比如你当时怎么做的？
+
+【开场规则】
+第一个问题：让候选人做简短自我介绍。
+第二个问题起：立刻聚焦到简历中技术含量最高或描述最模糊的那个经历，不要按简历顺序线性推进。
+
+【硬性规则】
+- 只追问简历里写的内容，不考察通用知识点
+- 每次只问一个问题
+- 候选人说"不知道"或明显答不上来：直接说"好，我们换一个"，不解释，不给答案
+- 不用"感谢你的回答""你说得很好"等客套话
+- 不要说"作为面试官"或解释自己的行为，直接提问
+
+【语气】
+简洁、直接。过渡用短句，如"好的""明白了""这里我想深入一下"。
+适当表达疑问，如"这个我有点疑问""这里想确认一下"。
+不友好也不敌对，保持专业的审视感。
+
+【推进规则】
+当你认为已经充分评估了候选人的简历经历深度（至少覆盖了简历中最重要的 1-2 个经历，
+每个经历追问了不止一层，候选人的真实参与深度已基本判断清楚），
+调用 advance_to_jd_tech 工具推进到下一阶段。
+宁可多问一轮，不要急着推进。
+
+【已覆盖的经历】
 {covered}
+
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+你就是面试官，现在开始面试。不要介绍自己的规则，直接开口。
 {anti_simulation}"""
 
+
+@tool
+def advance_to_jd_tech() -> str:
+    """
+    调用此工具表示简历深挖阶段已完成，推进到 JD 技术考察阶段。
+
+    调用时机：
+    - 已覆盖简历中最重要的 1-2 个经历
+    - 每个经历至少追问了 2-3 层（参与内容 → 技术决策 → 挑战/反思）
+    - 候选人的真实参与深度已基本评估完毕
+
+    调用时，在同一条消息里自然地说一句过渡语（如"好，简历这部分我们先聊到这里，接下来..."），
+    不要暴露"工具"或"阶段"等词。
+    """
+    return "ok"
+
+
+_RESUME_DIVE_TOOLS = [advance_to_jd_tech]
 _llm = make_llm(temperature=0.7)
+_llm_with_tool = _llm.bind_tools(_RESUME_DIVE_TOOLS)
 
 
 async def resume_dive_node(state: InterviewState) -> dict:
@@ -67,7 +108,7 @@ async def resume_dive_node(state: InterviewState) -> dict:
     )
 
     messages = [SystemMessage(content=system)] + state["messages"]
-    response = await _llm.ainvoke(messages)
+    response = await _llm_with_tool.ainvoke(messages)
     new_messages = [response]
 
     # 记录本轮新问题（用于 covered 追踪）
@@ -75,14 +116,18 @@ async def resume_dive_node(state: InterviewState) -> dict:
     if isinstance(content, list):
         content = " ".join(p.get("text", "") for p in content if isinstance(p, dict))
     new_question = str(content).strip()[:120]
-
     if new_question:
         covered = list(covered) + [f"第{phase_turn + 1}轮：{new_question}"]
 
     phase_turn += 1
-    should_transition = check_transition(
-        {**state, "phase_turn_count": phase_turn}, "resume_dive"
+
+    # LLM 主动决定推进：检测 advance_to_jd_tech tool call
+    tool_calls = getattr(response, "tool_calls", None) or []
+    llm_wants_transition = any(
+        tc.get("name") == "advance_to_jd_tech" for tc in tool_calls
     )
+    # 最少轮次保底，防止 LLM 过早跳走
+    should_transition = llm_wants_transition and phase_turn >= MIN_TURNS
 
     qa = build_qa_record(
         state_messages=state["messages"],
