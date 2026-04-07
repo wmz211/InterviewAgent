@@ -91,13 +91,6 @@ class SessionStore:
         except Exception as e:
             logger.warning(f"Failed to persist session {session_id}: {e}")
 
-        # Clean up ResumeProject nodes from Neo4j — no longer needed after interview ends
-        try:
-            from app.rag.graph_rag.knowledge_base import get_knowledge_graph
-            kg = get_knowledge_graph()
-            kg.delete_session_nodes(session_id)
-        except Exception as e:
-            logger.warning(f"Failed to clean up Neo4j session nodes for {session_id}: {e}")
 
 
 def _write_json(path: Path, data: dict) -> None:
