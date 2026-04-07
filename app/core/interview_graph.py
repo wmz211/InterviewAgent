@@ -89,7 +89,6 @@ def make_initial_state(
     session_id: str,
     resume_summary: str,
     jd_text: str,
-    anchored_entities: list[dict],
     interview_mode: str = "tech",
 ) -> dict:
     return {
@@ -97,7 +96,6 @@ def make_initial_state(
         "candidate_name":     "",
         "resume_summary":     resume_summary,
         "jd_text":            jd_text,
-        "anchored_entities":  anchored_entities,
         "messages":           [],
         "current_node":       "greeting",
         "current_topic":      "",

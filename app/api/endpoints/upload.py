@@ -7,7 +7,7 @@ POST /api/v1/upload/
     jd_text: str         (job description text, pasted by user)
 
 Returns:
-    session_id, resume summary, anchored KG entities
+    session_id, resume summary
 """
 import json
 import uuid
@@ -20,10 +20,6 @@ from loguru import logger
 
 from app.core.interview_graph import make_initial_state
 from app.core.session_store import get_session_store
-from app.rag.graph_rag.builder import build_session_graph
-import dataclasses
-
-from app.rag.graph_rag.schema import AnchoredEntity
 from app.rag.parser.resume_parser import parse_resume
 
 _SESSIONS_DIR = Path("./data/sessions")
@@ -35,8 +31,6 @@ class UploadResponse(BaseModel):
     session_id: str
     candidate_name: str
     resume_summary: str
-    anchored_entities: list[dict]
-    entity_count: int
 
 
 @router.post("/", response_model=UploadResponse)
@@ -47,9 +41,8 @@ async def upload_documents(
 ):
     """
     1. Parse resume bytes → ResumeData
-    2. Extract tech entities → anchor to knowledge graph
-    3. Create initial LangGraph state → store in session store
-    4. Return session_id for subsequent WebSocket connection
+    2. Create initial LangGraph state → store in session store
+    3. Return session_id for subsequent WebSocket connection
     """
     # --- Validate file type ---
     filename = (resume.filename or "").lower()
@@ -71,15 +64,6 @@ async def upload_documents(
         logger.exception("Resume parsing failed")
         raise HTTPException(status_code=422, detail=f"Resume parsing failed: {e}")
 
-    # --- Build session KG + anchor entities ---
-    try:
-        anchored: list[AnchoredEntity] = await build_session_graph(resume_data, session_id)
-    except Exception as e:
-        logger.warning(f"KG anchoring failed (non-fatal): {e}")
-        anchored = []
-
-    anchored_dicts = [dataclasses.asdict(a) for a in anchored]
-
     # --- Build resume summary string ---
     resume_summary = _format_resume_summary(resume_data)
 
@@ -89,7 +73,6 @@ async def upload_documents(
         session_id=session_id,
         resume_summary=resume_summary,
         jd_text=jd_text,
-        anchored_entities=anchored_dicts,
         interview_mode=mode,
     )
     state["candidate_name"] = resume_data.name
@@ -97,17 +80,12 @@ async def upload_documents(
     store = get_session_store()
     await store.set(session_id, state)
 
-    logger.info(
-        f"Session {session_id} ready: "
-        f"name={resume_data.name}, entities={len(anchored)}"
-    )
+    logger.info(f"Session {session_id} ready: name={resume_data.name}")
 
     return UploadResponse(
         session_id=session_id,
         candidate_name=resume_data.name,
         resume_summary=resume_summary,
-        anchored_entities=anchored_dicts,
-        entity_count=len(anchored),
     )
 
 
@@ -170,7 +148,6 @@ async def reuse_resume(body: ReuseRequest):
 
     resume_summary = src.get("resume_summary", "")
     candidate_name = src.get("candidate_name", "")
-    anchored_entities = src.get("anchored_entities", [])
 
     if not resume_summary:
         raise HTTPException(status_code=422, detail="Source session has no resume summary")
@@ -183,7 +160,6 @@ async def reuse_resume(body: ReuseRequest):
         session_id=session_id,
         resume_summary=resume_summary,
         jd_text=jd_text,
-        anchored_entities=anchored_entities,
         interview_mode=mode,
     )
     state["candidate_name"] = candidate_name
@@ -197,8 +173,6 @@ async def reuse_resume(body: ReuseRequest):
         session_id=session_id,
         candidate_name=candidate_name,
         resume_summary=resume_summary,
-        anchored_entities=anchored_entities,
-        entity_count=len(anchored_entities),
     )
 
 

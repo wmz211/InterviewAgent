@@ -250,47 +250,6 @@ class Neo4jKnowledgeGraph:
             result.append(self._row_to_node(props))
         return result
 
-    def create_resume_project(
-        self,
-        session_id: str,
-        project_name: str,
-        description: str,
-        anchored_node_ids: list[str],
-        confidences: list[float],
-    ) -> None:
-        """
-        Create a ResumeProject node and link it to anchored KG nodes via MENTIONS.
-        Called by builder.py after anchoring.
-        """
-        project_id = f"proj_{session_id}_{project_name[:20].replace(' ', '_')}"
-        with self._session() as s:
-            s.run(
-                """
-                MERGE (rp:ResumeProject {id: $id})
-                SET rp.session_id   = $session_id,
-                    rp.name         = $name,
-                    rp.description  = $description
-                """,
-                id=project_id,
-                session_id=session_id,
-                name=project_name,
-                description=description,
-            )
-            for node_id, confidence in zip(anchored_node_ids, confidences):
-                s.run(
-                    """
-                    MATCH (rp:ResumeProject {id: $proj_id})
-                    MATCH (tech {id: $tech_id})
-                    MERGE (rp)-[m:MENTIONS]->(tech)
-                    SET m.confidence = $confidence
-                    """,
-                    proj_id=project_id,
-                    tech_id=node_id,
-                    confidence=confidence,
-                )
-        logger.info(
-            f"ResumeProject '{project_name}' linked to {len(anchored_node_ids)} KG nodes"
-        )
 
     # ── Hybrid retrieval index ─────────────────────────────────────
 
@@ -364,20 +323,6 @@ class Neo4jKnowledgeGraph:
             rankings.append([self._vector_node_ids[i] for i in top_indices])
         return rankings
 
-    def delete_session_nodes(self, session_id: str) -> int:
-        """Delete all ResumeProject nodes (and their MENTIONS edges) for a session."""
-        with self._session() as s:
-            result = s.run(
-                """
-                MATCH (rp:ResumeProject {session_id: $sid})
-                DETACH DELETE rp
-                RETURN count(rp) AS deleted
-                """,
-                sid=session_id,
-            )
-            deleted = (result.single() or {}).get("deleted", 0)
-        logger.info(f"Deleted {deleted} ResumeProject node(s) for session {session_id}")
-        return deleted
 
     def close(self):
         self._driver.close()
@@ -560,11 +505,6 @@ class NetworkXKnowledgeGraph:
             rankings.append([self._vector_node_ids[i] for i in top_indices])
         return rankings
 
-    def create_resume_project(self, *args, **kwargs):
-        logger.warning("NetworkX backend: ResumeProject not persisted (in-memory only)")
-
-    def delete_session_nodes(self, session_id: str) -> int:
-        return 0  # NetworkX backend: nothing to delete
 
 
 # ══════════════════════════════════════════════════════════════════════

@@ -59,7 +59,14 @@
       "Bash(mkdir -p wasted)",
       "Bash(mv app/agents/nodes/cs_fundamentals.py wasted/)",
       "Bash(mv test_tts.py wasted/)",
-      "Bash(mv tests/ wasted/)"
+      "Bash(mv tests/ wasted/)",
+      "Bash(git add:*)",
+      "Bash(git commit -m ':*)",
+      "Bash(git push:*)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(list\\(d.keys\\(\\)\\)\\)\")",
+      "Bash(python3:*)",
+      "Bash(git checkout:*)",
+      "Bash(curl -s http://127.0.0.1:8765/api/v1/upload/resumes)"
     ]
   }
 }

@@ -53,9 +53,6 @@ _SYSTEM = """\
 【岗位要求（JD 摘要）】
 {jd_summary}
 
-【候选人技术背景（简历锚定实体）】
-{entity_background}
-
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 【本轮考察的技术点】{current_label}
 【本轮是第 {turns_on_node} 次在此技术点提问（共最多 {max_turns} 次）】
@@ -186,15 +183,8 @@ async def jd_tech_node(state: InterviewState) -> dict:
         else "（此节点考察完毕，下轮自动切换）"
     )
 
-    # ── 候选人背景 ────────────────────────────────────────────────
-    entities = state.get("anchored_entities", [])
-    entity_background = (
-        ", ".join(e["kg_node_label"] for e in entities) or "（未从简历锚定到具体技术点）"
-    )
-
     system = _SYSTEM.format(
         jd_summary=jd_summary,
-        entity_background=entity_background,
         current_label=current_label,
         turns_on_node=turns_on_node + 1,
         max_turns=MAX_TURNS_PER_NODE,

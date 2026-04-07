@@ -154,44 +154,5 @@ def graph_rag_tool(
     return "\n".join(lines)
 
 
-# ── Session-aware Cypher: get all deep-dive paths for a candidate ──────
-
-def get_session_interview_paths(session_id: str) -> list[dict]:
-    """
-    Non-tool utility — called by LangGraph during interview initialization.
-
-    Cypher:
-      MATCH (rp:ResumeProject {session_id: $sid})
-            -[:MENTIONS]->(tech)
-            -[:LEADS_TO*1..3]->(concept)
-      RETURN tech.id, tech.label, collect(concept.label) as chain
-
-    Returns a list of {tech_node_id, tech_label, chain_labels}
-    that the agent uses to plan its Resume_Deep_Dive questions.
-    """
-    from app.rag.graph_rag.knowledge_base import Neo4jKnowledgeGraph
-
-    kg = get_knowledge_graph()
-    if not isinstance(kg, Neo4jKnowledgeGraph):
-        logger.warning("get_session_interview_paths requires Neo4j backend")
-        return []
-
-    with kg._session() as s:
-        rows = s.run(
-            """
-            MATCH (rp:ResumeProject {session_id: $sid})-[:MENTIONS]->(tech)
-            OPTIONAL MATCH (tech)-[:LEADS_TO*1..3]->(concept)
-            RETURN tech.id       AS tech_id,
-                   tech.label    AS tech_label,
-                   collect(DISTINCT concept.label) AS chain_labels
-            ORDER BY tech_label
-            """,
-            sid=session_id,
-        ).data()
-
-    logger.info(f"Session {session_id}: {len(rows)} tech nodes with interview paths")
-    return rows
-
-
 # ── Exported tool list (bound to LangGraph agent) ─────────────────────
 GRAPH_RAG_TOOLS = [lookup_tech_node, graph_rag_tool]

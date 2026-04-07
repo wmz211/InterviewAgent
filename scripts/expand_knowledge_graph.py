@@ -5,8 +5,10 @@ Usage:
     python scripts/expand_knowledge_graph.py --topic "Kubernetes" --domain "domain_dist"
     python scripts/expand_knowledge_graph.py --topic "MySQL事务" --domain "domain_db"
 
-The script asks the LLM to generate new nodes + edges in the existing JSON schema,
-reviews them, and optionally merges them into tech_knowledge_graph.json.
+The script:
+  1. Asks the LLM to generate new nodes + edges
+  2. Shows the generated JSON for review
+  3. On confirmation: merges into tech_knowledge_graph.json AND syncs to Neo4j
 """
 import argparse
 import json
@@ -98,6 +100,56 @@ def merge_into_graph(new_data: dict, graph_path: Path = GRAPH_PATH) -> None:
     print(f"Merged: +{added_nodes} nodes, +{added_edges} edges → {graph_path}")
 
 
+VALID_NODE_TYPES = {"Domain", "Tech", "Concept", "Component", "Pitfall"}
+VALID_RELATIONS  = {"BELONGS_TO", "HAS_COMPONENT", "LEADS_TO", "HAS_PITFALL", "REQUIRES", "RELATED_TO"}
+
+
+def sync_to_neo4j(new_data: dict) -> None:
+    """Sync new nodes and edges into Neo4j using MERGE (idempotent)."""
+    try:
+        from neo4j import GraphDatabase
+    except ImportError:
+        print("[warn] neo4j package not installed, skipping Neo4j sync.")
+        return
+
+    driver = GraphDatabase.driver(
+        settings.neo4j_uri,
+        auth=(settings.neo4j_username, settings.neo4j_password),
+    )
+    try:
+        driver.verify_connectivity()
+    except Exception as e:
+        print(f"[warn] Neo4j unavailable ({e}), skipping sync.")
+        driver.close()
+        return
+
+    added_nodes = added_edges = 0
+    with driver.session(database=settings.neo4j_database) as s:
+        for node in new_data.get("nodes", []):
+            node_type = node.get("type", "Tech")
+            if node_type not in VALID_NODE_TYPES:
+                continue
+            aliases = node.get("aliases", [])
+            # node_type validated against VALID_NODE_TYPES — safe to embed in Cypher
+            cypher_node = f"MERGE (n:{node_type} {{id: $id}}) SET n.label=$label, n.domain=$domain, n.aliases=$aliases, n.aliases_text=$aliases_text, n.description=$description"  # type: ignore[assignment]
+            s.run(cypher_node, id=node["id"], label=node["label"],  # type: ignore[arg-type]
+                  domain=node.get("domain", ""), aliases=aliases,
+                  aliases_text=" ".join(aliases), description=node.get("description", ""))
+            added_nodes += 1
+
+        for edge in new_data.get("edges", []):
+            relation = edge.get("relation", "")
+            if relation not in VALID_RELATIONS:
+                continue
+            # relation validated against VALID_RELATIONS — safe to embed in Cypher
+            cypher_edge = f"MATCH (a {{id: $src}}), (b {{id: $tgt}}) MERGE (a)-[r:{relation}]->(b) SET r.question_hint=$hint"  # type: ignore[assignment]
+            s.run(cypher_edge, src=edge["source"], tgt=edge["target"], hint=edge.get("question_hint", ""))  # type: ignore[arg-type]
+            added_edges += 1
+
+    driver.close()
+    print(f"Neo4j synced: +{added_nodes} nodes, +{added_edges} edges")
+
+
 def main():
     parser = argparse.ArgumentParser(description="Expand tech_knowledge_graph.json via LLM")
     parser.add_argument("--topic", required=True, help="Technology topic to expand, e.g. 'Kubernetes'")
@@ -118,9 +170,10 @@ def main():
         print("[dry-run] Skipping merge.")
         return
 
-    confirm = input("Merge into tech_knowledge_graph.json? [y/N] ").strip().lower()
+    confirm = input("Merge into tech_knowledge_graph.json and sync Neo4j? [y/N] ").strip().lower()
     if confirm == "y":
         merge_into_graph(new_data)
+        sync_to_neo4j(new_data)
     else:
         print("Aborted.")
 

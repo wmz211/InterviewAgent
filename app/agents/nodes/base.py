@@ -200,9 +200,13 @@ def build_qa_record(
     return record
 
 
+MAX_TOOL_ITERATIONS = 8
+
+
 async def llm_tool_loop(llm, messages: list, tools: list) -> tuple[list, object]:
     """
     Run the LLM in a loop until it returns a response with no tool_calls.
+    Caps at MAX_TOOL_ITERATIONS to prevent runaway loops.
 
     Returns:
         (new_messages, final_response)
@@ -212,19 +216,14 @@ async def llm_tool_loop(llm, messages: list, tools: list) -> tuple[list, object]
     response = await llm.ainvoke(messages)
     new_messages = [response]
 
-    while getattr(response, "tool_calls", None):
+    iterations = 0
+    while getattr(response, "tool_calls", None) and iterations < MAX_TOOL_ITERATIONS:
         tool_results = await execute_tools(response.tool_calls, tools)
         new_messages.extend(tool_results)
         response = await llm.ainvoke(messages + new_messages)
         new_messages.append(response)
+        iterations += 1
 
     return new_messages, response
 
 
-def build_entity_summary(anchored_entities: list[dict]) -> str:
-    if not anchored_entities:
-        return "（暂无锚定技术点）"
-    lines = []
-    for e in anchored_entities:
-        lines.append(f"- {e['kg_node_label']}（简历原文：{e['resume_text']}）")
-    return "\n".join(lines)

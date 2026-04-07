@@ -25,15 +25,6 @@ class KGEdge:
 
 
 @dataclass
-class AnchoredEntity:
-    """A resume entity that has been matched to a pre-built knowledge graph node."""
-    resume_text: str                 # Raw text from resume, e.g. "Transformer-based model"
-    kg_node_id: str                  # Matched node id, e.g. "transformer"
-    kg_node_label: str
-    confidence: float                # 0.0–1.0 match confidence
-
-
-@dataclass
 class TraversalResult:
     """Output of a graph traversal starting from an anchored entity."""
     entry_node_id: str

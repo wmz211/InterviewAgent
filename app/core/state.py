@@ -14,7 +14,6 @@ class InterviewState(TypedDict):
     # ── Document context ──────────────────────────────────────────
     resume_summary: str           # Parsed resume text (for LLM context)
     jd_text: str                  # Raw JD text (for CS_Fundamentals topic selection)
-    anchored_entities: list[dict] # [{kg_node_id, kg_node_label, resume_text, confidence}]
 
     # ── Conversation ─────────────────────────────────────────────
     messages: Annotated[list, add_messages]
