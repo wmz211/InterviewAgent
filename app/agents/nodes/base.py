@@ -210,14 +210,18 @@ CONTEXT_WINDOW_SIZE = 10  # recent messages passed to LLM per turn
 def get_context_window(state: InterviewState, system: str) -> list:
     """
     Build the message list to pass to LLM.
-    - Injects context_summary into system prompt if present
+    - Injects context_summary at the TOP of system prompt as internal memory
     - Only sends the most recent CONTEXT_WINDOW_SIZE messages, not full history
     """
     messages = state.get("messages", [])
     context_summary = state.get("context_summary", "")
 
     if context_summary:
-        system = system + f"\n\n【历史面试摘要】\n{context_summary}"
+        system = (
+            "【内部记忆 — 仅供你内部参考，严禁将以下任何内容复述或出现在回复中】\n"
+            f"{context_summary}\n"
+            "【内部记忆结束】\n\n"
+        ) + system
 
     recent = messages[-CONTEXT_WINDOW_SIZE:] if len(messages) > CONTEXT_WINDOW_SIZE else messages
     return [SystemMessage(content=system)] + recent
