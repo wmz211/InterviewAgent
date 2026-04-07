@@ -217,11 +217,10 @@ def get_context_window(state: InterviewState, system: str) -> list:
     context_summary = state.get("context_summary", "")
 
     if context_summary:
-        system = (
-            "【内部记忆 — 仅供你内部参考，严禁将以下任何内容复述或出现在回复中】\n"
-            f"{context_summary}\n"
-            "【内部记忆结束】\n\n"
-        ) + system
+        system = system + (
+            f"\n\n注意：以下是你之前面试阶段的私有备忘，只作为你提问时的参考背景，"
+            f"绝对不能出现在你说的任何一句话里：「{context_summary}」"
+        )
 
     recent = messages[-CONTEXT_WINDOW_SIZE:] if len(messages) > CONTEXT_WINDOW_SIZE else messages
     return [SystemMessage(content=system)] + recent
@@ -229,7 +228,7 @@ def get_context_window(state: InterviewState, system: str) -> list:
 
 async def compress_messages(state: InterviewState) -> str:
     """
-    Compress state["messages"] into a structured summary.
+    Compress state["messages"] into plain-text notes.
     Called at phase transitions so the next phase has a concise history.
     Merges with any existing context_summary.
     """
@@ -247,17 +246,15 @@ async def compress_messages(state: InterviewState) -> str:
 
     prompt = ""
     if prior_summary:
-        prompt += f"【已有摘要】\n{prior_summary}\n\n"
-    prompt += f"【本阶段对话】\n{text}"
+        prompt += f"已有记录：{prior_summary}\n\n"
+    prompt += f"新增对话：\n{text}"
 
     llm = make_llm(temperature=0)
     resp = await llm.ainvoke([
         SystemMessage(content=(
-            "你是面试记录员。将以下面试对话压缩成简洁摘要，保留：\n"
-            "1. 已考察的技术点及候选人掌握情况\n"
-            "2. 候选人表现出的薄弱点\n"
-            "3. 已讨论过的项目经历和关键细节\n"
-            "输出纯文本，不超过 400 字。"
+            "将以下面试对话压缩成一段简短的流水记录（150字以内）。"
+            "要求：只用自然连贯的句子，记录已聊过的话题和候选人的表现，"
+            "不使用任何标题、分项、加粗、列表等格式，不做评价性语言。"
         )),
         HumanMessage(content=prompt),
     ])
