@@ -84,7 +84,7 @@ async def detect_exit_intent(state: InterviewState) -> bool:
             "只回答 yes 或 no，不要解释。"
         )),
         HumanMessage(content=user_text),
-    ])
+    ], config={"tags": ["internal"]})
     return resp.content.strip().lower().startswith("y")
 
 
@@ -257,7 +257,7 @@ async def compress_messages(state: InterviewState) -> str:
             "不使用任何标题、分项、加粗、列表等格式，不做评价性语言。"
         )),
         HumanMessage(content=prompt),
-    ])
+    ], config={"tags": ["internal"]})
     return resp.content.strip()
 
 

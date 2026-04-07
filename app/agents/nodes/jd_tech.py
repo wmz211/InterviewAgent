@@ -48,6 +48,21 @@ def _extract_entities(jd_text: str) -> list[str]:
 
 MAX_TURNS_PER_NODE = 2   # 每个技术节点最多追问几轮后推进
 
+
+def _node_has_content(node_id: str) -> bool:
+    """节点是否有实质 RAG 内容（LEADS_TO 链或 pitfall）。"""
+    if not node_id:
+        return False
+    try:
+        from app.rag.graph_rag.knowledge_base import get_knowledge_graph
+        kg = get_knowledge_graph()
+        return bool(
+            kg.get_leads_to_chain(node_id, max_depth=3)
+            or kg.get_pitfalls(node_id, recursive=True)
+        )
+    except Exception:
+        return False
+
 _SYSTEM = """\
 你是一位技术面试官，正在按照岗位要求考察候选人的技术深度。
 
@@ -165,7 +180,7 @@ async def jd_tech_node(state: InterviewState) -> dict:
         current_label = "LLM应用工程"
         current = {"node_id": "", "label": current_label}
 
-    # 是否需要推进到下一个节点
+    # 是否需要推进到下一个节点（已满轮次）
     if turns_on_node >= MAX_TURNS_PER_NODE and chain_idx + 1 < len(chain):
         chain_idx += 1
         turns_on_node = 0
@@ -173,6 +188,14 @@ async def jd_tech_node(state: InterviewState) -> dict:
         current_label = current["label"]
         if current_label not in covered_labels:
             covered_labels = list(covered_labels) + [current_label]
+
+    # 自动跳过 RAG 内容为空的节点，避免 LLM 用简历内容凑问题
+    while not _node_has_content(current["node_id"]) and chain_idx + 1 < len(chain):
+        logger.info(f"Skipping empty KG node: {current['label']} ({current['node_id']})")
+        chain_idx += 1
+        turns_on_node = 0
+        current = chain[chain_idx]
+        current_label = current["label"]
 
     if current_label not in covered_labels:
         covered_labels = list(covered_labels) + [current_label]

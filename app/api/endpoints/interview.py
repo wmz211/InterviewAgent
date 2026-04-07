@@ -192,6 +192,9 @@ async def stream_turn(session_id: str, body: TurnRequest):
                 ev = event["event"]
 
                 if ev == "on_chat_model_stream":
+                    # Skip internal utility LLM calls (compress_messages, detect_exit_intent)
+                    if "internal" in event.get("tags", []):
+                        continue
                     chunk = event["data"]["chunk"]
                     # Skip tool-call chunks (content is empty during function calling)
                     if getattr(chunk, "tool_call_chunks", None):
