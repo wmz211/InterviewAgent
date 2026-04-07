@@ -21,6 +21,7 @@ class InterviewState(TypedDict):
 
     # ── Per-turn context ─────────────────────────────────────────
     current_topic: str            # e.g. "RAG向量检索"
+    context_summary: str          # Compressed history injected into system prompt on phase change
 
     # ── Long-term performance tracking ───────────────────────────
     node_scores: dict[str, Any]   # {phase: {turn_count, topics, notes}}

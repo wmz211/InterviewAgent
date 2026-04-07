@@ -201,6 +201,60 @@ def build_qa_record(
 
 
 MAX_TOOL_ITERATIONS = 8
+CONTEXT_WINDOW_SIZE = 10  # recent messages passed to LLM per turn
+
+
+def get_context_window(state: InterviewState, system: str) -> list:
+    """
+    Build the message list to pass to LLM.
+    - Injects context_summary into system prompt if present
+    - Only sends the most recent CONTEXT_WINDOW_SIZE messages, not full history
+    """
+    messages = state.get("messages", [])
+    context_summary = state.get("context_summary", "")
+
+    if context_summary:
+        system = system + f"\n\n【历史面试摘要】\n{context_summary}"
+
+    recent = messages[-CONTEXT_WINDOW_SIZE:] if len(messages) > CONTEXT_WINDOW_SIZE else messages
+    return [SystemMessage(content=system)] + recent
+
+
+async def compress_messages(state: InterviewState) -> str:
+    """
+    Compress state["messages"] into a structured summary.
+    Called at phase transitions so the next phase has a concise history.
+    Merges with any existing context_summary.
+    """
+    messages = state.get("messages", [])
+    prior_summary = state.get("context_summary", "")
+
+    if not messages:
+        return prior_summary
+
+    text = "\n".join(
+        f"[{'面试官' if type(m).__name__ == 'AIMessage' else '候选人'}] {_get_text(m)}"
+        for m in messages
+        if type(m).__name__ in ("AIMessage", "HumanMessage")
+    )
+
+    prompt = ""
+    if prior_summary:
+        prompt += f"【已有摘要】\n{prior_summary}\n\n"
+    prompt += f"【本阶段对话】\n{text}"
+
+    llm = make_llm(temperature=0)
+    resp = await llm.ainvoke([
+        SystemMessage(content=(
+            "你是面试记录员。将以下面试对话压缩成简洁摘要，保留：\n"
+            "1. 已考察的技术点及候选人掌握情况\n"
+            "2. 候选人表现出的薄弱点\n"
+            "3. 已讨论过的项目经历和关键细节\n"
+            "输出纯文本，不超过 400 字。"
+        )),
+        HumanMessage(content=prompt),
+    ])
+    return resp.content.strip()
 
 
 async def llm_tool_loop(llm, messages: list, tools: list) -> tuple[list, object]:

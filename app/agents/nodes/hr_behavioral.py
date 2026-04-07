@@ -6,7 +6,7 @@ max 轮次：4
 """
 from langchain_core.messages import SystemMessage
 
-from app.agents.nodes.base import make_llm, check_transition, llm_tool_loop, build_qa_record, ANTI_SIMULATION_RULE
+from app.agents.nodes.base import make_llm, check_transition, llm_tool_loop, build_qa_record, compress_messages, get_context_window, ANTI_SIMULATION_RULE
 from app.core.state import InterviewState
 
 _SYSTEM = """\
@@ -49,7 +49,7 @@ async def hr_behavioral_node(state: InterviewState) -> dict:
         anti_simulation=ANTI_SIMULATION_RULE,
     )
 
-    messages = [SystemMessage(content=system)] + state["messages"]
+    messages = get_context_window(state, system)
     new_messages, _ = await llm_tool_loop(_llm_with_tools, messages, HR_TOOLS)
 
     # 从 ToolMessage 中提取已问的题目 ID
@@ -83,10 +83,13 @@ async def hr_behavioral_node(state: InterviewState) -> dict:
 
     going_to = "hr_career" if should_transition else "hr_behavioral"
 
-    return {
+    result = {
         "messages": new_messages,
         "current_node": going_to,
         "phase_turn_count": 0 if should_transition else phase_turn,
         "should_transition": should_transition,
         "node_scores": scores,
     }
+    if should_transition:
+        result["context_summary"] = await compress_messages(state)
+    return result

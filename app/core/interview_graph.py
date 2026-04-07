@@ -99,6 +99,7 @@ def make_initial_state(
         "messages":           [],
         "current_node":       "greeting",
         "current_topic":      "",
+        "context_summary":    "",
         "node_scores":        {},
         "asked_question_ids": [],
         "phase_turn_count":   0,

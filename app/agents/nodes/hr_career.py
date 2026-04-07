@@ -5,7 +5,7 @@ max 轮次：2
 """
 from langchain_core.messages import SystemMessage
 
-from app.agents.nodes.base import make_llm, check_transition, build_qa_record, ANTI_SIMULATION_RULE
+from app.agents.nodes.base import make_llm, check_transition, build_qa_record, compress_messages, get_context_window, ANTI_SIMULATION_RULE
 from app.core.state import InterviewState
 
 _SYSTEM = """\
@@ -41,7 +41,7 @@ async def hr_career_node(state: InterviewState) -> dict:
         anti_simulation=ANTI_SIMULATION_RULE,
     )
 
-    response = await _llm.ainvoke([SystemMessage(content=system)] + state["messages"])
+    response = await _llm.ainvoke(get_context_window(state, system))
     new_messages = [response]
 
     phase_turn = state.get("phase_turn_count", 0) + 1
@@ -63,10 +63,13 @@ async def hr_career_node(state: InterviewState) -> dict:
 
     going_to = "wrap_up" if should_transition else "hr_career"
 
-    return {
+    result = {
         "messages": new_messages,
         "current_node": going_to,
         "phase_turn_count": 0 if should_transition else phase_turn,
         "should_transition": should_transition,
         "node_scores": scores,
     }
+    if should_transition:
+        result["context_summary"] = await compress_messages(state)
+    return result

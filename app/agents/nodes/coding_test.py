@@ -4,7 +4,7 @@ Coding Test node — 手撕算法题。
 """
 from langchain_core.messages import SystemMessage
 
-from app.agents.nodes.base import make_llm, check_transition, execute_tools, llm_tool_loop, build_qa_record, ANTI_SIMULATION_RULE
+from app.agents.nodes.base import make_llm, check_transition, llm_tool_loop, build_qa_record, compress_messages, get_context_window, ANTI_SIMULATION_RULE
 from app.agents.tools.vector_search_tool import VECTOR_TOOLS
 from app.core.state import InterviewState
 
@@ -39,7 +39,7 @@ async def coding_test_node(state: InterviewState) -> dict:
         anti_simulation=ANTI_SIMULATION_RULE,
     )
 
-    messages = [SystemMessage(content=system)] + state["messages"]
+    messages = get_context_window(state, system)
     new_messages, _ = await llm_tool_loop(_llm_with_tools, messages, VECTOR_TOOLS)
 
     phase_turn = state.get("phase_turn_count", 0) + 1
@@ -62,10 +62,13 @@ async def coding_test_node(state: InterviewState) -> dict:
 
     going_to = "wrap_up" if should_transition else "coding_test"
 
-    return {
+    result = {
         "messages": new_messages,
         "current_node": going_to,
         "phase_turn_count": 0 if should_transition else phase_turn,
         "should_transition": should_transition,
         "node_scores": scores,
     }
+    if should_transition:
+        result["context_summary"] = await compress_messages(state)
+    return result

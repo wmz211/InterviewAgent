@@ -4,7 +4,7 @@ Greeting node — 开场破冰，收集自我介绍，提取候选人姓名。
 """
 from langchain_core.messages import SystemMessage
 
-from app.agents.nodes.base import make_llm, check_transition, ANTI_SIMULATION_RULE
+from app.agents.nodes.base import make_llm, check_transition, compress_messages, get_context_window, ANTI_SIMULATION_RULE
 from app.core.state import InterviewState
 
 _SYSTEM_FIRST = """\
@@ -60,9 +60,7 @@ async def greeting_node(state: InterviewState) -> dict:
         resume_summary=state.get("resume_summary", "（简历待解析）"),
     ) + ANTI_SIMULATION_RULE
 
-    response = await _llm.ainvoke(
-        [SystemMessage(content=system)] + state["messages"]
-    )
+    response = await _llm.ainvoke(get_context_window(state, system))
 
     phase_turn = state.get("phase_turn_count", 0) + 1
     should_transition = check_transition(
@@ -86,7 +84,7 @@ async def greeting_node(state: InterviewState) -> dict:
     next_phase = "resume_dive" if mode == "tech" else "hr_self_intro"
     going_to = next_phase if should_transition else "greeting"
 
-    return {
+    result = {
         "messages": [response],
         "current_node": going_to,
         "phase_turn_count": 0 if should_transition else phase_turn,
@@ -94,3 +92,6 @@ async def greeting_node(state: InterviewState) -> dict:
         "candidate_name": candidate_name or state.get("candidate_name", ""),
         "node_scores": scores,
     }
+    if should_transition:
+        result["context_summary"] = await compress_messages(state)
+    return result

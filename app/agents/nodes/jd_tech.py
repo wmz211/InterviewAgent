@@ -14,7 +14,8 @@ from langchain_core.messages import SystemMessage
 from loguru import logger
 
 from app.agents.nodes.base import (
-    make_llm, check_transition, llm_tool_loop, build_qa_record, ANTI_SIMULATION_RULE,
+    make_llm, check_transition, llm_tool_loop, build_qa_record,
+    compress_messages, get_context_window, ANTI_SIMULATION_RULE,
 )
 from app.agents.tools.graph_search_tool import GRAPH_RAG_TOOLS
 from app.core.state import InterviewState
@@ -193,7 +194,7 @@ async def jd_tech_node(state: InterviewState) -> dict:
         anti_simulation=ANTI_SIMULATION_RULE,
     )
 
-    messages = [SystemMessage(content=system)] + state["messages"]
+    messages = get_context_window(state, system)
     new_messages, _ = await llm_tool_loop(_llm_with_tools, messages, GRAPH_RAG_TOOLS)
 
     # ── 更新节点追踪 ──────────────────────────────────────────────
@@ -219,10 +220,13 @@ async def jd_tech_node(state: InterviewState) -> dict:
 
     going_to = "coding_test" if should_transition else "jd_tech"
 
-    return {
+    result = {
         "messages": new_messages,
         "current_node": going_to,
         "phase_turn_count": 0 if should_transition else phase_turn,
         "should_transition": should_transition,
         "node_scores": scores,
     }
+    if should_transition:
+        result["context_summary"] = await compress_messages(state)
+    return result

@@ -7,7 +7,7 @@ LLM 主导推进：当 LLM 判断简历经历已充分覆盖时，主动调用 a
 from langchain_core.messages import SystemMessage
 from langchain_core.tools import tool
 
-from app.agents.nodes.base import make_llm, build_qa_record, ANTI_SIMULATION_RULE
+from app.agents.nodes.base import make_llm, build_qa_record, compress_messages, get_context_window, ANTI_SIMULATION_RULE
 from app.core.state import InterviewState
 
 # 最少轮次保底——即使 LLM 调工具也不会提前跳走
@@ -113,7 +113,7 @@ async def resume_dive_node(state: InterviewState) -> dict:
         anti_simulation=ANTI_SIMULATION_RULE,
     )
 
-    messages = [SystemMessage(content=system)] + state["messages"]
+    messages = get_context_window(state, system)
     response = await _llm_with_tool.ainvoke(messages)
     new_messages = [response]
 
@@ -148,10 +148,13 @@ async def resume_dive_node(state: InterviewState) -> dict:
 
     going_to = "jd_tech" if should_transition else "resume_dive"
 
-    return {
+    result = {
         "messages": new_messages,
         "current_node": going_to,
         "phase_turn_count": 0 if should_transition else phase_turn,
         "should_transition": should_transition,
         "node_scores": scores,
     }
+    if should_transition:
+        result["context_summary"] = await compress_messages(state)
+    return result
