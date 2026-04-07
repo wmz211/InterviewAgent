@@ -9,9 +9,7 @@ POST /api/v1/upload/
 Returns:
     session_id, resume summary
 """
-import json
 import uuid
-from datetime import datetime
 from pathlib import Path
 
 from fastapi import APIRouter, Form, HTTPException, UploadFile, File
@@ -21,8 +19,6 @@ from loguru import logger
 from app.core.interview_graph import make_initial_state
 from app.core.session_store import get_session_store
 from app.rag.parser.resume_parser import parse_resume
-
-_SESSIONS_DIR = Path("./data/sessions")
 
 router = APIRouter()
 
@@ -89,91 +85,6 @@ async def upload_documents(
     )
 
 
-@router.get("/resumes")
-async def list_resumes():
-    """
-    List previously uploaded resumes available for reuse.
-    Reads from completed sessions (data/sessions/*.json).
-    Returns newest-first, deduplicates by candidate_name (keeps latest).
-    """
-    if not _SESSIONS_DIR.exists():
-        return []
-
-    seen: dict[str, dict] = {}
-    for p in sorted(_SESSIONS_DIR.glob("*.json"), key=lambda x: x.stat().st_mtime, reverse=True):
-        try:
-            with open(p, encoding="utf-8") as f:
-                d = json.load(f)
-            name = d.get("candidate_name", "").strip()
-            if not name or not d.get("resume_summary"):
-                continue
-            if name not in seen:
-                jd = d.get("jd_text", "")
-                seen[name] = {
-                    "session_id": d.get("session_id", p.stem),
-                    "candidate_name": name,
-                    "jd_snippet": jd[:60].replace("\n", " ") + ("..." if len(jd) > 60 else ""),
-                    "jd_text": jd,
-                    "interview_mode": d.get("interview_mode", "tech"),
-                    "date": datetime.fromtimestamp(p.stat().st_mtime).strftime("%Y-%m-%d"),
-                }
-        except Exception as e:
-            logger.warning(f"Failed to read session {p.name}: {e}")
-
-    return list(seen.values())
-
-
-class ReuseRequest(BaseModel):
-    source_session_id: str
-    jd_text: str = ""          # empty = keep original JD
-    interview_mode: str = ""   # empty = keep original mode
-
-
-@router.post("/reuse", response_model=UploadResponse)
-async def reuse_resume(body: ReuseRequest):
-    """
-    Create a new interview session reusing a previous resume's parsed data.
-    Skips resume parsing and KG anchoring — starts in ~100ms instead of ~10s.
-    """
-    # Load source session
-    src_path = _SESSIONS_DIR / f"{body.source_session_id}.json"
-    if not src_path.exists():
-        raise HTTPException(status_code=404, detail="Source session not found")
-
-    try:
-        with open(src_path, encoding="utf-8") as f:
-            src = json.load(f)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to read source session: {e}")
-
-    resume_summary = src.get("resume_summary", "")
-    candidate_name = src.get("candidate_name", "")
-
-    if not resume_summary:
-        raise HTTPException(status_code=422, detail="Source session has no resume summary")
-
-    jd_text = body.jd_text.strip() or src.get("jd_text", "")
-    mode = body.interview_mode if body.interview_mode in ("tech", "hr") else src.get("interview_mode", "tech")
-    session_id = str(uuid.uuid4())
-
-    state = make_initial_state(
-        session_id=session_id,
-        resume_summary=resume_summary,
-        jd_text=jd_text,
-        interview_mode=mode,
-    )
-    state["candidate_name"] = candidate_name
-
-    store = get_session_store()
-    await store.set(session_id, state)
-
-    logger.info(f"Reused session {body.source_session_id} → new session {session_id} ({candidate_name})")
-
-    return UploadResponse(
-        session_id=session_id,
-        candidate_name=candidate_name,
-        resume_summary=resume_summary,
-    )
 
 
 def _format_resume_summary(resume_data) -> str:

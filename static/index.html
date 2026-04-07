@@ -134,54 +134,6 @@ textarea, input { font-family: var(--font); }
 }
 .drop-file span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-/* ── Resume history picker ───────────────────────────────────── */
-.resume-history-btn {
-  font-size: 11.5px; color: var(--acc);
-  text-decoration: underline; text-underline-offset: 2px;
-  background: none; border: none; cursor: pointer; padding: 0;
-  position: relative; z-index: 1;
-}
-.resume-history-btn:hover { color: var(--acc-h); }
-
-.resume-picker {
-  position: absolute; inset: 0;
-  background: var(--bg1);
-  border-radius: inherit;
-  display: flex; flex-direction: column;
-  z-index: 10;
-  overflow: hidden;
-}
-.resume-picker-head {
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--b0);
-  display: flex; align-items: center; justify-content: space-between;
-  flex-shrink: 0;
-}
-.resume-picker-title { font-size: 12.5px; font-weight: 600; color: var(--t0); }
-.resume-picker-close {
-  width: 22px; height: 22px; border-radius: 50%;
-  background: var(--bg2); border: 1px solid var(--b1);
-  font-size: 11px; color: var(--t1);
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; transition: background .15s;
-}
-.resume-picker-close:hover { background: var(--bg3); }
-.resume-picker-list {
-  flex: 1; overflow-y: auto;
-  padding: 8px;
-  display: flex; flex-direction: column; gap: 4px;
-}
-.resume-picker-item {
-  padding: 10px 12px; border-radius: 8px;
-  border: 1px solid transparent;
-  cursor: pointer; transition: all .15s;
-  text-align: left;
-}
-.resume-picker-item:hover { background: var(--bg2); border-color: var(--b0); }
-.resume-picker-item.selected { background: var(--acc-lo2); border-color: rgba(207,120,32,.3); }
-.rpi-name { font-size: 13px; font-weight: 500; color: var(--t0); }
-.rpi-meta { font-size: 11px; color: var(--t2); margin-top: 2px; }
-.resume-picker-empty { padding: 24px; text-align: center; font-size: 13px; color: var(--t2); }
 
 .jd-zone {
   padding: 20px 22px;
@@ -860,21 +812,6 @@ textarea, input { font-family: var(--font); }
           <div class="drop-file hidden" id="fileTag">
             <span>✓</span><span id="fileTagName"></span>
           </div>
-          <button class="resume-history-btn" id="resumeHistoryBtn"
-                  onclick="event.stopPropagation(); openResumePicker()">
-            从历史记录选择
-          </button>
-
-          <!-- History picker overlay -->
-          <div class="resume-picker hidden" id="resumePicker">
-            <div class="resume-picker-head">
-              <span class="resume-picker-title">选择历史简历</span>
-              <button class="resume-picker-close" onclick="closeResumePicker()">✕</button>
-            </div>
-            <div class="resume-picker-list" id="resumePickerList">
-              <div class="resume-picker-empty">加载中...</div>
-            </div>
-          </div>
         </div>
         <!-- JD -->
         <div class="jd-zone">
@@ -1123,100 +1060,28 @@ $drop.addEventListener('drop', e => {
 function onFile() {
   const f = $file.files[0];
   if (!f) return;
-  _reuseSessionId = null; // clear any history selection
   document.getElementById('fileTagName').textContent = f.name;
   document.getElementById('fileTag').classList.remove('hidden');
   $start.disabled = false;
   $meta.textContent = f.name;
 }
 
-/* ══════════════════════════════════════════════════════════════
-   Resume history picker
-══════════════════════════════════════════════════════════════ */
-// source_session_id is set when user picks a historical resume
-let _reuseSessionId = null;
-
-async function openResumePicker() {
-  document.getElementById('resumePicker').classList.remove('hidden');
-  const list = document.getElementById('resumePickerList');
-  list.innerHTML = '<div class="resume-picker-empty">加载中...</div>';
-  try {
-    const r = await fetch('/api/v1/upload/resumes');
-    const items = await r.json();
-    if (!items.length) {
-      list.innerHTML = '<div class="resume-picker-empty">暂无历史简历</div>';
-      return;
-    }
-    list.innerHTML = '';
-    items.forEach(item => {
-      const el = document.createElement('button');
-      el.className = 'resume-picker-item' + (_reuseSessionId === item.session_id ? ' selected' : '');
-      el.innerHTML = `
-        <div class="rpi-name">${item.candidate_name}</div>
-        <div class="rpi-meta">${item.date} · ${item.interview_mode === 'hr' ? 'HR面试' : '技术面试'} · ${item.jd_snippet}</div>`;
-      el.addEventListener('click', () => selectHistoryResume(item));
-      list.appendChild(el);
-    });
-  } catch {
-    list.innerHTML = '<div class="resume-picker-empty" style="color:var(--err)">加载失败</div>';
-  }
-}
-
-function closeResumePicker() {
-  document.getElementById('resumePicker').classList.add('hidden');
-}
-
-function selectHistoryResume(item) {
-  _reuseSessionId = item.session_id;
-  // Show selected state in upload zone
-  document.getElementById('fileTagName').textContent = item.candidate_name + '（历史）';
-  document.getElementById('fileTag').classList.remove('hidden');
-  // Pre-fill JD if empty
-  const jdEl = document.getElementById('jdText');
-  if (!jdEl.value.trim()) jdEl.value = item.jd_text;
-  // Pre-select interview mode
-  selectMode(item.interview_mode || 'tech');
-  $start.disabled = false;
-  $meta.textContent = item.candidate_name + ' · 历史简历';
-  closeResumePicker();
-  toast('已选择：' + item.candidate_name);
-}
-
 $start.addEventListener('click', async () => {
   const f = $file.files[0];
-  if (!f && !_reuseSessionId) return;
+  if (!f) return;
   const err = document.getElementById('setupErr');
   err.classList.add('hidden');
   $start.disabled = true;
 
   try {
-    let upD;
-
-    if (_reuseSessionId) {
-      // Fast path: reuse existing parsed resume
-      $start.innerHTML = '<span class="ld"></span>加载简历...';
-      const up = await fetch('/api/v1/upload/reuse', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          source_session_id: _reuseSessionId,
-          jd_text: document.getElementById('jdText').value.trim(),
-          interview_mode: S.interviewMode,
-        }),
-      });
-      if (!up.ok) throw new Error((await up.json()).detail || '加载失败');
-      upD = await up.json();
-    } else {
-      // Normal path: upload and parse resume file
-      $start.innerHTML = '<span class="ld"></span>解析简历...';
-      const fd = new FormData();
-      fd.append('resume', f);
-      fd.append('jd_text', document.getElementById('jdText').value || '通用技术岗位');
-      fd.append('interview_mode', S.interviewMode);
-      const up = await fetch('/api/v1/upload/', { method: 'POST', body: fd });
-      if (!up.ok) throw new Error((await up.json()).detail || '上传失败');
-      upD = await up.json();
-    }
+    $start.innerHTML = '<span class="ld"></span>解析简历...';
+    const fd = new FormData();
+    fd.append('resume', f);
+    fd.append('jd_text', document.getElementById('jdText').value || '通用技术岗位');
+    fd.append('interview_mode', S.interviewMode);
+    const up = await fetch('/api/v1/upload/', { method: 'POST', body: fd });
+    if (!up.ok) throw new Error((await up.json()).detail || '上传失败');
+    const upD = await up.json();
 
     S.sessionId = upD.session_id;
     S.candidateName = upD.candidate_name;
