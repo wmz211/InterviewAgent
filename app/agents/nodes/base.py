@@ -207,11 +207,13 @@ MAX_TOOL_ITERATIONS = 8
 CONTEXT_WINDOW_SIZE = 10  # recent messages passed to LLM per turn
 
 
-def get_context_window(state: InterviewState, system: str) -> list:
+def get_context_window(state: InterviewState, system: str, is_new_phase: bool = False) -> list:
     """
     Build the message list to pass to LLM.
     - Injects context_summary at the TOP of system prompt as internal memory
     - Only sends the most recent CONTEXT_WINDOW_SIZE messages, not full history
+    - is_new_phase=True appends a phase-boundary reminder to prevent LLM from
+      continuing the previous phase's topic when context window spans phases
     """
     messages = state.get("messages", [])
     context_summary = state.get("context_summary", "")
@@ -220,6 +222,12 @@ def get_context_window(state: InterviewState, system: str) -> list:
         system = system + (
             f"\n\n注意：以下是你之前面试阶段的私有备忘，只作为你提问时的参考背景，"
             f"绝对不能出现在你说的任何一句话里：「{context_summary}」"
+        )
+
+    if is_new_phase and messages:
+        system += (
+            "\n\n【重要】这是本阶段第一轮。下方对话历史属于上一阶段，"
+            "不要延续其中的话题，严格按照当前阶段任务重新开始。"
         )
 
     recent = messages[-CONTEXT_WINDOW_SIZE:] if len(messages) > CONTEXT_WINDOW_SIZE else messages

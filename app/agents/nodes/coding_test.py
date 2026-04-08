@@ -34,15 +34,17 @@ _llm_with_tools = _llm.bind_tools(VECTOR_TOOLS)
 
 
 async def coding_test_node(state: InterviewState) -> dict:
+    phase_turn = state.get("phase_turn_count", 0)
+
     system = _SYSTEM.format(
         resume_summary=state.get("resume_summary", ""),
         anti_simulation=ANTI_SIMULATION_RULE,
     )
 
-    messages = get_context_window(state, system)
+    messages = get_context_window(state, system, is_new_phase=(phase_turn == 0))
     new_messages, _ = await llm_tool_loop(_llm_with_tools, messages, VECTOR_TOOLS)
 
-    phase_turn = state.get("phase_turn_count", 0) + 1
+    phase_turn += 1
     should_transition = check_transition(
         {**state, "phase_turn_count": phase_turn}, "coding_test"
     )
