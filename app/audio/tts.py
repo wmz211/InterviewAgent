@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import asyncio
 import base64
+import time
 from typing import AsyncIterator, Optional
 
 import dashscope
@@ -54,6 +55,7 @@ def _connect_tts(callback):
 
     dashscope.api_key = settings.dashscope_api_key
     logger.info(f"TTS connecting: model={settings.tts_model_name} voice={settings.tts_voice}")
+    started_at = time.perf_counter()
 
     session_ready = threading.Event()
 
@@ -91,7 +93,7 @@ def _connect_tts(callback):
         kwargs["instructions"] = settings.tts_instructions
         kwargs["optimize_instructions"] = True
     tts.update_session(**kwargs)
-    logger.debug("TTS update_session sent")
+    logger.debug(f"TTS update_session sent; connect_ms={(time.perf_counter() - started_at) * 1000:.0f}")
     return tts
 
 
@@ -162,6 +164,8 @@ class TtsLiveSession:
         self._queue: asyncio.Queue[Optional[bytes]] = asyncio.Queue()
         self._tts = None
         self._loop: Optional[asyncio.AbstractEventLoop] = None
+        self._opened_at = 0.0
+        self._first_audio_at = 0.0
 
     async def open(self) -> None:
         """Open the TTS WebSocket. Runs blocking SDK setup in a thread pool."""
@@ -170,6 +174,8 @@ class TtsLiveSession:
         self._loop = asyncio.get_event_loop()
         queue = self._queue
         loop = self._loop
+        session = self
+        self._opened_at = time.perf_counter()
 
         class _CB(QwenTtsRealtimeCallback):
             def on_open(self): logger.debug("TTS live session opened")
@@ -186,6 +192,12 @@ class TtsLiveSession:
                     if t == "response.audio.delta":
                         raw = response.get("delta", "")
                         if raw:
+                            if not session._first_audio_at:
+                                session._first_audio_at = time.perf_counter()
+                                logger.debug(
+                                    "TTS first audio latency: "
+                                    f"{(session._first_audio_at - session._opened_at) * 1000:.0f} ms"
+                                )
                             loop.call_soon_threadsafe(queue.put_nowait, base64.b64decode(raw))
                     elif t == "session.finished":
                         loop.call_soon_threadsafe(queue.put_nowait, None)
@@ -199,21 +211,29 @@ class TtsLiveSession:
         )
         logger.debug("TTS live session ready")
 
-    def append(self, text: str) -> None:
+    async def append(self, text: str) -> None:
         """Feed text into the open session. Safe to call multiple times."""
         if not self._tts or not text.strip():
             return
         for chunk in _split_text(text):
             try:
-                self._tts.append_text(chunk)
+                started_at = time.perf_counter()
+                await asyncio.to_thread(self._tts.append_text, chunk)
+                elapsed_ms = (time.perf_counter() - started_at) * 1000
+                if elapsed_ms > 250:
+                    logger.debug(f"TTS append_text slow: {elapsed_ms:.0f} ms chars={len(chunk)}")
             except Exception as e:
                 logger.warning(f"TTS live append error: {e}")
 
-    def finish(self) -> None:
+    async def finish(self) -> None:
         """Signal end of text input. Audio will finish streaming via chunks()."""
         if self._tts:
             try:
-                self._tts.finish()
+                started_at = time.perf_counter()
+                await asyncio.to_thread(self._tts.finish)
+                elapsed_ms = (time.perf_counter() - started_at) * 1000
+                if elapsed_ms > 250:
+                    logger.debug(f"TTS finish slow: {elapsed_ms:.0f} ms")
             except Exception as e:
                 logger.warning(f"TTS live finish error: {e}")
 

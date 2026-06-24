@@ -174,15 +174,20 @@ class AudioStreamHandler:
         session = self._tts_session
         if session is None:
             return
+        chunk_count = 0
+        byte_count = 0
         await self._send_json({"type": "tts_start"})
         try:
             async for chunk in session.chunks():
+                chunk_count += 1
+                byte_count += len(chunk)
                 await self._send_bytes(chunk)
         except asyncio.CancelledError:
             raise
         except Exception as e:
             logger.exception(f"TTS drain error: {e}")
         finally:
+            logger.debug(f"TTS drain finished: chunks={chunk_count} bytes={byte_count}")
             await self._send_json({"type": "tts_done"})
             if self._tts_session is session:
                 self._tts_session = None
@@ -199,12 +204,12 @@ class AudioStreamHandler:
     async def handle_tts_append(self, text: str) -> None:
         """Append text to the current streaming TTS session."""
         if self._tts_session and text.strip():
-            self._tts_session.append(text)
+            await self._tts_session.append(text)
 
     async def handle_tts_finish(self) -> None:
         """Finalize the current streaming TTS session."""
         if self._tts_session:
-            self._tts_session.finish()
+            await self._tts_session.finish()
 
 
 # ── Utility ────────────────────────────────────────────────────────────────

@@ -404,7 +404,7 @@ textarea, input { font-family: var(--font); }
   background: rgba(255,255,255,.04);
   border: 1px solid var(--b1); color: var(--t1);
 }
-.msg-human .msg-body { flex: none; }
+.msg-human .msg-body { flex: none; min-width: 0; max-width: 100%; }
 .msg-human .msg-who { text-align: right; }
 .msg-human .msg-text {
   background: var(--bg1);
@@ -413,6 +413,8 @@ textarea, input { font-family: var(--font); }
   border-radius: 14px 14px 4px 14px;
   font-size: 13.5px;
   color: var(--t0);
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 /* Thinking animation */
@@ -1262,6 +1264,14 @@ function removeThinking() { document.getElementById('msg-thinking')?.remove(); }
 /* ══════════════════════════════════════════════════════════════
    Text mode turn
 ══════════════════════════════════════════════════════════════ */
+function appendTranscriptToInput(current, transcript) {
+  const existing = (current || '').trim();
+  const next = (transcript || '').trim();
+  if (!existing) return next;
+  if (!next) return existing;
+  return `${existing}\n${next}`;
+}
+
 const $input = document.getElementById('userInput');
 const $send  = document.getElementById('btnSend');
 
@@ -1402,7 +1412,7 @@ function handleWS(m) {
     case 'asr_final':
       document.getElementById('asrText').textContent = '';
       // Fill input box — user can review/edit before sending
-      $input.value = m.text;
+      $input.value = appendTranscriptToInput($input.value, m.text);
       $input.style.height = 'auto';
       $input.style.height = Math.min($input.scrollHeight, 140) + 'px';
       $input.focus();
