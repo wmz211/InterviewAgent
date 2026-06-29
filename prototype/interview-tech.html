@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InterviewAgent — 技术面试</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300;1,9..144,600&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg0: #f7f4ee; --bg1: #efeae1; --bg2: #e8e3d8; --bg3: #dfd9cc;
+  --b0: #e0dace; --b1: #cdc6b8;
+  --t0: #1c1a16; --t1: #5c5449; --t2: #9c9488;
+  --acc: #c96214; --acc-h: #b8570f; --acc-lo: rgba(201,98,20,.1);
+  --ok: #16a34a;
+  --font: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --serif: 'Fraunces', Georgia, serif;
+  --ease: cubic-bezier(.4,0,.2,1);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; }
+body {
+  background: var(--bg0); color: var(--t0);
+  font-family: var(--font); font-size: 14px; line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  display: flex; flex-direction: column;
+}
+::selection { background: rgba(201,98,20,.15); }
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-thumb { background: var(--b1); border-radius: 4px; }
+
+/* Proto nav */
+.proto-nav {
+  height: 30px; flex-shrink: 0;
+  background: var(--bg1); border-bottom: 1px solid var(--b0);
+  display: flex; align-items: center; gap: 4px;
+  padding: 0 24px; font-size: 11px; font-weight: 500; color: var(--t2);
+}
+.proto-nav a { color: var(--t2); text-decoration: none; padding: 0 5px; transition: color .15s; }
+.proto-nav a:hover { color: var(--acc); }
+.proto-nav .sep { color: var(--b1); }
+.proto-nav .tag {
+  font-size: 10px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase;
+  color: var(--acc); border: 1px solid rgba(201,98,20,.3);
+  padding: 1px 7px; border-radius: 99px;
+}
+.proto-nav .current { color: var(--t1); font-weight: 600; }
+.proto-nav .next-link {
+  margin-left: auto; display: flex; align-items: center; gap: 5px;
+  color: var(--acc); font-weight: 600; text-decoration: none; padding: 0;
+}
+.proto-nav .next-link:hover { color: var(--acc-h); }
+
+/* App layout */
+.app { flex: 1; display: flex; overflow: hidden; }
+
+/* ── Sidebar ── */
+.sidebar {
+  width: 248px; flex-shrink: 0;
+  background: var(--bg1); border-right: 1px solid var(--b0);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.sb-top {
+  padding: 20px 18px 14px; border-bottom: 1px solid var(--b0);
+}
+.sb-app {
+  font-family: var(--serif); font-size: 16px; font-weight: 600;
+  color: var(--t0); letter-spacing: -.01em; margin-bottom: 10px;
+}
+.sb-app em { font-style: italic; color: var(--acc); }
+.sb-candidate { display: flex; align-items: center; gap: 8px; }
+.sb-avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--acc-lo); border: 1px solid rgba(207,120,32,.25);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 600; color: var(--acc); flex-shrink: 0;
+}
+.sb-cname { font-size: 13px; font-weight: 500; color: var(--t0); }
+.sb-ctag {
+  font-size: 10px; font-weight: 600; letter-spacing: .06em;
+  text-transform: uppercase; padding: 1px 6px; border-radius: 99px;
+  background: var(--bg2); color: var(--t2); border: 1px solid var(--b0);
+}
+
+/* Phase stepper */
+.sb-phases { padding: 18px 18px 14px; flex: 0; }
+.sb-section-label {
+  font-size: 10.5px; font-weight: 600; letter-spacing: .07em;
+  text-transform: uppercase; color: var(--t2); margin-bottom: 14px;
+}
+.phase-list { position: relative; display: flex; flex-direction: column; gap: 0; }
+.phase-list::before {
+  content: ''; position: absolute; left: 7px; top: 8px; bottom: 8px;
+  width: 1px; background: var(--b1); z-index: 0;
+}
+.ph-item {
+  position: relative; z-index: 1;
+  display: flex; align-items: center; gap: 12px;
+  padding: 7px 0; cursor: pointer;
+}
+.ph-dot {
+  width: 15px; height: 15px; flex-shrink: 0; border-radius: 50%;
+  border: 2px solid var(--b1); background: var(--bg1);
+  display: flex; align-items: center; justify-content: center;
+  transition: all .3s var(--ease);
+}
+.ph-dot-inner {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--t2); transition: all .3s var(--ease);
+}
+.ph-item.done .ph-dot { border-color: var(--ok); background: rgba(22,163,74,.1); }
+.ph-item.done .ph-dot-inner { background: var(--ok); }
+.ph-item.active .ph-dot { border-color: var(--acc); background: var(--acc-lo); box-shadow: 0 0 0 3px rgba(201,98,20,.12); }
+.ph-item.active .ph-dot-inner { background: var(--acc); }
+.ph-label { font-size: 12.5px; color: var(--t2); transition: color .2s; }
+.ph-item.done .ph-label  { color: var(--t1); }
+.ph-item.active .ph-label { color: var(--t0); font-weight: 500; }
+.ph-item:hover .ph-label { color: var(--acc); }
+.ph-item:hover .ph-dot { border-color: var(--acc); }
+
+/* Phase nav */
+.sb-nav { padding: 14px 18px; border-top: 1px solid var(--b0); }
+.sb-nav-btn {
+  width: 100%; padding: 9px 14px;
+  background: var(--acc); color: #fff;
+  font-size: 12.5px; font-weight: 600; border-radius: 7px;
+  border: none; cursor: pointer; font-family: var(--font);
+  text-decoration: none; display: flex; align-items: center; justify-content: center;
+  gap: 7px; transition: background .18s;
+}
+.sb-nav-btn:hover { background: var(--acc-h); }
+
+.sb-footer {
+  margin-top: auto; padding: 14px 18px; border-top: 1px solid var(--b0);
+  display: flex; flex-direction: column; gap: 5px;
+}
+.sb-stat { display: flex; justify-content: space-between; align-items: center; }
+.sb-stat-label { font-size: 11.5px; color: var(--t2); }
+.sb-stat-val { font-size: 11.5px; font-weight: 500; color: var(--t1); }
+
+/* ── Chat area ── */
+.chat-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #fff; }
+.chat-header {
+  flex-shrink: 0; padding: 0 24px; height: 50px;
+  border-bottom: 1px solid var(--b0);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.chat-title { font-size: 13px; font-weight: 500; color: var(--t1); }
+.phase-badge {
+  padding: 3px 10px; border-radius: 99px;
+  font-size: 11px; font-weight: 600; letter-spacing: .04em;
+  background: var(--acc-lo); color: var(--acc);
+  border: 1px solid rgba(207,120,32,.2); text-transform: uppercase;
+}
+.chat-turns { font-size: 12px; color: var(--t2); }
+
+.chat-msgs { flex: 1; overflow-y: auto; padding: 28px 0; display: flex; flex-direction: column; }
+.chat-msgs-inner {
+  max-width: 700px; width: 100%; margin: 0 auto; padding: 0 24px;
+  display: flex; flex-direction: column; gap: 20px;
+}
+
+/* Messages */
+.msg { display: flex; gap: 14px; }
+.msg-avatar {
+  width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 600; margin-top: 1px;
+}
+.msg-ai .msg-avatar { background: var(--acc-lo); border: 1px solid rgba(207,120,32,.2); color: var(--acc); }
+.msg-body { flex: 1; min-width: 0; }
+.msg-who { font-size: 11px; font-weight: 600; letter-spacing: .02em; color: var(--t2); margin-bottom: 5px; text-transform: uppercase; }
+.msg-text { font-size: 14px; line-height: 1.72; color: var(--t0); white-space: pre-wrap; word-break: break-word; }
+
+.msg-human { flex-direction: row-reverse; align-self: flex-end; max-width: 82%; }
+.msg-human .msg-avatar { background: rgba(255,255,255,.04); border: 1px solid var(--b1); color: var(--t1); }
+.msg-human .msg-body { flex: none; }
+.msg-human .msg-who { text-align: right; }
+.msg-human .msg-text {
+  background: var(--bg1); border: 1px solid var(--b0);
+  padding: 10px 15px; border-radius: 14px 14px 4px 14px;
+  font-size: 13.5px; color: var(--t0);
+}
+
+/* Tool call indicator */
+.msg-tool { align-self: flex-start; }
+.msg-tool .msg-body { flex: none; }
+.tool-call {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 7px 12px; border-radius: 8px;
+  background: rgba(107,70,193,.06); border: 1px solid rgba(107,70,193,.15);
+  font-size: 12px; color: #6b46c1;
+}
+.tool-call-dot {
+  width: 6px; height: 6px; border-radius: 50%; background: #9f7aea;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:.4} 50%{opacity:1} }
+
+/* Thinking */
+.msg-thinking .msg-text { color: var(--t2); font-style: italic; display: flex; align-items: center; gap: 6px; }
+.thinking-dots { display: flex; gap: 4px; }
+.thinking-dots span {
+  width: 4px; height: 4px; border-radius: 50%; background: var(--t2);
+  display: inline-block; animation: bob .9s ease-in-out infinite;
+}
+.thinking-dots span:nth-child(2) { animation-delay: .15s; }
+.thinking-dots span:nth-child(3) { animation-delay: .3s; }
+@keyframes bob { 0%,60%,100%{transform:translateY(0);opacity:.4} 30%{transform:translateY(-4px);opacity:1} }
+
+/* Input bar */
+.chat-input-wrap { flex-shrink: 0; padding: 14px 24px 18px; border-top: 1px solid var(--b0); }
+.chat-input-inner {
+  max-width: 700px; margin: 0 auto;
+  background: var(--bg0); border: 1px solid var(--b1);
+  border-radius: 12px; display: flex; align-items: flex-end; gap: 0;
+  transition: border-color .2s;
+}
+.chat-input-inner:focus-within { border-color: var(--acc); }
+.chat-input-inner textarea {
+  flex: 1; background: transparent; border: none; outline: none;
+  color: var(--t2); font-size: 13.5px; line-height: 1.6;
+  padding: 12px 16px; resize: none; min-height: 46px; max-height: 120px;
+  font-family: var(--font);
+}
+.chat-input-inner textarea::placeholder { color: var(--t2); }
+.btn-mic {
+  width: 40px; height: 40px; margin: 3px; border-radius: 8px;
+  background: var(--bg2); border: 1px solid var(--b1); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; color: var(--t1);
+  cursor: pointer; transition: all .18s;
+}
+.btn-mic:hover { border-color: var(--acc); background: var(--acc-lo); color: var(--acc); }
+.btn-send {
+  width: 40px; height: 40px; margin: 3px; border-radius: 8px;
+  background: var(--acc); color: #fff; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; border: none; transition: background .18s;
+}
+.btn-send:hover { background: var(--acc-h); }
+.input-hint { margin-top: 6px; text-align: center; font-size: 11px; color: var(--t2); }
+.input-hint span { color: var(--t2); }
+
+/* ── Audio section ── */
+.sb-audio { padding: 14px 18px; border-top: 1px solid var(--b0); }
+.sb-wave-wrap {
+  background: var(--bg0); border: 1px solid var(--b0);
+  border-radius: 8px; padding: 0 8px;
+  margin-bottom: 10px; height: 44px;
+  display: flex; align-items: center; justify-content: center; gap: 2px;
+  overflow: hidden;
+}
+.wave-bar {
+  width: 3px; border-radius: 99px; background: var(--b1);
+  height: 4px; flex-shrink: 0; transition: background .3s;
+}
+.sb-audio.rec .wave-bar {
+  background: var(--acc);
+  animation: waveBar var(--dur,.8s) ease-in-out infinite;
+  animation-delay: var(--delay,0s);
+}
+@keyframes waveBar { 0%,100%{height:3px} 50%{height:var(--h,18px)} }
+.sb-mic-row { display: flex; align-items: center; gap: 10px; }
+.mic-btn {
+  width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+  background: var(--bg2); border: 1px solid var(--b1);
+  display: flex; align-items: center; justify-content: center; color: var(--t1);
+  cursor: pointer; transition: all .2s;
+}
+.mic-btn:hover { border-color: var(--acc); background: var(--acc-lo); color: var(--acc); }
+.mic-btn.rec { background: rgba(220,38,38,.08); border-color: var(--err); color: var(--err); animation: ring 1.5s ease-out infinite; }
+@keyframes ring { 0%{box-shadow:0 0 0 0 rgba(220,38,38,.35)} 70%{box-shadow:0 0 0 9px rgba(220,38,38,0)} 100%{box-shadow:0 0 0 0 rgba(220,38,38,0)} }
+.asr-text { flex:1; font-size:11.5px; color:var(--acc); line-height:1.4; word-break:break-all; min-height:16px; }
+.asr-text:empty::before { content:'等待语音…'; color:var(--t2); }
+.mode-row { display:flex; gap:6px; margin-top:10px; }
+.mode-chip {
+  flex:1; padding:5px 0; border:1px solid var(--b1); border-radius:6px;
+  font-size:11.5px; font-weight:500; color:var(--t2); text-align:center;
+  cursor:pointer; background:transparent; font-family:var(--font); transition:all .18s;
+}
+.mode-chip.on { background:var(--bg3); color:var(--t0); }
+</style>
+</head>
+<body>
+
+<nav class="proto-nav">
+  <span class="tag">Prototype</span>
+  <span class="sep">·</span>
+  <a href="index.html">Overview</a>
+  <span class="sep">/</span>
+  <a href="setup.html">Setup</a>
+  <span class="sep">/</span>
+  <span class="current">Tech Interview</span>
+  <a class="next-link" href="wrapup.html">
+    Wrap-up
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="m4 2 4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </a>
+</nav>
+
+<div class="app">
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sb-top">
+      <div class="sb-app">Interview<em>Agent</em></div>
+      <div class="sb-candidate">
+        <div class="sb-avatar">ZW</div>
+        <span class="sb-cname">张伟</span>
+        <span class="sb-ctag">Tech</span>
+      </div>
+    </div>
+
+    <div class="sb-phases">
+      <div class="sb-section-label">面试进度</div>
+      <div class="phase-list" id="phaseList">
+        <div class="ph-item done" onclick="switchPhase('greeting')">
+          <div class="ph-dot"><div class="ph-dot-inner"></div></div>
+          <span class="ph-label">开场寒暄</span>
+        </div>
+        <div class="ph-item active" id="ph-resume_dive" onclick="switchPhase('resume_dive')">
+          <div class="ph-dot"><div class="ph-dot-inner"></div></div>
+          <span class="ph-label">简历深挖</span>
+        </div>
+        <div class="ph-item" id="ph-jd_tech" onclick="switchPhase('jd_tech')">
+          <div class="ph-dot"><div class="ph-dot-inner"></div></div>
+          <span class="ph-label">JD 技术考察</span>
+        </div>
+        <div class="ph-item" id="ph-coding_test" onclick="switchPhase('coding_test')">
+          <div class="ph-dot"><div class="ph-dot-inner"></div></div>
+          <span class="ph-label">算法编程</span>
+        </div>
+        <div class="ph-item" id="ph-wrapup" onclick="location.href='wrapup.html'">
+          <div class="ph-dot"><div class="ph-dot-inner"></div></div>
+          <span class="ph-label">收尾 Q&amp;A</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Audio -->
+    <div class="sb-audio" id="sbAudio">
+      <div class="sb-section-label">语音输入</div>
+      <div class="sb-wave-wrap" id="waveWrap"></div>
+      <div class="sb-mic-row">
+        <button class="mic-btn" id="micBtn" onclick="toggleMic()">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+            <rect x="5" y="1" width="5" height="8.5" rx="2.5" stroke="currentColor" stroke-width="1.35"/>
+            <path d="M2.5 7.5a5 5 0 0 0 10 0M7.5 13v1.5" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <div class="asr-text" id="asrText"></div>
+      </div>
+      <div class="mode-row">
+        <button class="mode-chip on" onclick="setMode(this)">语音</button>
+        <button class="mode-chip" onclick="setMode(this)">文字</button>
+      </div>
+    </div>
+
+    <div class="sb-nav">
+      <button class="sb-nav-btn" id="navBtn" onclick="nextPhase()">
+        进入下一阶段
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M3 6.5h7m-3-3 3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+
+    <div class="sb-footer">
+      <div class="sb-stat">
+        <span class="sb-stat-label">当前轮次</span>
+        <span class="sb-stat-val" id="turnCount">2 / 4+</span>
+      </div>
+      <div class="sb-stat">
+        <span class="sb-stat-label">Session</span>
+        <span class="sb-stat-val" style="font-family:monospace;font-size:10.5px;">sess_abc1</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chat -->
+  <div class="chat-area">
+    <div class="chat-header">
+      <span class="chat-title" id="chatTitle">技术面试 · 简历深挖阶段</span>
+      <span class="phase-badge" id="phaseBadge">Resume Dive</span>
+      <span class="chat-turns" id="chatTurns">Turn 2</span>
+    </div>
+
+    <div class="chat-msgs">
+      <div class="chat-msgs-inner" id="msgsInner"></div>
+    </div>
+
+    <div class="chat-input-wrap">
+      <div class="chat-input-inner">
+        <textarea placeholder="（原型模式：输入框仅展示，不可实际输入）" readonly rows="1"></textarea>
+        <button class="btn-mic" title="语音输入">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <rect x="4.5" y="1" width="5" height="8" rx="2.5" stroke="currentColor" stroke-width="1.3"/>
+            <path d="M2 7a5 5 0 0 0 10 0M7 12v1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <button class="btn-send" disabled>
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8m-3-3 3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+      <div class="input-hint">Shift + Enter 换行 &nbsp;·&nbsp; Enter 发送</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const PHASES = {
+  greeting: {
+    title: '技术面试 · 开场寒暄',
+    badge: 'Greeting',
+    turns: 'Turn 2',
+    turnCount: '2 / 2+',
+    next: 'resume_dive',
+    messages: [
+      {role:'ai', text:'您好！我是今天的 AI 面试官，很高兴见到您。请先做一个简短的自我介绍，重点介绍您的技术背景和主要项目经历。'},
+      {role:'human', text:'您好！我叫张伟，有 4 年后端开发经验，主要使用 Python 和 Go。近两年专注于 LLM 应用开发，参与设计并落地了一套大规模 RAG 检索系统，日均查询量在千万级别。'},
+    ]
+  },
+  resume_dive: {
+    title: '技术面试 · 简历深挖',
+    badge: 'Resume Dive',
+    turns: 'Turn 2',
+    turnCount: '2 / 4+',
+    next: 'jd_tech',
+    messages: [
+      {role:'ai', text:'您提到参与设计了大规模 RAG 检索系统。能具体描述一下您在这个项目中负责的模块以及核心技术挑战吗？'},
+      {role:'human', text:'我主要负责向量检索模块，使用 FAISS 做离线索引，同时设计了增量更新策略来避免全量重建索引带来的性能开销。核心挑战在于在保证查询延迟 P99 < 50ms 的前提下支持每天数百万条新增文档的实时写入。'},
+      {role:'ai', text:'很有意思。您选择 FAISS 而非 Milvus 或 Weaviate 等专用向量数据库，当时是基于哪些维度的评估？部署成本以外，性能和一致性方面有什么取舍？'},
+      {role:'human', text:'核心考量有三点：一是部署复杂度，FAISS 直接嵌入应用进程，运维成本极低；二是延迟，内存级操作比 RPC 调用快一个数量级；三是当时数据量在千万级，FAISS 的单机能力完全够用。但代价是分布式扩展性差，后来数据增长到亿级时确实遇到了瓶颈，最终迁移到了 Milvus。'},
+    ]
+  },
+  jd_tech: {
+    title: '技术面试 · JD 技术考察',
+    badge: 'JD Tech',
+    turns: 'Turn 1',
+    turnCount: '1 / 6+',
+    next: 'coding_test',
+    tool: '调用 graph_search_tool — 从 JD 中提取技术实体，查询知识图谱，沿 LEADS_TO 边构建追问链…',
+    messages: [
+      {role:'ai', text:'根据岗位要求，我们来深入考察一下 RAG 系统的核心技术。请问在设计检索系统时，您如何处理检索召回率与精确率之间的 trade-off？具体在您的项目中是如何平衡的？'},
+      {role:'human', text:'我们的方案是两阶段检索：第一阶段用 FAISS 做 ANN 搜索，top-k 设为 50，保证高召回；第二阶段用 cross-encoder 精排，将候选集压缩到 5 条再输入 LLM。精排阶段延迟大约 80ms，是系统的主要瓶颈。'},
+    ]
+  },
+  coding_test: {
+    title: '技术面试 · 算法编程',
+    badge: 'Coding Test',
+    turns: 'Turn 1',
+    turnCount: '1 / 3+',
+    next: 'wrapup',
+    nextHref: 'wrapup.html',
+    tool: '调用 vector_search_tool — 从算法题库匹配难度适配题目…',
+    messages: [
+      {role:'ai', text:'好的，进入算法题环节。\n\n给定一个字符串 s，找出其中最长的不含重复字符的子串长度。\n\n示例：s = "abcabcbb" → 3（对应子串 "abc"）\n\n请先描述解题思路，再分析时间与空间复杂度。'},
+      {role:'human', text:'这是经典的滑动窗口问题。用双指针 left / right 维护一个窗口，哈希表记录每个字符最近出现的位置。遍历时：若 s[right] 已在窗口内，则将 left 移到该字符上次出现位置的下一位，否则直接扩展右边界，同时更新最大长度。\n\n时间复杂度 O(n)，空间复杂度 O(min(m, n))，m 为字符集大小。'},
+    ]
+  }
+};
+
+const ORDER = ['greeting','resume_dive','jd_tech','coding_test','wrapup'];
+let cur = 'resume_dive';
+
+function renderMessages(phase) {
+  const inner = document.getElementById('msgsInner');
+  inner.innerHTML = '';
+  const data = PHASES[phase];
+  if (!data) return;
+
+  if (data.tool) {
+    const d = document.createElement('div');
+    d.className = 'msg msg-tool';
+    d.innerHTML = `<div class="msg-body"><div class="tool-call"><div class="tool-call-dot"></div>${data.tool}</div></div>`;
+    inner.appendChild(d);
+  }
+
+  data.messages.forEach(m => {
+    const d = document.createElement('div');
+    d.className = 'msg msg-' + m.role;
+    if (m.role === 'ai') {
+      d.innerHTML = `<div class="msg-avatar">AI</div><div class="msg-body"><div class="msg-who">Interviewer</div><div class="msg-text">${m.text.replace(/\n/g,'<br>')}</div></div>`;
+    } else {
+      d.innerHTML = `<div class="msg-avatar">ZW</div><div class="msg-body"><div class="msg-who">候选人</div><div class="msg-text">${m.text.replace(/\n/g,'<br>')}</div></div>`;
+    }
+    inner.appendChild(d);
+  });
+
+  // Thinking indicator
+  const t = document.createElement('div');
+  t.className = 'msg msg-ai msg-thinking';
+  t.innerHTML = `<div class="msg-avatar">AI</div><div class="msg-body"><div class="msg-who">Interviewer</div><div class="msg-text"><div class="thinking-dots"><span></span><span></span><span></span></div></div></div>`;
+  inner.appendChild(t);
+
+  inner.parentElement.scrollTop = inner.parentElement.scrollHeight;
+}
+
+function switchPhase(phase) {
+  if (!PHASES[phase] && phase !== 'wrapup') return;
+  if (phase === 'wrapup') { location.href = 'wrapup.html'; return; }
+  cur = phase;
+  const data = PHASES[phase];
+
+  // Update header
+  document.getElementById('chatTitle').textContent = data.title;
+  document.getElementById('phaseBadge').textContent = data.badge;
+  document.getElementById('chatTurns').textContent = data.turns;
+  document.getElementById('turnCount').textContent = data.turnCount;
+
+  // Update stepper
+  const idx = ORDER.indexOf(phase);
+  ORDER.forEach((p, i) => {
+    const el = document.getElementById('ph-' + p) || document.querySelector(`.ph-item:nth-child(${i+1})`);
+    if (!el) return;
+    el.className = 'ph-item' + (i < idx ? ' done' : i === idx ? ' active' : '');
+  });
+
+  // Update nav button
+  const btn = document.getElementById('navBtn');
+  const nextPhaseId = data.next;
+  if (nextPhaseId === 'wrapup') {
+    btn.onclick = () => location.href = 'wrapup.html';
+    btn.innerHTML = '进入收尾阶段 <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M3 6.5h7m-3-3 3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  } else {
+    btn.onclick = () => nextPhase();
+    btn.innerHTML = '进入下一阶段 <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M3 6.5h7m-3-3 3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  }
+
+  renderMessages(phase);
+}
+
+function nextPhase() {
+  const idx = ORDER.indexOf(cur);
+  if (idx < ORDER.length - 1) switchPhase(ORDER[idx + 1]);
+}
+
+// ── Wave bars init ──
+(function(){
+  const wrap = document.getElementById('waveWrap');
+  const heights = [5,8,14,20,26,30,26,20,14,9,7,11,18,26,22,16,11,7,5,4];
+  const durs = [.75,.82,.68,.9,.72,.85,.78,.65,.88,.7,.8,.73,.67,.84,.76,.9,.71,.83,.69,.77];
+  heights.forEach((h, i) => {
+    const b = document.createElement('div');
+    b.className = 'wave-bar';
+    b.style.cssText = `--h:${h}px;--dur:${durs[i]}s;--delay:${(i*0.04).toFixed(2)}s`;
+    wrap.appendChild(b);
+  });
+})();
+
+let _rec = false;
+function toggleMic() {
+  _rec = !_rec;
+  document.getElementById('micBtn').classList.toggle('rec', _rec);
+  document.getElementById('sbAudio').classList.toggle('rec', _rec);
+  const asr = document.getElementById('asrText');
+  if (_rec) { setTimeout(() => { if (_rec) asr.textContent = '正在识别…'; }, 600); }
+  else { asr.textContent = ''; }
+}
+function setMode(btn) {
+  btn.closest('.mode-row').querySelectorAll('.mode-chip').forEach(c => c.classList.remove('on'));
+  btn.classList.add('on');
+}
+
+// Init from hash
+const hash = location.hash.replace('#','');
+switchPhase(PHASES[hash] ? hash : 'resume_dive');
+</script>
+</body>
+</html>

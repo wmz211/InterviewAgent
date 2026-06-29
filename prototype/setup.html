@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InterviewAgent — 信息录入</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300;1,9..144,600&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg0: #f7f4ee; --bg1: #efeae1; --bg2: #e8e3d8; --bg3: #dfd9cc;
+  --b0: #e0dace; --b1: #cdc6b8;
+  --t0: #1c1a16; --t1: #5c5449; --t2: #9c9488;
+  --acc: #c96214; --acc-h: #b8570f; --acc-lo: rgba(201,98,20,.1);
+  --ok: #16a34a; --err: #dc2626;
+  --font: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --serif: 'Fraunces', Georgia, serif;
+  --ease: cubic-bezier(.4,0,.2,1);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; }
+body {
+  background: var(--bg0); color: var(--t0);
+  font-family: var(--font); font-size: 14px; line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  display: flex; flex-direction: column;
+}
+::selection { background: rgba(201,98,20,.15); }
+
+/* Proto nav */
+.proto-nav {
+  height: 30px; flex-shrink: 0;
+  background: var(--bg1); border-bottom: 1px solid var(--b0);
+  display: flex; align-items: center; gap: 4px;
+  padding: 0 24px; font-size: 11px; font-weight: 500; color: var(--t2);
+}
+.proto-nav a { color: var(--t2); text-decoration: none; padding: 0 5px; transition: color .15s; }
+.proto-nav a:hover { color: var(--acc); }
+.proto-nav .sep { color: var(--b1); }
+.proto-nav .tag {
+  font-size: 10px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase;
+  color: var(--acc); border: 1px solid rgba(201,98,20,.3);
+  padding: 1px 7px; border-radius: 99px;
+}
+.proto-nav .current { color: var(--t1); font-weight: 600; }
+
+/* Full-page centering */
+.page-center {
+  flex: 1; overflow-y: auto;
+  display: flex; align-items: center; justify-content: center;
+  padding: 32px 24px;
+  position: relative;
+}
+.page-center::before {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(201,98,20,.05) 0%, transparent 65%);
+}
+
+.setup-inner {
+  position: relative; z-index: 1;
+  width: 100%; max-width: 760px;
+  display: flex; flex-direction: column; gap: 28px;
+}
+
+/* Logo */
+.setup-logo { text-align: center; }
+.setup-logo h1 {
+  font-family: var(--serif); font-size: 40px; font-weight: 300;
+  letter-spacing: -.02em; color: var(--t0); line-height: 1;
+}
+.setup-logo h1 em { font-style: italic; color: var(--acc); }
+.setup-logo p { margin-top: 8px; color: var(--t2); font-size: 13px; font-weight: 300; }
+
+/* Main card */
+.setup-card {
+  background: var(--bg1); border: 1px solid var(--b0); border-radius: 16px; overflow: hidden;
+}
+.setup-card-body { display: grid; grid-template-columns: 1fr 1fr; }
+
+/* Drop zone */
+.drop-zone {
+  padding: 36px 28px; border-right: 1px solid var(--b0);
+  cursor: pointer; position: relative;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 12px; text-align: center;
+  min-height: 200px; transition: background .2s;
+}
+.drop-zone:hover, .drop-zone.over { background: var(--bg2); }
+.drop-icon {
+  width: 48px; height: 48px; border-radius: 12px;
+  background: var(--bg2); border: 1px solid var(--b1);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--t1); transition: transform .2s, background .2s;
+}
+.drop-zone:hover .drop-icon { transform: translateY(-2px); background: var(--bg3); }
+.drop-zone h3 { font-size: 13.5px; font-weight: 600; color: var(--t0); }
+.drop-zone p { font-size: 12px; color: var(--t2); line-height: 1.5; }
+.drop-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+
+.drop-file {
+  display: none; align-items: center; gap: 6px;
+  padding: 5px 10px; border-radius: 6px;
+  background: rgba(22,163,74,.08); border: 1px solid rgba(22,163,74,.2);
+  font-size: 12px; color: var(--ok);
+}
+.drop-file.visible { display: flex; }
+.drop-file span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* JD zone */
+.jd-zone { padding: 18px 22px; display: flex; flex-direction: column; gap: 8px; }
+.field-label {
+  font-size: 10.5px; font-weight: 600; letter-spacing: .07em;
+  text-transform: uppercase; color: var(--t2);
+}
+.jd-zone textarea {
+  flex: 1; min-height: 148px; background: transparent;
+  border: none; outline: none; color: var(--t0);
+  font-size: 13.5px; line-height: 1.65; resize: none;
+  font-family: var(--font);
+}
+.jd-zone textarea::placeholder { color: var(--t2); }
+
+/* Footer */
+.setup-footer {
+  padding: 14px 20px; border-top: 1px solid var(--b0);
+  display: flex; align-items: center; gap: 12px;
+}
+.mode-row { display: flex; gap: 6px; }
+.mode-chip {
+  padding: 5px 14px; border: 1px solid var(--b1); border-radius: 6px;
+  font-size: 12px; font-weight: 500; color: var(--t2); cursor: pointer;
+  transition: all .18s; background: transparent; font-family: var(--font);
+}
+.mode-chip.on { background: var(--bg3); border-color: var(--b1); color: var(--t0); }
+.mode-chip:hover:not(.on) { border-color: var(--acc); color: var(--acc); }
+.setup-meta { flex: 1; font-size: 12px; color: var(--t2); }
+
+.btn-primary {
+  padding: 10px 24px; background: var(--acc); color: #fff;
+  font-size: 13px; font-weight: 600; border-radius: 8px;
+  letter-spacing: .01em; border: none; cursor: pointer; font-family: var(--font);
+  text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
+  transition: background .18s, transform .15s;
+}
+.btn-primary:hover { background: var(--acc-h); transform: translateY(-1px); }
+</style>
+</head>
+<body>
+
+<nav class="proto-nav">
+  <span class="tag">Prototype</span>
+  <span class="sep">·</span>
+  <a href="index.html">Overview</a>
+  <span class="sep">/</span>
+  <span class="current">Setup</span>
+  <span class="sep">/</span>
+  <a href="interview-tech.html">Tech</a>
+  <span class="sep">/</span>
+  <a href="interview-hr.html">HR</a>
+</nav>
+
+<div class="page-center">
+  <div class="setup-inner">
+
+    <div class="setup-logo">
+      <h1>Interview<em>Agent</em></h1>
+      <p>上传您的简历与岗位描述，AI 将量身定制一场完整的模拟面试</p>
+    </div>
+
+    <div class="setup-card">
+      <div class="setup-card-body">
+
+        <!-- Drop zone -->
+        <div class="drop-zone" id="dropZone" onclick="showFile()">
+          <input type="file" accept=".pdf,.docx" tabindex="-1">
+          <div class="drop-icon">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <path d="M11 14V8m0 0-3 3m3-3 3 3M5 18h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <rect x="3" y="3" width="16" height="16" rx="3" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+          </div>
+          <h3>上传简历</h3>
+          <p>点击选择或拖拽文件至此处<br>PDF · DOCX · 最大 10 MB</p>
+          <div class="drop-file" id="dropFile">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="m2 6 3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>张伟_后端工程师简历.pdf</span>
+          </div>
+        </div>
+
+        <!-- JD zone -->
+        <div class="jd-zone">
+          <div class="field-label">岗位描述 JD</div>
+          <textarea placeholder="粘贴岗位描述内容…&#10;&#10;高级后端工程师 / 3年+ 经验 / 熟悉分布式系统与微服务 / Python 或 Go / RAG · LLM 应用经验优先…"></textarea>
+        </div>
+
+      </div>
+
+      <div class="setup-footer">
+        <div class="mode-row">
+          <button class="mode-chip on" id="chip-tech" onclick="selectMode('tech')">技术面试</button>
+          <button class="mode-chip" id="chip-hr" onclick="selectMode('hr')">HR 综合</button>
+        </div>
+        <div class="setup-meta">选择面试类型后点击开始</div>
+        <a class="btn-primary" id="startBtn" href="interview-tech.html">
+          开始面试
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8m-3-3 3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function showFile() {
+  document.getElementById('dropFile').classList.add('visible');
+}
+function selectMode(m) {
+  document.getElementById('chip-tech').className = 'mode-chip' + (m === 'tech' ? ' on' : '');
+  document.getElementById('chip-hr').className   = 'mode-chip' + (m === 'hr'   ? ' on' : '');
+  document.getElementById('startBtn').href = m === 'tech' ? 'interview-tech.html' : 'interview-hr.html';
+}
+</script>
+</body>
+</html>

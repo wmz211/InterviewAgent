@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InterviewAgent — HR 综合面试</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300;1,9..144,600&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg0: #f7f4ee; --bg1: #efeae1; --bg2: #e8e3d8; --bg3: #dfd9cc;
+  --b0: #e0dace; --b1: #cdc6b8;
+  --t0: #1c1a16; --t1: #5c5449; --t2: #9c9488;
+  --acc: #c96214; --acc-h: #b8570f; --acc-lo: rgba(201,98,20,.1);
+  --ok: #16a34a;
+  --font: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --serif: 'Fraunces', Georgia, serif;
+  --ease: cubic-bezier(.4,0,.2,1);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; }
+body {
+  background: var(--bg0); color: var(--t0);
+  font-family: var(--font); font-size: 14px; line-height: 1.6;
+  -webkit-font-smoothing: antialiased; display: flex; flex-direction: column;
+}
+::selection { background: rgba(201,98,20,.15); }
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-thumb { background: var(--b1); border-radius: 4px; }
+
+.proto-nav {
+  height: 30px; flex-shrink: 0;
+  background: var(--bg1); border-bottom: 1px solid var(--b0);
+  display: flex; align-items: center; gap: 4px;
+  padding: 0 24px; font-size: 11px; font-weight: 500; color: var(--t2);
+}
+.proto-nav a { color: var(--t2); text-decoration: none; padding: 0 5px; transition: color .15s; }
+.proto-nav a:hover { color: var(--acc); }
+.proto-nav .sep { color: var(--b1); }
+.proto-nav .tag {
+  font-size: 10px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase;
+  color: var(--acc); border: 1px solid rgba(201,98,20,.3); padding: 1px 7px; border-radius: 99px;
+}
+.proto-nav .current { color: var(--t1); font-weight: 600; }
+.proto-nav .next-link {
+  margin-left: auto; display: flex; align-items: center; gap: 5px;
+  color: var(--acc); font-weight: 600; text-decoration: none; padding: 0;
+}
+.proto-nav .next-link:hover { color: var(--acc-h); }
+
+.app { flex: 1; display: flex; overflow: hidden; }
+
+.sidebar {
+  width: 248px; flex-shrink: 0;
+  background: var(--bg1); border-right: 1px solid var(--b0);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.sb-top { padding: 20px 18px 14px; border-bottom: 1px solid var(--b0); }
+.sb-app { font-family: var(--serif); font-size: 16px; font-weight: 600; color: var(--t0); letter-spacing: -.01em; margin-bottom: 10px; }
+.sb-app em { font-style: italic; color: var(--acc); }
+.sb-candidate { display: flex; align-items: center; gap: 8px; }
+.sb-avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--acc-lo); border: 1px solid rgba(207,120,32,.25);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 600; color: var(--acc); flex-shrink: 0;
+}
+.sb-cname { font-size: 13px; font-weight: 500; color: var(--t0); }
+.sb-ctag {
+  font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+  padding: 1px 6px; border-radius: 99px; background: var(--bg2); color: var(--t2); border: 1px solid var(--b0);
+}
+
+.sb-phases { padding: 18px 18px 14px; flex: 0; }
+.sb-section-label { font-size: 10.5px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--t2); margin-bottom: 14px; }
+.phase-list { position: relative; display: flex; flex-direction: column; gap: 0; }
+.phase-list::before { content: ''; position: absolute; left: 7px; top: 8px; bottom: 8px; width: 1px; background: var(--b1); z-index: 0; }
+.ph-item { position: relative; z-index: 1; display: flex; align-items: center; gap: 12px; padding: 7px 0; cursor: pointer; }
+.ph-dot { width: 15px; height: 15px; flex-shrink: 0; border-radius: 50%; border: 2px solid var(--b1); background: var(--bg1); display: flex; align-items: center; justify-content: center; transition: all .3s var(--ease); }
+.ph-dot-inner { width: 5px; height: 5px; border-radius: 50%; background: var(--t2); transition: all .3s var(--ease); }
+.ph-item.done .ph-dot { border-color: var(--ok); background: rgba(22,163,74,.1); }
+.ph-item.done .ph-dot-inner { background: var(--ok); }
+.ph-item.active .ph-dot { border-color: var(--acc); background: var(--acc-lo); box-shadow: 0 0 0 3px rgba(201,98,20,.12); }
+.ph-item.active .ph-dot-inner { background: var(--acc); }
+.ph-label { font-size: 12.5px; color: var(--t2); transition: color .2s; }
+.ph-item.done .ph-label { color: var(--t1); }
+.ph-item.active .ph-label { color: var(--t0); font-weight: 500; }
+.ph-item:hover .ph-label { color: var(--acc); }
+.ph-item:hover .ph-dot { border-color: var(--acc); }
+
+.sb-nav { padding: 14px 18px; border-top: 1px solid var(--b0); }
+.sb-nav-btn {
+  width: 100%; padding: 9px 14px;
+  background: var(--acc); color: #fff;
+  font-size: 12.5px; font-weight: 600; border-radius: 7px;
+  border: none; cursor: pointer; font-family: var(--font);
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  transition: background .18s;
+}
+.sb-nav-btn:hover { background: var(--acc-h); }
+
+.sb-footer { margin-top: auto; padding: 14px 18px; border-top: 1px solid var(--b0); display: flex; flex-direction: column; gap: 5px; }
+.sb-stat { display: flex; justify-content: space-between; align-items: center; }
+.sb-stat-label { font-size: 11.5px; color: var(--t2); }
+.sb-stat-val { font-size: 11.5px; font-weight: 500; color: var(--t1); }
+
+.chat-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #fff; }
+.chat-header { flex-shrink: 0; padding: 0 24px; height: 50px; border-bottom: 1px solid var(--b0); display: flex; align-items: center; justify-content: space-between; }
+.chat-title { font-size: 13px; font-weight: 500; color: var(--t1); }
+.phase-badge { padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 600; letter-spacing: .04em; background: var(--acc-lo); color: var(--acc); border: 1px solid rgba(207,120,32,.2); text-transform: uppercase; }
+.chat-turns { font-size: 12px; color: var(--t2); }
+
+.chat-msgs { flex: 1; overflow-y: auto; padding: 28px 0; display: flex; flex-direction: column; }
+.chat-msgs-inner { max-width: 700px; width: 100%; margin: 0 auto; padding: 0 24px; display: flex; flex-direction: column; gap: 20px; }
+
+.msg { display: flex; gap: 14px; }
+.msg-avatar { width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; margin-top: 1px; }
+.msg-ai .msg-avatar { background: var(--acc-lo); border: 1px solid rgba(207,120,32,.2); color: var(--acc); }
+.msg-body { flex: 1; min-width: 0; }
+.msg-who { font-size: 11px; font-weight: 600; letter-spacing: .02em; color: var(--t2); margin-bottom: 5px; text-transform: uppercase; }
+.msg-text { font-size: 14px; line-height: 1.72; color: var(--t0); white-space: pre-wrap; word-break: break-word; }
+
+.msg-human { flex-direction: row-reverse; align-self: flex-end; max-width: 82%; }
+.msg-human .msg-avatar { background: rgba(255,255,255,.04); border: 1px solid var(--b1); color: var(--t1); }
+.msg-human .msg-body { flex: none; }
+.msg-human .msg-who { text-align: right; }
+.msg-human .msg-text { background: var(--bg1); border: 1px solid var(--b0); padding: 10px 15px; border-radius: 14px 14px 4px 14px; font-size: 13.5px; color: var(--t0); }
+
+.msg-thinking .msg-text { color: var(--t2); font-style: italic; display: flex; align-items: center; gap: 6px; }
+.thinking-dots { display: flex; gap: 4px; }
+.thinking-dots span { width: 4px; height: 4px; border-radius: 50%; background: var(--t2); display: inline-block; animation: bob .9s ease-in-out infinite; }
+.thinking-dots span:nth-child(2) { animation-delay: .15s; }
+.thinking-dots span:nth-child(3) { animation-delay: .3s; }
+@keyframes bob { 0%,60%,100%{transform:translateY(0);opacity:.4} 30%{transform:translateY(-4px);opacity:1} }
+
+.chat-input-wrap { flex-shrink: 0; padding: 14px 24px 18px; border-top: 1px solid var(--b0); }
+.chat-input-inner { max-width: 700px; margin: 0 auto; background: var(--bg0); border: 1px solid var(--b1); border-radius: 12px; display: flex; align-items: flex-end; gap: 0; transition: border-color .2s; }
+.chat-input-inner textarea { flex: 1; background: transparent; border: none; outline: none; color: var(--t2); font-size: 13.5px; line-height: 1.6; padding: 12px 16px; resize: none; min-height: 46px; max-height: 120px; font-family: var(--font); }
+.btn-mic { width: 40px; height: 40px; margin: 3px; border-radius: 8px; background: var(--bg2); border: 1px solid var(--b1); flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: var(--t1); cursor: pointer; transition: all .18s; }
+.btn-mic:hover { border-color: var(--acc); background: var(--acc-lo); color: var(--acc); }
+.btn-send { width: 40px; height: 40px; margin: 3px; border-radius: 8px; background: var(--acc); color: #fff; flex-shrink: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; transition: background .18s; }
+.btn-send:hover { background: var(--acc-h); }
+.input-hint { margin-top: 6px; text-align: center; font-size: 11px; color: var(--t2); }
+
+/* ── Audio section ── */
+.sb-audio { padding: 14px 18px; border-top: 1px solid var(--b0); }
+.sb-wave-wrap {
+  background: var(--bg0); border: 1px solid var(--b0);
+  border-radius: 8px; padding: 0 8px; margin-bottom: 10px;
+  height: 44px; display: flex; align-items: center; justify-content: center;
+  gap: 2px; overflow: hidden;
+}
+.wave-bar { width: 3px; border-radius: 99px; background: var(--b1); height: 4px; flex-shrink: 0; transition: background .3s; }
+.sb-audio.rec .wave-bar { background: var(--acc); animation: waveBar var(--dur,.8s) ease-in-out infinite; animation-delay: var(--delay,0s); }
+@keyframes waveBar { 0%,100%{height:3px} 50%{height:var(--h,18px)} }
+.sb-mic-row { display: flex; align-items: center; gap: 10px; }
+.mic-btn { width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0; background: var(--bg2); border: 1px solid var(--b1); display: flex; align-items: center; justify-content: center; color: var(--t1); cursor: pointer; transition: all .2s; }
+.mic-btn:hover { border-color: var(--acc); background: var(--acc-lo); color: var(--acc); }
+.mic-btn.rec { background: rgba(220,38,38,.08); border-color: var(--err); color: var(--err); animation: ring 1.5s ease-out infinite; }
+@keyframes ring { 0%{box-shadow:0 0 0 0 rgba(220,38,38,.35)} 70%{box-shadow:0 0 0 9px rgba(220,38,38,0)} 100%{box-shadow:0 0 0 0 rgba(220,38,38,0)} }
+.asr-text { flex:1; font-size:11.5px; color:var(--acc); line-height:1.4; word-break:break-all; min-height:16px; }
+.asr-text:empty::before { content:'等待语音…'; color:var(--t2); }
+.mode-row { display:flex; gap:6px; margin-top:10px; }
+.mode-chip { flex:1; padding:5px 0; border:1px solid var(--b1); border-radius:6px; font-size:11.5px; font-weight:500; color:var(--t2); text-align:center; cursor:pointer; background:transparent; font-family:var(--font); transition:all .18s; }
+.mode-chip.on { background:var(--bg3); color:var(--t0); }
+</style>
+</head>
+<body>
+
+<nav class="proto-nav">
+  <span class="tag">Prototype</span>
+  <span class="sep">·</span>
+  <a href="index.html">Overview</a>
+  <span class="sep">/</span>
+  <a href="setup.html">Setup</a>
+  <span class="sep">/</span>
+  <span class="current">HR Interview</span>
+  <a class="next-link" href="wrapup.html">
+    Wrap-up
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="m4 2 4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </a>
+</nav>
+
+<div class="app">
+  <div class="sidebar">
+    <div class="sb-top">
+      <div class="sb-app">Interview<em>Agent</em></div>
+      <div class="sb-candidate">
+        <div class="sb-avatar">LM</div>
+        <span class="sb-cname">李明</span>
+        <span class="sb-ctag">HR</span>
+      </div>
+    </div>
+
+    <div class="sb-phases">
+      <div class="sb-section-label">面试进度</div>
+      <div class="phase-list">
+        <div class="ph-item done" onclick="switchPhase('greeting')">
+          <div class="ph-dot"><div class="ph-dot-inner"></div></div>
+          <span class="ph-label">开场寒暄</span>
+        </div>
+        <div class="ph-item active" id="ph-hr_self_intro" onclick="switchPhase('hr_self_intro')">
+          <div class="ph-dot"><div class="ph-dot-inner"></div></div>
+          <span class="ph-label">自我介绍</span>
+        </div>
+        <div class="ph-item" id="ph-hr_behavioral" onclick="switchPhase('hr_behavioral')">
+          <div class="ph-dot"><div class="ph-dot-inner"></div></div>
+          <span class="ph-label">行为面试</span>
+        </div>
+        <div class="ph-item" id="ph-hr_career" onclick="switchPhase('hr_career')">
+          <div class="ph-dot"><div class="ph-dot-inner"></div></div>
+          <span class="ph-label">职业规划</span>
+        </div>
+        <div class="ph-item" id="ph-wrapup" onclick="location.href='wrapup.html'">
+          <div class="ph-dot"><div class="ph-dot-inner"></div></div>
+          <span class="ph-label">收尾 Q&amp;A</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Audio -->
+    <div class="sb-audio" id="sbAudio">
+      <div class="sb-section-label">语音输入</div>
+      <div class="sb-wave-wrap" id="waveWrap"></div>
+      <div class="sb-mic-row">
+        <button class="mic-btn" id="micBtn" onclick="toggleMic()">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+            <rect x="5" y="1" width="5" height="8.5" rx="2.5" stroke="currentColor" stroke-width="1.35"/>
+            <path d="M2.5 7.5a5 5 0 0 0 10 0M7.5 13v1.5" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <div class="asr-text" id="asrText"></div>
+      </div>
+      <div class="mode-row">
+        <button class="mode-chip on" onclick="setMode(this)">语音</button>
+        <button class="mode-chip" onclick="setMode(this)">文字</button>
+      </div>
+    </div>
+
+    <div class="sb-nav">
+      <button class="sb-nav-btn" id="navBtn" onclick="nextPhase()">
+        进入下一阶段
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M3 6.5h7m-3-3 3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+
+    <div class="sb-footer">
+      <div class="sb-stat">
+        <span class="sb-stat-label">当前轮次</span>
+        <span class="sb-stat-val" id="turnCount">1 / 2+</span>
+      </div>
+      <div class="sb-stat">
+        <span class="sb-stat-label">Session</span>
+        <span class="sb-stat-val" style="font-family:monospace;font-size:10.5px;">sess_def2</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="chat-area">
+    <div class="chat-header">
+      <span class="chat-title" id="chatTitle">HR 面试 · 自我介绍</span>
+      <span class="phase-badge" id="phaseBadge">Self Intro</span>
+      <span class="chat-turns" id="chatTurns">Turn 1</span>
+    </div>
+    <div class="chat-msgs">
+      <div class="chat-msgs-inner" id="msgsInner"></div>
+    </div>
+    <div class="chat-input-wrap">
+      <div class="chat-input-inner">
+        <textarea placeholder="（原型模式：输入框仅展示）" readonly rows="1"></textarea>
+        <button class="btn-mic">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <rect x="4.5" y="1" width="5" height="8" rx="2.5" stroke="currentColor" stroke-width="1.3"/>
+            <path d="M2 7a5 5 0 0 0 10 0M7 12v1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <button class="btn-send" disabled>
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8m-3-3 3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+      <div class="input-hint">Shift + Enter 换行 &nbsp;·&nbsp; Enter 发送</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const PHASES = {
+  greeting: {
+    title: 'HR 面试 · 开场寒暄', badge: 'Greeting', turns: 'Turn 2', turnCount: '2 / 2+', next: 'hr_self_intro',
+    messages: [
+      {role:'ai', text:'您好，欢迎参加本次 HR 综合面试。我是今天的面试官，很高兴认识您。能先做一个简短的自我介绍吗？'},
+      {role:'human', text:'您好！我叫李明，5 年工作经验，目前在一家中型互联网公司担任研发团队 Lead，管理一支 6 人的后端研发小组。'},
+    ]
+  },
+  hr_self_intro: {
+    title: 'HR 面试 · 自我介绍', badge: 'Self Intro', turns: 'Turn 1', turnCount: '1 / 2+', next: 'hr_behavioral',
+    messages: [
+      {role:'ai', text:'您提到担任了团队 Lead，能说说您在带团队过程中最引以为傲的一次经历吗？具体取得了什么成果？'},
+      {role:'human', text:'去年团队在人手减少三分之一的情况下，仍然按时交付了核心功能迭代。我重新拆解了任务优先级，将 P0 功能聚焦到 70% 的工作量，每天 15 分钟站会同步进展。最终只比计划晚了 3 天完成全部交付。'},
+      {role:'ai', text:'面对资源受限的压力，您是如何维持团队士气的？有没有遇到成员状态下滑的情况？'},
+    ]
+  },
+  hr_behavioral: {
+    title: 'HR 面试 · 行为面试', badge: 'Behavioral', turns: 'Turn 2', turnCount: '2 / 4+', next: 'hr_career',
+    messages: [
+      {role:'ai', text:'请用 STAR 法则描述一次您主动解决团队内部冲突的经历。\n\n情境（S）— 任务（T）— 行动（A）— 结果（R）'},
+      {role:'human', text:'（S）去年两位同事因技术路线选型产生严重分歧，项目停滞了近一周。（T）我作为 Lead 需要推动决策并修复团队关系。（A）我组织了一次结构化技术讨论：让双方各自提案并量化收益与风险，再邀请一位没有利益关系的架构师进行第三方评估。（R）最终选定了折中方案，项目恢复推进，两位同事的协作关系也有了明显改善。'},
+      {role:'ai', text:'在最终拍板时，如果两个方案势均力敌，您会更倾向于依赖数据分析还是团队共识？为什么？'},
+      {role:'human', text:'我会优先寻求数据，但不会盲目依赖数据。数据用来验证假设，团队共识用来保障执行。如果数据不够充分，我会倾向于选择可逆性更强的那个方案，降低试错成本。'},
+    ]
+  },
+  hr_career: {
+    title: 'HR 面试 · 职业规划', badge: 'Career', turns: 'Turn 1', turnCount: '1 / 2+', next: 'wrapup',
+    messages: [
+      {role:'ai', text:'您目前已经是团队 Lead，是什么原因促使您考虑新的机会？'},
+      {role:'human', text:'主要是希望接触更大规模的系统挑战，以及在 AI 方向做更深入的技术探索。现在公司的技术积累较为保守，难以推动大的技术升级。'},
+      {role:'ai', text:'那您对未来 3 年有什么具体的职业规划？您期待这个岗位在哪些方面帮助您实现这个目标？'},
+    ]
+  }
+};
+
+const ORDER = ['greeting','hr_self_intro','hr_behavioral','hr_career','wrapup'];
+let cur = 'hr_self_intro';
+
+function renderMessages(phase) {
+  const inner = document.getElementById('msgsInner');
+  inner.innerHTML = '';
+  const data = PHASES[phase];
+  if (!data) return;
+  data.messages.forEach(m => {
+    const d = document.createElement('div');
+    d.className = 'msg msg-' + m.role;
+    if (m.role === 'ai') {
+      d.innerHTML = `<div class="msg-avatar">AI</div><div class="msg-body"><div class="msg-who">Interviewer</div><div class="msg-text">${m.text.replace(/\n/g,'<br>')}</div></div>`;
+    } else {
+      d.innerHTML = `<div class="msg-avatar">LM</div><div class="msg-body"><div class="msg-who">候选人</div><div class="msg-text">${m.text.replace(/\n/g,'<br>')}</div></div>`;
+    }
+    inner.appendChild(d);
+  });
+  const t = document.createElement('div');
+  t.className = 'msg msg-ai msg-thinking';
+  t.innerHTML = `<div class="msg-avatar">AI</div><div class="msg-body"><div class="msg-who">Interviewer</div><div class="msg-text"><div class="thinking-dots"><span></span><span></span><span></span></div></div></div>`;
+  inner.appendChild(t);
+  inner.parentElement.scrollTop = inner.parentElement.scrollHeight;
+}
+
+function switchPhase(phase) {
+  if (!PHASES[phase] && phase !== 'wrapup') return;
+  if (phase === 'wrapup') { location.href = 'wrapup.html'; return; }
+  cur = phase;
+  const data = PHASES[phase];
+  document.getElementById('chatTitle').textContent = data.title;
+  document.getElementById('phaseBadge').textContent = data.badge;
+  document.getElementById('chatTurns').textContent = data.turns;
+  document.getElementById('turnCount').textContent = data.turnCount;
+  const idx = ORDER.indexOf(phase);
+  ORDER.forEach((p, i) => {
+    const el = document.getElementById('ph-' + p);
+    if (!el) return;
+    el.className = 'ph-item' + (i < idx ? ' done' : i === idx ? ' active' : '');
+  });
+  const btn = document.getElementById('navBtn');
+  if (data.next === 'wrapup') {
+    btn.onclick = () => location.href = 'wrapup.html';
+    btn.innerHTML = '进入收尾阶段 <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M3 6.5h7m-3-3 3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  } else {
+    btn.onclick = () => nextPhase();
+    btn.innerHTML = '进入下一阶段 <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M3 6.5h7m-3-3 3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  }
+  renderMessages(phase);
+}
+
+function nextPhase() {
+  const idx = ORDER.indexOf(cur);
+  if (idx < ORDER.length - 1) switchPhase(ORDER[idx + 1]);
+}
+
+(function(){
+  const wrap = document.getElementById('waveWrap');
+  const heights = [5,8,14,20,26,30,26,20,14,9,7,11,18,26,22,16,11,7,5,4];
+  const durs = [.75,.82,.68,.9,.72,.85,.78,.65,.88,.7,.8,.73,.67,.84,.76,.9,.71,.83,.69,.77];
+  heights.forEach((h, i) => {
+    const b = document.createElement('div');
+    b.className = 'wave-bar';
+    b.style.cssText = `--h:${h}px;--dur:${durs[i]}s;--delay:${(i*0.04).toFixed(2)}s`;
+    wrap.appendChild(b);
+  });
+})();
+
+let _rec = false;
+function toggleMic() {
+  _rec = !_rec;
+  document.getElementById('micBtn').classList.toggle('rec', _rec);
+  document.getElementById('sbAudio').classList.toggle('rec', _rec);
+  const asr = document.getElementById('asrText');
+  if (_rec) { setTimeout(() => { if (_rec) asr.textContent = '正在识别…'; }, 600); }
+  else { asr.textContent = ''; }
+}
+function setMode(btn) {
+  btn.closest('.mode-row').querySelectorAll('.mode-chip').forEach(c => c.classList.remove('on'));
+  btn.classList.add('on');
+}
+
+const hash = location.hash.replace('#','');
+switchPhase(PHASES[hash] ? hash : 'hr_self_intro');
+</script>
+</body>
+</html>

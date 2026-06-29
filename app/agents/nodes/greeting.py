@@ -2,6 +2,8 @@
 Greeting node — 开场破冰，收集自我介绍，提取候选人姓名。
 无工具调用，纯对话。
 """
+import re
+
 from langchain_core.messages import SystemMessage
 
 from app.agents.nodes.base import make_llm, check_transition, compress_messages, get_context_window, ANTI_SIMULATION_RULE
@@ -50,6 +52,11 @@ _SYSTEM_FOLLOWUP = """\
 _llm = make_llm(temperature=0.7)
 
 
+def _extract_candidate_name(text: str) -> str:
+    match = re.search(r"(?:我叫|我是)([\u4e00-\u9fffA-Za-z·]{2,10})", text)
+    return match.group(1) if match else ""
+
+
 async def greeting_node(state: InterviewState) -> dict:
     # Pick system prompt based on whether the candidate has already spoken
     has_human_msg = any(
@@ -71,10 +78,10 @@ async def greeting_node(state: InterviewState) -> dict:
     candidate_name = state.get("candidate_name", "")
     if not candidate_name and len(state["messages"]) > 0:
         for msg in state["messages"]:
-            if hasattr(msg, "content") and "我叫" in msg.content:
-                # Very simple extraction — LLM will handle better in practice
-                candidate_name = msg.content.split("我叫")[-1].split()[0][:10]
-                break
+            if hasattr(msg, "content"):
+                candidate_name = _extract_candidate_name(str(msg.content))
+                if candidate_name:
+                    break
 
     scores = state.get("node_scores", {})
     scores["greeting"] = {"turn_count": phase_turn}

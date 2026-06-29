@@ -63,6 +63,16 @@ python-dateutil==2.9.0
 loguru==0.7.3                 # Structured logging
 rich==13.9.4                  # Pretty console output
 
+# --- Redis ---
+redis[asyncio]==5.2.1             # Async Redis client (session store backend)
+
+# --- Auth ---
+python-jose[cryptography]==3.3.0  # JWT token signing/verification
+passlib[bcrypt]==1.7.4            # Password hashing (requires bcrypt==4.0.1)
+bcrypt==4.0.1                     # Pinned: passlib incompatible with bcrypt>=4.1
+sqlalchemy==2.0.36                # ORM for user/session DB
+aiosqlite==0.20.0                 # Async SQLite driver
+
 # --- Dev / Testing ---
 pytest==8.3.4
 pytest-asyncio==0.25.0

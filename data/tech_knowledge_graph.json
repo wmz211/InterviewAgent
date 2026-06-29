@@ -3,32 +3,36 @@
     "version": "0.2.0",
     "description": "AI/LLM domain knowledge graph — NLP, Transformer, LLM, Agent, RAG, Embedding, Prompt Engineering, Fine-tuning",
     "node_types": {
-      "Domain":    "顶层技术域，如 大语言模型",
-      "Tech":      "核心技术栈，如 Transformer / RAG / Agent",
-      "Concept":   "技术概念，需要候选人深度理解",
+      "Domain": "顶层技术域，如 大语言模型",
+      "Tech": "核心技术栈，如 Transformer / RAG / Agent",
+      "Concept": "技术概念，需要候选人深度理解",
       "Component": "Tech的子组件，可单独追问",
-      "Pitfall":   "常见踩坑点、面试高频陷阱题"
+      "Pitfall": "常见踩坑点、面试高频陷阱题"
     },
     "edge_types": {
-      "BELONGS_TO":   "Tech/Concept 属于某个 Domain",
-      "HAS_COMPONENT":"Tech 包含某个子组件或子概念",
-      "LEADS_TO":     "面试追问路径：A问完自然引出B，带 question_hint",
-      "HAS_PITFALL":  "该技术/概念有一个常见坑点",
-      "REQUIRES":     "理解A需要先掌握B（前置依赖）",
-      "RELATED_TO":   "两个节点强相关，面试中可横向延伸"
+      "BELONGS_TO": "Tech/Concept 属于某个 Domain",
+      "HAS_COMPONENT": "Tech 包含某个子组件或子概念",
+      "LEADS_TO": "面试追问路径：A问完自然引出B，带 question_hint",
+      "HAS_PITFALL": "该技术/概念有一个常见坑点",
+      "REQUIRES": "理解A需要先掌握B（前置依赖）",
+      "RELATED_TO": "两个节点强相关，面试中可横向延伸"
     }
   },
-
   "nodes": [
-
-    {"id": "domain_ai", "label": "AI / NLP / LLM", "type": "Domain"},
-
+    {
+      "id": "domain_ai",
+      "label": "AI / NLP / LLM",
+      "type": "Domain"
+    },
     {
       "id": "nlp",
       "label": "NLP",
       "type": "Tech",
       "domain": "domain_ai",
-      "aliases": ["自然语言处理", "natural language processing"],
+      "aliases": [
+        "自然语言处理",
+        "natural language processing"
+      ],
       "description": "让计算机理解和生成人类语言的技术领域，是LLM的基础学科"
     },
     {
@@ -36,7 +40,10 @@
       "label": "Transformer",
       "type": "Tech",
       "domain": "domain_ai",
-      "aliases": ["transformer模型", "transformers架构"],
+      "aliases": [
+        "transformer模型",
+        "transformers架构"
+      ],
       "description": "基于自注意力的序列建模架构，彻底取代RNN，成为现代LLM的基础"
     },
     {
@@ -44,7 +51,11 @@
       "label": "LLM",
       "type": "Tech",
       "domain": "domain_ai",
-      "aliases": ["大语言模型", "large language model", "预训练语言模型"],
+      "aliases": [
+        "大语言模型",
+        "large language model",
+        "预训练语言模型"
+      ],
       "description": "在海量文本上预训练的超大规模语言模型，如GPT/Qwen/LLaMA系列"
     },
     {
@@ -52,7 +63,12 @@
       "label": "Embedding",
       "type": "Tech",
       "domain": "domain_ai",
-      "aliases": ["词向量", "向量表示", "文本嵌入", "text embedding"],
+      "aliases": [
+        "词向量",
+        "向量表示",
+        "文本嵌入",
+        "text embedding"
+      ],
       "description": "将文本映射到稠密向量空间，是语义检索和RAG的基础"
     },
     {
@@ -60,7 +76,10 @@
       "label": "RAG",
       "type": "Tech",
       "domain": "domain_ai",
-      "aliases": ["检索增强生成", "retrieval augmented generation"],
+      "aliases": [
+        "检索增强生成",
+        "retrieval augmented generation"
+      ],
       "description": "通过外部知识检索增强LLM生成，减少幻觉，支持知识更新"
     },
     {
@@ -68,7 +87,11 @@
       "label": "Fine-tuning",
       "type": "Tech",
       "domain": "domain_ai",
-      "aliases": ["微调", "模型微调", "finetune"],
+      "aliases": [
+        "微调",
+        "模型微调",
+        "finetune"
+      ],
       "description": "在预训练模型基础上用特定数据进一步训练，使模型适配下游任务"
     },
     {
@@ -76,7 +99,11 @@
       "label": "Prompt Engineering",
       "type": "Tech",
       "domain": "domain_ai",
-      "aliases": ["提示工程", "prompt设计", "提示词工程"],
+      "aliases": [
+        "提示工程",
+        "prompt设计",
+        "提示词工程"
+      ],
       "description": "通过设计输入提示引导LLM产出高质量输出的工程方法"
     },
     {
@@ -84,626 +111,4736 @@
       "label": "LLM Agent",
       "type": "Tech",
       "domain": "domain_ai",
-      "aliases": ["AI Agent", "智能体", "llm agent"],
+      "aliases": [
+        "AI Agent",
+        "智能体",
+        "llm agent"
+      ],
       "description": "以LLM为决策核心，具备规划、记忆、工具调用能力的自主系统"
     },
-
-    {"id": "attention",
+    {
+      "id": "attention",
       "label": "Attention Mechanism",
       "type": "Concept",
       "domain": "domain_ai",
-      "aliases": ["注意力机制", "self-attention", "自注意力"],
-      "description": "通过Q/K/V矩阵计算序列元素两两相关性，复杂度O(n²)"},
-
-    {"id": "mha",
+      "aliases": [
+        "注意力机制",
+        "self-attention",
+        "自注意力"
+      ],
+      "description": "通过Q/K/V矩阵计算序列元素两两相关性，复杂度O(n²)"
+    },
+    {
+      "id": "mha",
       "label": "Multi-Head Attention",
       "type": "Component",
       "domain": "domain_ai",
-      "aliases": ["多头注意力", "MHA"],
-      "description": "将Attention分到h个子空间并行计算再拼接，捕获不同粒度的语义"},
-
-    {"id": "scaled_dot_product",
+      "aliases": [
+        "多头注意力",
+        "MHA"
+      ],
+      "description": "将Attention分到h个子空间并行计算再拼接，捕获不同粒度的语义"
+    },
+    {
+      "id": "scaled_dot_product",
       "label": "Scaled Dot-Product Attention",
       "type": "Component",
       "domain": "domain_ai",
-      "aliases": ["缩放点积注意力", "scaled attention"],
-      "description": "Attention(Q,K,V) = softmax(QKᵀ/√d_k)V，除以√d_k防止梯度消失"},
-
-    {"id": "positional_encoding",
+      "aliases": [
+        "缩放点积注意力",
+        "scaled attention"
+      ],
+      "description": "Attention(Q,K,V) = softmax(QKᵀ/√d_k)V，除以√d_k防止梯度消失"
+    },
+    {
+      "id": "positional_encoding",
       "label": "Positional Encoding",
       "type": "Component",
       "domain": "domain_ai",
-      "aliases": ["位置编码", "PE", "绝对位置编码"],
-      "description": "向embedding注入位置信息，原始Transformer用正弦余弦函数"},
-
-    {"id": "rope",
+      "aliases": [
+        "位置编码",
+        "PE",
+        "绝对位置编码"
+      ],
+      "description": "向embedding注入位置信息，原始Transformer用正弦余弦函数"
+    },
+    {
+      "id": "rope",
       "label": "RoPE",
       "type": "Concept",
       "domain": "domain_ai",
-      "aliases": ["旋转位置编码", "rotary position embedding"],
-      "description": "通过旋转矩阵编码相对位置，支持外推到更长序列，LLaMA/Qwen采用"},
-
-    {"id": "kv_cache",
+      "aliases": [
+        "旋转位置编码",
+        "rotary position embedding"
+      ],
+      "description": "通过旋转矩阵编码相对位置，支持外推到更长序列，LLaMA/Qwen采用"
+    },
+    {
+      "id": "kv_cache",
       "label": "KV Cache",
       "type": "Concept",
       "domain": "domain_ai",
-      "aliases": ["键值缓存", "kv缓存"],
-      "description": "缓存历史token的K/V矩阵避免重复计算，推理加速的核心机制"},
-
-    {"id": "ffn",
+      "aliases": [
+        "键值缓存",
+        "kv缓存"
+      ],
+      "description": "缓存历史token的K/V矩阵避免重复计算，推理加速的核心机制"
+    },
+    {
+      "id": "ffn",
       "label": "Feed-Forward Network",
       "type": "Component",
       "domain": "domain_ai",
-      "aliases": ["前馈网络", "FFN", "MLP层"],
-      "description": "Transformer中每个位置独立的两层全连接，通常用SwiGLU激活"},
-
-    {"id": "layer_norm",
+      "aliases": [
+        "前馈网络",
+        "FFN",
+        "MLP层"
+      ],
+      "description": "Transformer中每个位置独立的两层全连接，通常用SwiGLU激活"
+    },
+    {
+      "id": "layer_norm",
       "label": "Layer Normalization",
       "type": "Component",
       "domain": "domain_ai",
-      "aliases": ["层归一化", "LayerNorm", "RMSNorm"],
-      "description": "对特征维度归一化，Pre-LN(前置)比Post-LN训练更稳定"},
-
-    {"id": "pretraining",
+      "aliases": [
+        "层归一化",
+        "LayerNorm",
+        "RMSNorm"
+      ],
+      "description": "对特征维度归一化，Pre-LN(前置)比Post-LN训练更稳定"
+    },
+    {
+      "id": "pretraining",
       "label": "预训练 (Pre-training)",
       "type": "Concept",
       "domain": "domain_ai",
-      "aliases": ["预训练", "pre-training", "CLM", "MLM"],
-      "description": "在海量无标注文本上自监督训练，CLM(因果语言建模)是GPT路线的核心"},
-
-    {"id": "rlhf",
+      "aliases": [
+        "预训练",
+        "pre-training",
+        "CLM",
+        "MLM"
+      ],
+      "description": "在海量无标注文本上自监督训练，CLM(因果语言建模)是GPT路线的核心"
+    },
+    {
+      "id": "rlhf",
       "label": "RLHF",
       "type": "Concept",
       "domain": "domain_ai",
-      "aliases": ["人类反馈强化学习", "reinforcement learning from human feedback"],
-      "description": "通过人类偏好数据训练奖励模型，再用PPO优化LLM对齐人类价值观"},
-
-    {"id": "reward_model",
+      "aliases": [
+        "人类反馈强化学习",
+        "reinforcement learning from human feedback"
+      ],
+      "description": "通过人类偏好数据训练奖励模型，再用PPO优化LLM对齐人类价值观"
+    },
+    {
+      "id": "reward_model",
       "label": "Reward Model",
       "type": "Component",
       "domain": "domain_ai",
-      "aliases": ["奖励模型", "RM"],
-      "description": "RLHF的评分器，学习人类偏好判断哪个回答更好"},
-
-    {"id": "sft",
+      "aliases": [
+        "奖励模型",
+        "RM"
+      ],
+      "description": "RLHF的评分器，学习人类偏好判断哪个回答更好"
+    },
+    {
+      "id": "sft",
       "label": "SFT (指令微调)",
       "type": "Concept",
       "domain": "domain_ai",
-      "aliases": ["有监督微调", "supervised fine-tuning", "instruction tuning", "指令跟随"],
-      "description": "用高质量指令-回复对进行监督训练，让模型学会遵循用户指令"},
-
-    {"id": "lora",
+      "aliases": [
+        "有监督微调",
+        "supervised fine-tuning",
+        "instruction tuning",
+        "指令跟随"
+      ],
+      "description": "用高质量指令-回复对进行监督训练，让模型学会遵循用户指令"
+    },
+    {
+      "id": "lora",
       "label": "LoRA",
       "type": "Concept",
       "domain": "domain_ai",
-      "aliases": ["低秩适应", "low-rank adaptation"],
-      "description": "冻结原始权重，只训练低秩分解的增量矩阵ΔW=AB，大幅降低显存"},
-
-    {"id": "qlora",
+      "aliases": [
+        "低秩适应",
+        "low-rank adaptation"
+      ],
+      "description": "冻结原始权重，只训练低秩分解的增量矩阵ΔW=AB，大幅降低显存"
+    },
+    {
+      "id": "qlora",
       "label": "QLoRA",
       "type": "Concept",
       "domain": "domain_ai",
-      "aliases": ["量化LoRA", "quantized lora"],
-      "description": "将基础模型量化为4-bit NF4格式后再做LoRA，消费级GPU可微调70B模型"},
-
-    {"id": "vector_retrieval",
+      "aliases": [
+        "量化LoRA",
+        "quantized lora"
+      ],
+      "description": "将基础模型量化为4-bit NF4格式后再做LoRA，消费级GPU可微调70B模型"
+    },
+    {
+      "id": "vector_retrieval",
       "label": "向量检索",
       "type": "Concept",
       "domain": "domain_ai",
-      "aliases": ["dense retrieval", "embedding检索", "ANN检索"],
-      "description": "将文本embedding化后用近似最近邻(ANN)算法召回语义相似文档"},
-
-    {"id": "hnsw",
+      "aliases": [
+        "dense retrieval",
+        "embedding检索",
+        "ANN检索"
+      ],
+      "description": "将文本embedding化后用近似最近邻(ANN)算法召回语义相似文档"
+    },
+    {
+      "id": "hnsw",
       "label": "HNSW",
       "type": "Component",
       "domain": "domain_ai",
-      "aliases": ["分层可导航小世界", "hierarchical navigable small world"],
-      "description": "主流ANN索引算法，通过多层图结构实现次线性时间的近似最近邻搜索"},
-
-    {"id": "chunking",
+      "aliases": [
+        "分层可导航小世界",
+        "hierarchical navigable small world"
+      ],
+      "description": "主流ANN索引算法，通过多层图结构实现次线性时间的近似最近邻搜索"
+    },
+    {
+      "id": "chunking",
       "label": "Chunking策略",
       "type": "Concept",
       "domain": "domain_ai",
-      "aliases": ["文本切块", "chunk", "文档分割"],
-      "description": "文档切割粒度直接影响检索精度：过大上下文冗余，过小语义不完整"},
-
-    {"id": "reranking",
+      "aliases": [
+        "文本切块",
+        "chunk",
+        "文档分割"
+      ],
+      "description": "文档切割粒度直接影响检索精度：过大上下文冗余，过小语义不完整"
+    },
+    {
+      "id": "reranking",
       "label": "Reranking (重排序)",
       "type": "Concept",
       "domain": "domain_ai",
-      "aliases": ["重排", "cross-encoder重排"],
-      "description": "用精度更高的Cross-Encoder对初步召回结果重新打分排序，精排阶段"},
-
-    {"id": "hybrid_search",
+      "aliases": [
+        "重排",
+        "cross-encoder重排"
+      ],
+      "description": "用精度更高的Cross-Encoder对初步召回结果重新打分排序，精排阶段"
+    },
+    {
+      "id": "hybrid_search",
       "label": "混合检索 (Hybrid Search)",
       "type": "Concept",
       "domain": "domain_ai",
-      "aliases": ["hybrid retrieval", "BM25+向量", "稀疏+稠密"],
-      "description": "结合BM25关键词检索和向量语义检索，互补提升召回率"},
-
-    {"id": "react",
+      "aliases": [
+        "hybrid retrieval",
+        "BM25+向量",
+        "稀疏+稠密"
+      ],
+      "description": "结合BM25关键词检索和向量语义检索，互补提升召回率"
+    },
+    {
+      "id": "react",
       "label": "ReAct",
       "type": "Concept",
       "domain": "domain_ai",
-      "aliases": ["ReAct模式", "reason and act"],
-      "description": "交替生成推理轨迹(Thought)和执行动作(Action)，每步基于观察更新"},
-
-    {"id": "tool_calling",
+      "aliases": [
+        "ReAct模式",
+        "reason and act"
+      ],
+      "description": "交替生成推理轨迹(Thought)和执行动作(Action)，每步基于观察更新"
+    },
+    {
+      "id": "tool_calling",
       "label": "Tool Calling",
       "type": "Concept",
       "domain": "domain_ai",
-      "aliases": ["函数调用", "function calling", "工具调用"],
-      "description": "LLM输出结构化JSON指令触发外部工具，结果回传至上下文继续推理"},
-
-    {"id": "agent_memory",
+      "aliases": [
+        "函数调用",
+        "function calling",
+        "工具调用"
+      ],
+      "description": "LLM输出结构化JSON指令触发外部工具，结果回传至上下文继续推理"
+    },
+    {
+      "id": "agent_memory",
       "label": "Agent记忆机制",
       "type": "Concept",
       "domain": "domain_ai",
-      "aliases": ["短期记忆", "长期记忆", "agent memory"],
-      "description": "短期:当前对话窗口；长期:外部存储(向量库/DB)，通过检索注入上下文"},
-
-    {"id": "cot",
+      "aliases": [
+        "短期记忆",
+        "长期记忆",
+        "agent memory"
+      ],
+      "description": "短期:当前对话窗口；长期:外部存储(向量库/DB)，通过检索注入上下文"
+    },
+    {
+      "id": "cot",
       "label": "Chain of Thought",
       "type": "Concept",
       "domain": "domain_ai",
-      "aliases": ["思维链", "CoT", "chain-of-thought"],
-      "description": "引导LLM逐步推理而非直接输出答案，显著提升复杂推理准确率"},
-
-    {"id": "few_shot",
+      "aliases": [
+        "思维链",
+        "CoT",
+        "chain-of-thought"
+      ],
+      "description": "引导LLM逐步推理而非直接输出答案，显著提升复杂推理准确率"
+    },
+    {
+      "id": "few_shot",
       "label": "Few-shot Learning",
       "type": "Concept",
       "domain": "domain_ai",
-      "aliases": ["少样本学习", "few-shot", "in-context learning", "ICL"],
-      "description": "在Prompt中提供少量示例让LLM学习任务模式，无需参数更新"},
-
-    {"id": "system_prompt",
+      "aliases": [
+        "少样本学习",
+        "few-shot",
+        "in-context learning",
+        "ICL"
+      ],
+      "description": "在Prompt中提供少量示例让LLM学习任务模式，无需参数更新"
+    },
+    {
+      "id": "system_prompt",
       "label": "System Prompt",
       "type": "Component",
       "domain": "domain_ai",
-      "aliases": ["系统提示词", "system message"],
-      "description": "对话开始前注入的角色设定和约束指令，优先级高于用户输入"},
-
-    {"id": "word2vec",
+      "aliases": [
+        "系统提示词",
+        "system message"
+      ],
+      "description": "对话开始前注入的角色设定和约束指令，优先级高于用户输入"
+    },
+    {
+      "id": "word2vec",
       "label": "Word2Vec",
       "type": "Concept",
       "domain": "domain_ai",
-      "aliases": ["词嵌入", "CBOW", "Skip-gram"],
-      "description": "早期静态词向量，通过预测上下文学习语义，不能处理一词多义"},
-
-    {"id": "sentence_transformer",
+      "aliases": [
+        "词嵌入",
+        "CBOW",
+        "Skip-gram"
+      ],
+      "description": "早期静态词向量，通过预测上下文学习语义，不能处理一词多义"
+    },
+    {
+      "id": "sentence_transformer",
       "label": "Sentence Transformer",
       "type": "Concept",
       "domain": "domain_ai",
-      "aliases": ["句向量", "sentence-bert", "SBERT"],
-      "description": "基于BERT的句级别向量模型，通过对比学习优化语义相似度"},
-
-    {"id": "contrastive_learning",
+      "aliases": [
+        "句向量",
+        "sentence-bert",
+        "SBERT"
+      ],
+      "description": "基于BERT的句级别向量模型，通过对比学习优化语义相似度"
+    },
+    {
+      "id": "contrastive_learning",
       "label": "对比学习",
       "type": "Concept",
       "domain": "domain_ai",
-      "aliases": ["contrastive learning", "SimCSE"],
-      "description": "正例拉近、负例推远，是训练高质量Embedding模型的核心范式"},
-
-    {"id": "tokenization",
+      "aliases": [
+        "contrastive learning",
+        "SimCSE"
+      ],
+      "description": "正例拉近、负例推远，是训练高质量Embedding模型的核心范式"
+    },
+    {
+      "id": "tokenization",
       "label": "Tokenization",
       "type": "Concept",
       "domain": "domain_ai",
-      "aliases": ["分词", "tokenize", "token化"],
-      "description": "将原始文本切割为模型可处理的token单元，直接影响语言理解边界"},
-
-    {"id": "bpe",
+      "aliases": [
+        "分词",
+        "tokenize",
+        "token化"
+      ],
+      "description": "将原始文本切割为模型可处理的token单元，直接影响语言理解边界"
+    },
+    {
+      "id": "bpe",
       "label": "BPE (字节对编码)",
       "type": "Component",
       "domain": "domain_ai",
-      "aliases": ["byte pair encoding", "BPE分词"],
-      "description": "GPT系列采用的分词算法，迭代合并高频字符对，平衡词表大小与覆盖率"},
-
-    {"id": "pitfall_attention_complexity",
+      "aliases": [
+        "byte pair encoding",
+        "BPE分词"
+      ],
+      "description": "GPT系列采用的分词算法，迭代合并高频字符对，平衡词表大小与覆盖率"
+    },
+    {
+      "id": "pitfall_attention_complexity",
       "label": "Attention O(n²)复杂度",
       "type": "Pitfall",
       "domain": "domain_ai",
-      "description": "Self-Attention时间和显存复杂度随序列长度平方增长，长文本时显存爆炸"},
-
-    {"id": "pitfall_pe_extrapolation",
+      "description": "Self-Attention时间和显存复杂度随序列长度平方增长，长文本时显存爆炸"
+    },
+    {
+      "id": "pitfall_pe_extrapolation",
       "label": "位置编码外推失效",
       "type": "Pitfall",
       "domain": "domain_ai",
-      "description": "模型在超出训练长度的序列上性能骤降，绝对位置编码无法外推"},
-
-    {"id": "pitfall_hallucination",
+      "description": "模型在超出训练长度的序列上性能骤降，绝对位置编码无法外推"
+    },
+    {
+      "id": "pitfall_hallucination",
       "label": "LLM幻觉 (Hallucination)",
       "type": "Pitfall",
       "domain": "domain_ai",
-      "description": "LLM自信地生成与事实不符的内容，根源是统计语言模型缺乏事实锚定"},
-
-    {"id": "pitfall_lost_in_middle",
+      "description": "LLM自信地生成与事实不符的内容，根源是统计语言模型缺乏事实锚定"
+    },
+    {
+      "id": "pitfall_lost_in_middle",
       "label": "Lost-in-the-Middle",
       "type": "Pitfall",
       "domain": "domain_ai",
-      "description": "LLM对长上下文中间段落的关注度显著低于首尾，影响RAG准确率"},
-
-    {"id": "pitfall_prompt_injection",
+      "description": "LLM对长上下文中间段落的关注度显著低于首尾，影响RAG准确率"
+    },
+    {
+      "id": "pitfall_prompt_injection",
       "label": "Prompt Injection",
       "type": "Pitfall",
       "domain": "domain_ai",
-      "description": "恶意用户通过精心构造输入覆盖系统提示词，劫持模型行为的安全攻击"},
-
-    {"id": "pitfall_catastrophic_forgetting",
+      "description": "恶意用户通过精心构造输入覆盖系统提示词，劫持模型行为的安全攻击"
+    },
+    {
+      "id": "pitfall_catastrophic_forgetting",
       "label": "灾难性遗忘",
       "type": "Pitfall",
       "domain": "domain_ai",
-      "aliases": ["catastrophic forgetting"],
-      "description": "全量微调特定任务数据时，模型大量遗忘预训练阶段的通用能力"},
-
-    {"id": "pitfall_reward_hacking",
+      "aliases": [
+        "catastrophic forgetting"
+      ],
+      "description": "全量微调特定任务数据时，模型大量遗忘预训练阶段的通用能力"
+    },
+    {
+      "id": "pitfall_reward_hacking",
       "label": "奖励黑客 (Reward Hacking)",
       "type": "Pitfall",
       "domain": "domain_ai",
-      "description": "模型找到奖励模型的漏洞获得高分但实际输出无意义，RLHF的核心风险"},
-
-    {"id": "pitfall_kv_cache_memory",
+      "description": "模型找到奖励模型的漏洞获得高分但实际输出无意义，RLHF的核心风险"
+    },
+    {
+      "id": "pitfall_kv_cache_memory",
       "label": "KV Cache显存占用",
       "type": "Pitfall",
       "domain": "domain_ai",
-      "description": "长序列推理时KV Cache显存随batch_size和序列长度线性增长，OOM风险"},
-
-    {"id": "pitfall_agent_loop",
+      "description": "长序列推理时KV Cache显存随batch_size和序列长度线性增长，OOM风险"
+    },
+    {
+      "id": "pitfall_agent_loop",
       "label": "Agent无限循环",
       "type": "Pitfall",
       "domain": "domain_ai",
-      "description": "工具调用失败时Agent可能陷入重试死循环，需要max_iterations硬限制"},
-
-    {"id": "pitfall_embedding_collapse",
+      "description": "工具调用失败时Agent可能陷入重试死循环，需要max_iterations硬限制"
+    },
+    {
+      "id": "pitfall_embedding_collapse",
       "label": "Embedding空间坍缩",
       "type": "Pitfall",
       "domain": "domain_ai",
-      "description": "训练不充分时所有向量聚集在小区域，余弦相似度失去区分能力"},
-
-    {"id": "context_engineering",
+      "description": "训练不充分时所有向量聚集在小区域，余弦相似度失去区分能力"
+    },
+    {
+      "id": "context_engineering",
       "label": "Context Engineering",
       "type": "Tech",
       "domain": "domain_ai",
-      "aliases": ["上下文工程", "context management", "上下文管理"],
-      "description": "对注入LLM上下文窗口的信息进行工程化管理：选择、压缩、排布与动态更新，使有限token发挥最大价值"},
-
-    {"id": "multi_agent",
+      "aliases": [
+        "上下文工程",
+        "context management",
+        "上下文管理"
+      ],
+      "description": "对注入LLM上下文窗口的信息进行工程化管理：选择、压缩、排布与动态更新，使有限token发挥最大价值"
+    },
+    {
+      "id": "multi_agent",
       "label": "多智能体系统",
       "type": "Tech",
       "domain": "domain_ai",
-      "aliases": ["multi-agent", "多Agent", "多智能体编排", "agent orchestration"],
-      "description": "多个专用Agent分工协作完成复杂任务，包括Supervisor模式、流水线模式和对等协商模式"},
-
-    {"id": "agent_framework",
+      "aliases": [
+        "multi-agent",
+        "多Agent",
+        "多智能体编排",
+        "agent orchestration"
+      ],
+      "description": "多个专用Agent分工协作完成复杂任务，包括Supervisor模式、流水线模式和对等协商模式"
+    },
+    {
+      "id": "agent_framework",
       "label": "Agent开发框架",
       "type": "Tech",
       "domain": "domain_ai",
-      "aliases": ["LangChain", "LangGraph", "langgraph", "langchain", "agent framework"],
-      "description": "LangChain/LangGraph等框架，提供图状态机、工具集成、记忆管理等Agent工程化能力"},
-
-    {"id": "llm_inference",
+      "aliases": [
+        "LangChain",
+        "LangGraph",
+        "langgraph",
+        "langchain",
+        "agent framework"
+      ],
+      "description": "LangChain/LangGraph等框架，提供图状态机、工具集成、记忆管理等Agent工程化能力"
+    },
+    {
+      "id": "llm_inference",
       "label": "LLM推理优化",
       "type": "Tech",
       "domain": "domain_ai",
-      "aliases": ["vLLM", "Ollama", "推理引擎", "inference engine", "推理框架"],
-      "description": "vLLM/Ollama等高性能推理框架，通过PagedAttention、连续批处理等技术大幅提升吞吐和降低延迟"},
-
-    {"id": "mcp",
+      "aliases": [
+        "vLLM",
+        "Ollama",
+        "推理引擎",
+        "inference engine",
+        "推理框架"
+      ],
+      "description": "vLLM/Ollama等高性能推理框架，通过PagedAttention、连续批处理等技术大幅提升吞吐和降低延迟"
+    },
+    {
+      "id": "mcp",
       "label": "MCP（模型上下文协议）",
       "type": "Concept",
       "domain": "domain_ai",
-      "aliases": ["model context protocol", "MCP协议", "MCP server"],
-      "description": "Anthropic提出的标准化工具集成协议，统一LLM与外部工具/数据源的交互接口，类比USB-C"},
-
-    {"id": "agent_planning",
+      "aliases": [
+        "model context protocol",
+        "MCP协议",
+        "MCP server"
+      ],
+      "description": "Anthropic提出的标准化工具集成协议，统一LLM与外部工具/数据源的交互接口，类比USB-C"
+    },
+    {
+      "id": "agent_planning",
       "label": "任务规划与拆解",
       "type": "Concept",
       "domain": "domain_ai",
-      "aliases": ["task decomposition", "任务分解", "规划", "planning"],
-      "description": "LLM将复杂目标分解为有依赖关系的子任务序列，是多智能体系统的核心调度能力"},
-
-    {"id": "agent_reflection",
+      "aliases": [
+        "task decomposition",
+        "任务分解",
+        "规划",
+        "planning"
+      ],
+      "description": "LLM将复杂目标分解为有依赖关系的子任务序列，是多智能体系统的核心调度能力"
+    },
+    {
+      "id": "agent_reflection",
       "label": "Agent反思纠错",
       "type": "Concept",
       "domain": "domain_ai",
-      "aliases": ["self-reflection", "反思", "self-correction", "自我纠错", "reflexion"],
-      "description": "Agent对自身输出进行批判性评估，检测错误并主动修正，形成'规划-执行-反思'闭环"},
-
-    {"id": "dpo",
+      "aliases": [
+        "self-reflection",
+        "反思",
+        "self-correction",
+        "自我纠错",
+        "reflexion"
+      ],
+      "description": "Agent对自身输出进行批判性评估，检测错误并主动修正，形成'规划-执行-反思'闭环"
+    },
+    {
+      "id": "dpo",
       "label": "DPO（直接偏好优化）",
       "type": "Concept",
       "domain": "domain_ai",
-      "aliases": ["direct preference optimization", "direct preference", "偏好优化"],
-      "description": "将奖励模型隐式嵌入策略模型，绕过强化学习直接优化偏好对齐，比RLHF更稳定简洁"},
-
-    {"id": "quantization",
+      "aliases": [
+        "direct preference optimization",
+        "direct preference",
+        "偏好优化"
+      ],
+      "description": "将奖励模型隐式嵌入策略模型，绕过强化学习直接优化偏好对齐，比RLHF更稳定简洁"
+    },
+    {
+      "id": "quantization",
       "label": "模型量化",
       "type": "Concept",
       "domain": "domain_ai",
-      "aliases": ["INT4量化", "INT8量化", "GGUF", "AWQ", "GPTQ", "量化推理"],
-      "description": "将模型权重从FP32/BF16压缩为INT8/INT4，降低显存和推理延迟，代价是轻微精度损失"},
-
-    {"id": "paged_attention",
+      "aliases": [
+        "INT4量化",
+        "INT8量化",
+        "GGUF",
+        "AWQ",
+        "GPTQ",
+        "量化推理"
+      ],
+      "description": "将模型权重从FP32/BF16压缩为INT8/INT4，降低显存和推理延迟，代价是轻微精度损失"
+    },
+    {
+      "id": "paged_attention",
       "label": "PagedAttention",
       "type": "Concept",
       "domain": "domain_ai",
-      "aliases": ["分页注意力", "paged kv cache", "vLLM核心"],
-      "description": "vLLM提出的KV Cache显存管理技术，借鉴操作系统分页思想消除显存碎片，支持大并发"},
-
-    {"id": "continuous_batching",
+      "aliases": [
+        "分页注意力",
+        "paged kv cache",
+        "vLLM核心"
+      ],
+      "description": "vLLM提出的KV Cache显存管理技术，借鉴操作系统分页思想消除显存碎片，支持大并发"
+    },
+    {
+      "id": "continuous_batching",
       "label": "连续批处理",
       "type": "Concept",
       "domain": "domain_ai",
-      "aliases": ["continuous batching", "动态批处理", "iteration-level batching"],
-      "description": "推理服务动态插入新请求而非等待整个batch完成，GPU利用率从30%提升到70%+"},
-
-    {"id": "observability",
+      "aliases": [
+        "continuous batching",
+        "动态批处理",
+        "iteration-level batching"
+      ],
+      "description": "推理服务动态插入新请求而非等待整个batch完成，GPU利用率从30%提升到70%+"
+    },
+    {
+      "id": "observability",
       "label": "LLM可观测性",
       "type": "Concept",
       "domain": "domain_ai",
-      "aliases": ["可观测性", "LLM tracing", "全链路追踪", "LangSmith", "trace", "span"],
-      "description": "对LLM调用链路进行trace/span级别追踪，记录每步输入输出、延迟、Token消耗，支持多维归因分析"},
-
-    {"id": "context_window_mgmt",
+      "aliases": [
+        "可观测性",
+        "LLM tracing",
+        "全链路追踪",
+        "LangSmith",
+        "trace",
+        "span"
+      ],
+      "description": "对LLM调用链路进行trace/span级别追踪，记录每步输入输出、延迟、Token消耗，支持多维归因分析"
+    },
+    {
+      "id": "context_window_mgmt",
       "label": "上下文窗口管理",
       "type": "Concept",
       "domain": "domain_ai",
-      "aliases": ["context window", "上下文压缩", "滑动窗口", "context compression"],
-      "description": "长对话中选择性保留关键信息：滑动窗口、摘要压缩、重要性评分等策略维持有效上下文"},
-
-    {"id": "function_schema",
+      "aliases": [
+        "context window",
+        "上下文压缩",
+        "滑动窗口",
+        "context compression"
+      ],
+      "description": "长对话中选择性保留关键信息：滑动窗口、摘要压缩、重要性评分等策略维持有效上下文"
+    },
+    {
+      "id": "function_schema",
       "label": "Function/Tool Schema设计",
       "type": "Component",
       "domain": "domain_ai",
-      "aliases": ["tool schema", "function schema", "工具描述", "工具定义"],
-      "description": "JSON Schema格式的工具描述，name/description/parameters质量直接决定LLM工具选择准确率"},
-
-    {"id": "graph_state_machine",
+      "aliases": [
+        "tool schema",
+        "function schema",
+        "工具描述",
+        "工具定义"
+      ],
+      "description": "JSON Schema格式的工具描述，name/description/parameters质量直接决定LLM工具选择准确率"
+    },
+    {
+      "id": "graph_state_machine",
       "label": "图状态机",
       "type": "Component",
       "domain": "domain_ai",
-      "aliases": ["state graph", "状态图", "LangGraph DAG", "有向无环图", "DAG"],
-      "description": "LangGraph的核心抽象，用节点(Node)和边(Edge)描述Agent控制流，支持条件路由和循环"},
-
-    {"id": "pitfall_context_overflow",
+      "aliases": [
+        "state graph",
+        "状态图",
+        "LangGraph DAG",
+        "有向无环图",
+        "DAG"
+      ],
+      "description": "LangGraph的核心抽象，用节点(Node)和边(Edge)描述Agent控制流，支持条件路由和循环"
+    },
+    {
+      "id": "pitfall_context_overflow",
       "label": "上下文窗口溢出",
       "type": "Pitfall",
       "domain": "domain_ai",
-      "description": "长对话/多轮Agent超出context limit时历史消息被截断，导致Agent失忆或任务失败"},
-
-    {"id": "pitfall_tool_schema_ambiguity",
+      "description": "长对话/多轮Agent超出context limit时历史消息被截断，导致Agent失忆或任务失败"
+    },
+    {
+      "id": "pitfall_tool_schema_ambiguity",
       "label": "Tool Schema歧义",
       "type": "Pitfall",
       "domain": "domain_ai",
-      "description": "工具描述含糊或参数命名不清时LLM频繁误调用，是Agent工程中最常见的准确率瓶颈"},
-
-    {"id": "pitfall_multi_agent_conflict",
+      "description": "工具描述含糊或参数命名不清时LLM频繁误调用，是Agent工程中最常见的准确率瓶颈"
+    },
+    {
+      "id": "pitfall_multi_agent_conflict",
       "label": "多智能体状态冲突",
       "type": "Pitfall",
       "domain": "domain_ai",
-      "description": "多个Agent并发修改共享状态时产生竞争条件，或子Agent结论相互矛盾导致协调失败"},
-
-    {"id": "pitfall_inference_latency",
+      "description": "多个Agent并发修改共享状态时产生竞争条件，或子Agent结论相互矛盾导致协调失败"
+    },
+    {
+      "id": "pitfall_inference_latency",
       "label": "首Token延迟（TTFT）",
       "type": "Pitfall",
       "domain": "domain_ai",
-      "description": "Time-To-First-Token过高导致用户感知卡顿，根因可能是prefill计算量大或调度队列积压"}
+      "description": "Time-To-First-Token过高导致用户感知卡顿，根因可能是prefill计算量大或调度队列积压"
+    },
+    {
+      "id": "domain_cs_core",
+      "label": "Computer Science Core",
+      "type": "Domain",
+      "aliases": [
+        "计算机基础",
+        "CS fundamentals"
+      ],
+      "description": "Core CS topics: data structures, algorithms, operating systems, and networking."
+    },
+    {
+      "id": "domain_backend",
+      "label": "Backend Engineering",
+      "type": "Domain",
+      "aliases": [
+        "后端工程",
+        "server-side development"
+      ],
+      "description": "Backend language, framework, API, and service engineering topics."
+    },
+    {
+      "id": "domain_database",
+      "label": "Database and Cache",
+      "type": "Domain",
+      "aliases": [
+        "数据库",
+        "缓存"
+      ],
+      "description": "Database, cache, transaction, index, and query optimization topics."
+    },
+    {
+      "id": "domain_distributed",
+      "label": "Distributed Systems",
+      "type": "Domain",
+      "aliases": [
+        "分布式系统",
+        "system design"
+      ],
+      "description": "Microservices, message queues, consistency, and system design topics."
+    },
+    {
+      "id": "domain_devops",
+      "label": "DevOps and Cloud Native",
+      "type": "Domain",
+      "aliases": [
+        "DevOps",
+        "云原生"
+      ],
+      "description": "Linux, Docker, Kubernetes, and CI/CD topics."
+    },
+    {
+      "id": "domain_frontend",
+      "label": "Frontend Engineering",
+      "type": "Domain",
+      "aliases": [
+        "前端工程",
+        "frontend development"
+      ],
+      "description": "JavaScript, browser runtime, React, and frontend engineering topics."
+    },
+    {
+      "id": "domain_security_quality",
+      "label": "Security and Quality Engineering",
+      "type": "Domain",
+      "aliases": [
+        "安全",
+        "质量保障"
+      ],
+      "description": "Authentication, web security, testing, and observability topics."
+    },
+    {
+      "id": "data_structures",
+      "label": "Data Structures",
+      "type": "Tech",
+      "domain": "domain_cs_core",
+      "aliases": [
+        "数据结构",
+        "array",
+        "linked list",
+        "stack",
+        "queue",
+        "hash map",
+        "tree",
+        "graph",
+        "heap"
+      ],
+      "description": "Core ways to organize and access data, shared by coding interviews and engineering trade-offs."
+    },
+    {
+      "id": "array_linked_list",
+      "label": "Array and Linked List",
+      "type": "Concept",
+      "domain": "domain_cs_core",
+      "aliases": [
+        "数组",
+        "链表",
+        "array",
+        "linked list"
+      ],
+      "description": "Contiguous storage versus linked storage; access, insertion, deletion, and cache-locality trade-offs."
+    },
+    {
+      "id": "stack_queue",
+      "label": "Stack and Queue",
+      "type": "Concept",
+      "domain": "domain_cs_core",
+      "aliases": [
+        "栈",
+        "队列",
+        "stack",
+        "queue",
+        "deque"
+      ],
+      "description": "Restricted linear structures used in parsing, monotonic stacks, BFS, and scheduling."
+    },
+    {
+      "id": "hash_table",
+      "label": "Hash Table",
+      "type": "Concept",
+      "domain": "domain_cs_core",
+      "aliases": [
+        "哈希表",
+        "HashMap",
+        "dict",
+        "hash map"
+      ],
+      "description": "Maps keys to buckets with a hash function; collision handling and resizing matter."
+    },
+    {
+      "id": "tree_graph",
+      "label": "Tree and Graph",
+      "type": "Concept",
+      "domain": "domain_cs_core",
+      "aliases": [
+        "树",
+        "图",
+        "binary tree",
+        "BST",
+        "graph"
+      ],
+      "description": "Models hierarchical and network relationships; common traversals include DFS, BFS, and topological sort."
+    },
+    {
+      "id": "pitfall_hash_collision",
+      "label": "Hash Collision Degradation",
+      "type": "Pitfall",
+      "domain": "domain_cs_core",
+      "aliases": [
+        "哈希冲突",
+        "hash collision"
+      ],
+      "description": "Poor hash distribution or adversarial input can degrade expected O(1) operations."
+    },
+    {
+      "id": "algorithms",
+      "label": "Algorithms",
+      "type": "Tech",
+      "domain": "domain_cs_core",
+      "aliases": [
+        "算法",
+        "排序",
+        "二分",
+        "动态规划",
+        "贪心",
+        "DFS",
+        "BFS",
+        "backtracking"
+      ],
+      "description": "General problem-solving methods used to assess abstraction, complexity analysis, and edge handling."
+    },
+    {
+      "id": "complexity_analysis",
+      "label": "Complexity Analysis",
+      "type": "Concept",
+      "domain": "domain_cs_core",
+      "aliases": [
+        "时间复杂度",
+        "空间复杂度",
+        "time complexity"
+      ],
+      "description": "Asymptotic analysis of time and space growth as input size increases."
+    },
+    {
+      "id": "sorting_searching",
+      "label": "Sorting and Searching",
+      "type": "Concept",
+      "domain": "domain_cs_core",
+      "aliases": [
+        "排序",
+        "二分查找",
+        "sort",
+        "binary search"
+      ],
+      "description": "Common foundations where invariants, boundaries, and stability are frequently tested."
+    },
+    {
+      "id": "dynamic_programming",
+      "label": "Dynamic Programming",
+      "type": "Concept",
+      "domain": "domain_cs_core",
+      "aliases": [
+        "动态规划",
+        "DP",
+        "dynamic programming"
+      ],
+      "description": "Solves overlapping subproblems by defining states and transition equations."
+    },
+    {
+      "id": "dfs_bfs_backtracking",
+      "label": "DFS/BFS and Backtracking",
+      "type": "Concept",
+      "domain": "domain_cs_core",
+      "aliases": [
+        "DFS",
+        "BFS",
+        "回溯",
+        "backtracking"
+      ],
+      "description": "Search strategies for trees, graphs, and combinatorial spaces; pruning and visited state are key."
+    },
+    {
+      "id": "pitfall_dp_state_explosion",
+      "label": "DP State Explosion",
+      "type": "Pitfall",
+      "domain": "domain_cs_core",
+      "aliases": [
+        "状态爆炸",
+        "state explosion"
+      ],
+      "description": "Too many state dimensions can make time or space unacceptable."
+    },
+    {
+      "id": "operating_systems",
+      "label": "Operating Systems",
+      "type": "Tech",
+      "domain": "domain_cs_core",
+      "aliases": [
+        "操作系统",
+        "OS",
+        "进程",
+        "线程",
+        "锁",
+        "死锁",
+        "虚拟内存",
+        "epoll"
+      ],
+      "description": "Program execution, resource management, memory, IO, and concurrency foundations."
+    },
+    {
+      "id": "process_thread",
+      "label": "Process and Thread",
+      "type": "Concept",
+      "domain": "domain_cs_core",
+      "aliases": [
+        "进程",
+        "线程",
+        "process",
+        "thread"
+      ],
+      "description": "Processes own resources; threads are scheduling units within a process."
+    },
+    {
+      "id": "concurrency_locking",
+      "label": "Concurrency and Locking",
+      "type": "Concept",
+      "domain": "domain_cs_core",
+      "aliases": [
+        "并发",
+        "锁",
+        "mutex",
+        "semaphore"
+      ],
+      "description": "Protects shared state with synchronization primitives; races and visibility matter."
+    },
+    {
+      "id": "virtual_memory",
+      "label": "Virtual Memory",
+      "type": "Concept",
+      "domain": "domain_cs_core",
+      "aliases": [
+        "虚拟内存",
+        "页表",
+        "缺页",
+        "virtual memory"
+      ],
+      "description": "Address translation provides isolation and expansion through pages and page tables."
+    },
+    {
+      "id": "io_multiplexing",
+      "label": "IO Multiplexing",
+      "type": "Concept",
+      "domain": "domain_cs_core",
+      "aliases": [
+        "IO 多路复用",
+        "select",
+        "poll",
+        "epoll"
+      ],
+      "description": "Lets one thread manage many connections efficiently; select/poll/epoll differences are common."
+    },
+    {
+      "id": "pitfall_deadlock",
+      "label": "Deadlock",
+      "type": "Pitfall",
+      "domain": "domain_cs_core",
+      "aliases": [
+        "死锁",
+        "deadlock"
+      ],
+      "description": "Threads can wait on each other forever when deadlock conditions hold."
+    },
+    {
+      "id": "computer_networks",
+      "label": "Computer Networks",
+      "type": "Tech",
+      "domain": "domain_cs_core",
+      "aliases": [
+        "计算机网络",
+        "网络",
+        "TCP",
+        "UDP",
+        "HTTP",
+        "HTTPS",
+        "DNS",
+        "TLS",
+        "WebSocket"
+      ],
+      "description": "Communication protocols, reliability, latency, and troubleshooting foundations."
+    },
+    {
+      "id": "tcp_udp",
+      "label": "TCP and UDP",
+      "type": "Concept",
+      "domain": "domain_cs_core",
+      "aliases": [
+        "TCP",
+        "UDP",
+        "三次握手",
+        "四次挥手"
+      ],
+      "description": "TCP provides reliable byte streams; UDP provides low-overhead datagrams."
+    },
+    {
+      "id": "http_https",
+      "label": "HTTP and HTTPS",
+      "type": "Concept",
+      "domain": "domain_cs_core",
+      "aliases": [
+        "HTTP",
+        "HTTPS",
+        "TLS",
+        "SSL",
+        "HTTP/2",
+        "HTTP/3"
+      ],
+      "description": "HTTP defines request-response semantics; HTTPS adds encryption, authentication, and integrity."
+    },
+    {
+      "id": "dns_cdn",
+      "label": "DNS and CDN",
+      "type": "Concept",
+      "domain": "domain_cs_core",
+      "aliases": [
+        "DNS",
+        "CDN",
+        "域名解析"
+      ],
+      "description": "DNS maps names to addresses; CDN improves latency and availability via edge nodes."
+    },
+    {
+      "id": "websocket_long_connection",
+      "label": "WebSocket and Long Connection",
+      "type": "Concept",
+      "domain": "domain_cs_core",
+      "aliases": [
+        "WebSocket",
+        "长连接",
+        "long connection"
+      ],
+      "description": "Provides bidirectional communication over one TCP connection for realtime use cases."
+    },
+    {
+      "id": "pitfall_tcp_head_of_line",
+      "label": "Head-of-Line Blocking",
+      "type": "Pitfall",
+      "domain": "domain_cs_core",
+      "aliases": [
+        "队头阻塞",
+        "HOL"
+      ],
+      "description": "Earlier data can block later data delivery in TCP or multiplexed protocols."
+    },
+    {
+      "id": "java",
+      "label": "Java",
+      "type": "Tech",
+      "domain": "domain_backend",
+      "aliases": [
+        "Java",
+        "JVM",
+        "GC",
+        "集合",
+        "线程池",
+        "Java concurrency"
+      ],
+      "description": "Mainstream backend language often paired with Spring, JVM, concurrency, and collections."
+    },
+    {
+      "id": "jvm_memory_model",
+      "label": "JVM Memory Model",
+      "type": "Concept",
+      "domain": "domain_backend",
+      "aliases": [
+        "JVM",
+        "JMM",
+        "heap",
+        "stack",
+        "堆",
+        "栈"
+      ],
+      "description": "Runtime memory areas, object allocation, and visibility semantics."
+    },
+    {
+      "id": "java_gc",
+      "label": "Java GC",
+      "type": "Concept",
+      "domain": "domain_backend",
+      "aliases": [
+        "GC",
+        "G1",
+        "ZGC",
+        "垃圾回收"
+      ],
+      "description": "Automatic memory management based on reachability, generations, and pause trade-offs."
+    },
+    {
+      "id": "java_collections",
+      "label": "Java Collections",
+      "type": "Concept",
+      "domain": "domain_backend",
+      "aliases": [
+        "ArrayList",
+        "HashMap",
+        "ConcurrentHashMap",
+        "集合"
+      ],
+      "description": "Core containers with important implementation and thread-safety differences."
+    },
+    {
+      "id": "java_thread_pool",
+      "label": "Java Thread Pool",
+      "type": "Concept",
+      "domain": "domain_backend",
+      "aliases": [
+        "ThreadPoolExecutor",
+        "Executor",
+        "线程池"
+      ],
+      "description": "Reuses threads and controls concurrency through core size, queue, max size, and rejection policy."
+    },
+    {
+      "id": "pitfall_thread_pool_oom",
+      "label": "Thread Pool Queue Buildup",
+      "type": "Pitfall",
+      "domain": "domain_backend",
+      "aliases": [
+        "OOM",
+        "线程池堆积"
+      ],
+      "description": "Unbounded queues or bad parameters can create memory growth and latency collapse."
+    },
+    {
+      "id": "spring_boot",
+      "label": "Spring Boot",
+      "type": "Tech",
+      "domain": "domain_backend",
+      "aliases": [
+        "Spring",
+        "Spring Boot",
+        "Spring MVC",
+        "Spring Cloud",
+        "IoC",
+        "AOP"
+      ],
+      "description": "Common Java backend framework around dependency injection, web handling, transactions, and ecosystem integration."
+    },
+    {
+      "id": "spring_ioc",
+      "label": "IoC Container",
+      "type": "Concept",
+      "domain": "domain_backend",
+      "aliases": [
+        "IoC",
+        "DI",
+        "Bean",
+        "依赖注入"
+      ],
+      "description": "Creates and wires beans to reduce manual object assembly and coupling."
+    },
+    {
+      "id": "spring_aop",
+      "label": "AOP",
+      "type": "Concept",
+      "domain": "domain_backend",
+      "aliases": [
+        "AOP",
+        "切面",
+        "dynamic proxy"
+      ],
+      "description": "Separates cross-cutting concerns such as logging, transactions, and authorization."
+    },
+    {
+      "id": "spring_mvc",
+      "label": "Spring MVC Request Flow",
+      "type": "Concept",
+      "domain": "domain_backend",
+      "aliases": [
+        "Spring MVC",
+        "DispatcherServlet",
+        "Controller"
+      ],
+      "description": "DispatcherServlet routes requests through mapping, binding, controller execution, and response handling."
+    },
+    {
+      "id": "spring_transaction",
+      "label": "Spring Transaction",
+      "type": "Concept",
+      "domain": "domain_backend",
+      "aliases": [
+        "@Transactional",
+        "事务传播",
+        "事务隔离"
+      ],
+      "description": "Declarative transactions manage commit and rollback through proxies."
+    },
+    {
+      "id": "pitfall_spring_transaction_invalid",
+      "label": "@Transactional Not Effective",
+      "type": "Pitfall",
+      "domain": "domain_backend",
+      "aliases": [
+        "事务失效",
+        "self invocation"
+      ],
+      "description": "Self-invocation, wrong visibility, or swallowed exceptions can bypass transaction proxies."
+    },
+    {
+      "id": "python",
+      "label": "Python",
+      "type": "Tech",
+      "domain": "domain_backend",
+      "aliases": [
+        "Python",
+        "FastAPI",
+        "Django",
+        "asyncio",
+        "协程",
+        "GIL"
+      ],
+      "description": "Common scripting, backend, and AI engineering language."
+    },
+    {
+      "id": "python_gil",
+      "label": "GIL",
+      "type": "Concept",
+      "domain": "domain_backend",
+      "aliases": [
+        "GIL",
+        "global interpreter lock",
+        "全局解释器锁"
+      ],
+      "description": "CPython lock protecting interpreter state; affects CPU-bound multithreading."
+    },
+    {
+      "id": "python_asyncio",
+      "label": "asyncio and Coroutine",
+      "type": "Concept",
+      "domain": "domain_backend",
+      "aliases": [
+        "asyncio",
+        "coroutine",
+        "await",
+        "协程"
+      ],
+      "description": "Event-loop concurrency for IO-heavy workloads."
+    },
+    {
+      "id": "python_web_frameworks",
+      "label": "Python Web Frameworks",
+      "type": "Concept",
+      "domain": "domain_backend",
+      "aliases": [
+        "FastAPI",
+        "Django",
+        "Flask"
+      ],
+      "description": "Framework choices differ in typing, batteries-included features, and minimalism."
+    },
+    {
+      "id": "python_packaging",
+      "label": "Python Packaging",
+      "type": "Concept",
+      "domain": "domain_backend",
+      "aliases": [
+        "pip",
+        "venv",
+        "poetry",
+        "requirements.txt"
+      ],
+      "description": "Dependency isolation and version pinning affect reproducible deployment."
+    },
+    {
+      "id": "pitfall_python_blocking_async",
+      "label": "Blocking Call in Async Code",
+      "type": "Pitfall",
+      "domain": "domain_backend",
+      "aliases": [
+        "blocking call",
+        "异步阻塞"
+      ],
+      "description": "Blocking IO or CPU work in async paths can stall the event loop."
+    },
+    {
+      "id": "api_design",
+      "label": "API Design",
+      "type": "Tech",
+      "domain": "domain_backend",
+      "aliases": [
+        "API 设计",
+        "REST",
+        "GraphQL",
+        "接口设计",
+        "幂等",
+        "限流",
+        "分页"
+      ],
+      "description": "External service contract design affecting usability, evolution, performance, and security."
+    },
+    {
+      "id": "restful_api",
+      "label": "RESTful API",
+      "type": "Concept",
+      "domain": "domain_backend",
+      "aliases": [
+        "REST",
+        "RESTful",
+        "HTTP API"
+      ],
+      "description": "Uses resources, methods, and status codes to express interface semantics."
+    },
+    {
+      "id": "api_idempotency",
+      "label": "API Idempotency",
+      "type": "Concept",
+      "domain": "domain_backend",
+      "aliases": [
+        "idempotency",
+        "幂等",
+        "幂等键"
+      ],
+      "description": "Repeated requests should produce the same business result in retry-sensitive flows."
+    },
+    {
+      "id": "rate_limiting",
+      "label": "Rate Limiting and Degradation",
+      "type": "Concept",
+      "domain": "domain_backend",
+      "aliases": [
+        "rate limit",
+        "限流",
+        "降级",
+        "熔断"
+      ],
+      "description": "Protects services from overload using token bucket, leaky bucket, or related patterns."
+    },
+    {
+      "id": "api_pagination_versioning",
+      "label": "Pagination and Versioning",
+      "type": "Concept",
+      "domain": "domain_backend",
+      "aliases": [
+        "pagination",
+        "versioning",
+        "分页",
+        "版本管理"
+      ],
+      "description": "List APIs need cursor or offset pagination and compatibility strategy."
+    },
+    {
+      "id": "pitfall_api_backward_incompatible",
+      "label": "Backward-Incompatible API Change",
+      "type": "Pitfall",
+      "domain": "domain_backend",
+      "aliases": [
+        "breaking change",
+        "兼容性"
+      ],
+      "description": "Changing fields or status semantics can break old clients."
+    },
+    {
+      "id": "mysql",
+      "label": "MySQL",
+      "type": "Tech",
+      "domain": "domain_database",
+      "aliases": [
+        "MySQL",
+        "InnoDB",
+        "SQL",
+        "关系型数据库",
+        "数据库"
+      ],
+      "description": "Relational database topic centered on indexes, transactions, locks, plans, and storage engines."
+    },
+    {
+      "id": "mysql_index",
+      "label": "MySQL Index",
+      "type": "Concept",
+      "domain": "domain_database",
+      "aliases": [
+        "index",
+        "B+Tree",
+        "索引",
+        "联合索引"
+      ],
+      "description": "InnoDB commonly uses B+Tree indexes; compound indexes involve leftmost-prefix and covering rules."
+    },
+    {
+      "id": "mysql_transaction",
+      "label": "Transaction and Isolation",
+      "type": "Concept",
+      "domain": "domain_database",
+      "aliases": [
+        "transaction",
+        "ACID",
+        "隔离级别",
+        "MVCC"
+      ],
+      "description": "Transactions provide ACID; isolation balances consistency and concurrency."
+    },
+    {
+      "id": "mysql_locking",
+      "label": "MySQL Locking",
+      "type": "Concept",
+      "domain": "domain_database",
+      "aliases": [
+        "row lock",
+        "gap lock",
+        "next-key lock",
+        "行锁",
+        "间隙锁"
+      ],
+      "description": "InnoDB uses row, gap, and next-key locks for concurrent updates and phantom prevention."
+    },
+    {
+      "id": "mysql_execution_plan",
+      "label": "Execution Plan",
+      "type": "Concept",
+      "domain": "domain_database",
+      "aliases": [
+        "EXPLAIN",
+        "执行计划",
+        "optimizer"
+      ],
+      "description": "EXPLAIN reveals access type, chosen index, estimated rows, and extra operations."
+    },
+    {
+      "id": "pitfall_mysql_index_miss",
+      "label": "Index Miss",
+      "type": "Pitfall",
+      "domain": "domain_database",
+      "aliases": [
+        "索引失效",
+        "index miss"
+      ],
+      "description": "Functions on columns, implicit conversion, or leading wildcard LIKE can prevent index use."
+    },
+    {
+      "id": "redis",
+      "label": "Redis",
+      "type": "Tech",
+      "domain": "domain_database",
+      "aliases": [
+        "Redis",
+        "缓存",
+        "分布式锁",
+        "zset",
+        "缓存穿透",
+        "缓存雪崩"
+      ],
+      "description": "In-memory data structure service for cache, counters, rate limits, leaderboards, and locks."
+    },
+    {
+      "id": "redis_data_structures",
+      "label": "Redis Data Structures",
+      "type": "Concept",
+      "domain": "domain_database",
+      "aliases": [
+        "string",
+        "hash",
+        "list",
+        "set",
+        "zset",
+        "bitmap",
+        "stream"
+      ],
+      "description": "Different structures imply different complexity and memory trade-offs."
+    },
+    {
+      "id": "redis_cache_patterns",
+      "label": "Cache Patterns",
+      "type": "Concept",
+      "domain": "domain_database",
+      "aliases": [
+        "cache aside",
+        "缓存更新",
+        "旁路缓存"
+      ],
+      "description": "Common approaches include Cache Aside, Read Through, and Write Through."
+    },
+    {
+      "id": "redis_persistence",
+      "label": "Redis Persistence",
+      "type": "Concept",
+      "domain": "domain_database",
+      "aliases": [
+        "RDB",
+        "AOF",
+        "持久化"
+      ],
+      "description": "RDB and AOF trade recovery speed, data-loss window, and write amplification."
+    },
+    {
+      "id": "redis_distributed_lock",
+      "label": "Redis Distributed Lock",
+      "type": "Concept",
+      "domain": "domain_database",
+      "aliases": [
+        "SET NX EX",
+        "Redlock",
+        "分布式锁"
+      ],
+      "description": "SET NX EX based locks must handle expiry, renewal, and safe release."
+    },
+    {
+      "id": "pitfall_cache_breakdown",
+      "label": "Cache Penetration/Breakdown/Avalanche",
+      "type": "Pitfall",
+      "domain": "domain_database",
+      "aliases": [
+        "缓存穿透",
+        "缓存击穿",
+        "缓存雪崩"
+      ],
+      "description": "Cache misses or mass expiry can push traffic into the database."
+    },
+    {
+      "id": "message_queue",
+      "label": "Message Queue",
+      "type": "Tech",
+      "domain": "domain_distributed",
+      "aliases": [
+        "消息队列",
+        "MQ",
+        "Kafka",
+        "RabbitMQ",
+        "RocketMQ",
+        "异步消息"
+      ],
+      "description": "Asynchronous messaging for decoupling, buffering, and traffic smoothing."
+    },
+    {
+      "id": "mq_delivery_semantics",
+      "label": "Delivery Semantics",
+      "type": "Concept",
+      "domain": "domain_distributed",
+      "aliases": [
+        "at least once",
+        "at most once",
+        "exactly once",
+        "至少一次",
+        "恰好一次"
+      ],
+      "description": "Messaging systems trade reliability and performance; business idempotency is often required."
+    },
+    {
+      "id": "mq_ordering",
+      "label": "Message Ordering",
+      "type": "Concept",
+      "domain": "domain_distributed",
+      "aliases": [
+        "ordered message",
+        "顺序消息",
+        "partition"
+      ],
+      "description": "Ordering usually depends on routing the same key to the same partition or queue."
+    },
+    {
+      "id": "mq_retry_dlq",
+      "label": "Retry and Dead Letter Queue",
+      "type": "Concept",
+      "domain": "domain_distributed",
+      "aliases": [
+        "retry",
+        "DLQ",
+        "死信队列"
+      ],
+      "description": "Failures need retry, backoff, and isolation to avoid blocking the main flow."
+    },
+    {
+      "id": "kafka_partition_consumer_group",
+      "label": "Kafka Partition and Consumer Group",
+      "type": "Concept",
+      "domain": "domain_distributed",
+      "aliases": [
+        "Kafka partition",
+        "consumer group",
+        "分区",
+        "消费者组"
+      ],
+      "description": "Kafka scales throughput with partitions; a partition is consumed by only one consumer in a group."
+    },
+    {
+      "id": "pitfall_mq_duplicate_consumption",
+      "label": "Duplicate Message Consumption",
+      "type": "Pitfall",
+      "domain": "domain_distributed",
+      "aliases": [
+        "duplicate message",
+        "重复消费"
+      ],
+      "description": "Retries and offset timing can cause duplicate delivery; consumers need idempotency."
+    },
+    {
+      "id": "microservices",
+      "label": "Microservices",
+      "type": "Tech",
+      "domain": "domain_distributed",
+      "aliases": [
+        "微服务",
+        "Spring Cloud",
+        "服务发现",
+        "熔断",
+        "RPC"
+      ],
+      "description": "Splits systems into independently deployable services with governance and failure isolation."
+    },
+    {
+      "id": "service_discovery",
+      "label": "Service Discovery",
+      "type": "Concept",
+      "domain": "domain_distributed",
+      "aliases": [
+        "service discovery",
+        "注册中心",
+        "Nacos",
+        "Eureka"
+      ],
+      "description": "Callers discover dynamic service instances through a registry."
+    },
+    {
+      "id": "rpc_http",
+      "label": "RPC and HTTP Call",
+      "type": "Concept",
+      "domain": "domain_distributed",
+      "aliases": [
+        "RPC",
+        "gRPC",
+        "OpenFeign",
+        "HTTP client"
+      ],
+      "description": "Service calls require serialization, timeout, retry, and connection-pool design."
+    },
+    {
+      "id": "circuit_breaker",
+      "label": "Circuit Breaker and Fallback",
+      "type": "Concept",
+      "domain": "domain_distributed",
+      "aliases": [
+        "circuit breaker",
+        "熔断",
+        "降级",
+        "Sentinel"
+      ],
+      "description": "Fails fast or returns fallback when downstream services are unstable."
+    },
+    {
+      "id": "distributed_tracing",
+      "label": "Distributed Tracing",
+      "type": "Concept",
+      "domain": "domain_distributed",
+      "aliases": [
+        "trace",
+        "Jaeger",
+        "Zipkin",
+        "链路追踪"
+      ],
+      "description": "Connects cross-service request paths to locate errors and latency."
+    },
+    {
+      "id": "pitfall_retry_storm",
+      "label": "Retry Storm",
+      "type": "Pitfall",
+      "domain": "domain_distributed",
+      "aliases": [
+        "retry storm",
+        "重试风暴"
+      ],
+      "description": "Unbounded retries amplify downstream failures without timeout, backoff, limits, and breakers."
+    },
+    {
+      "id": "system_design",
+      "label": "System Design",
+      "type": "Tech",
+      "domain": "domain_distributed",
+      "aliases": [
+        "系统设计",
+        "架构设计",
+        "高并发",
+        "秒杀",
+        "短链接",
+        "IM",
+        "Feed"
+      ],
+      "description": "Designs complete systems from requirements, capacity, data model, APIs, scalability, and recovery."
+    },
+    {
+      "id": "capacity_estimation",
+      "label": "Capacity Estimation",
+      "type": "Concept",
+      "domain": "domain_distributed",
+      "aliases": [
+        "capacity estimation",
+        "QPS",
+        "容量估算"
+      ],
+      "description": "Estimates DAU, QPS, data volume, bandwidth, and bottlenecks."
+    },
+    {
+      "id": "load_balancing",
+      "label": "Load Balancing",
+      "type": "Concept",
+      "domain": "domain_distributed",
+      "aliases": [
+        "load balancer",
+        "Nginx",
+        "负载均衡"
+      ],
+      "description": "Distributes traffic across instances with health checks and routing algorithms."
+    },
+    {
+      "id": "sharding_replication",
+      "label": "Sharding and Replication",
+      "type": "Concept",
+      "domain": "domain_distributed",
+      "aliases": [
+        "sharding",
+        "replication",
+        "分库分表",
+        "主从复制"
+      ],
+      "description": "Improves capacity and availability while adding consistency and routing complexity."
+    },
+    {
+      "id": "consistency_availability",
+      "label": "Consistency and Availability",
+      "type": "Concept",
+      "domain": "domain_distributed",
+      "aliases": [
+        "CAP",
+        "BASE",
+        "一致性",
+        "可用性"
+      ],
+      "description": "Distributed systems choose trade-offs between strong consistency, availability, and partition tolerance."
+    },
+    {
+      "id": "pitfall_hot_key_hot_partition",
+      "label": "Hot Key / Hot Partition",
+      "type": "Pitfall",
+      "domain": "domain_distributed",
+      "aliases": [
+        "hot key",
+        "hot partition",
+        "热点"
+      ],
+      "description": "Skewed traffic can overload one key, shard, or partition."
+    },
+    {
+      "id": "linux",
+      "label": "Linux",
+      "type": "Tech",
+      "domain": "domain_devops",
+      "aliases": [
+        "Linux",
+        "Shell",
+        "进程排查",
+        "日志排查",
+        "权限",
+        "top",
+        "ps",
+        "netstat"
+      ],
+      "description": "Base environment for deployment and troubleshooting."
+    },
+    {
+      "id": "linux_process_tools",
+      "label": "Process and Resource Tools",
+      "type": "Concept",
+      "domain": "domain_devops",
+      "aliases": [
+        "ps",
+        "top",
+        "htop",
+        "lsof",
+        "进程"
+      ],
+      "description": "Observes processes, CPU, memory, and file handles."
+    },
+    {
+      "id": "linux_network_tools",
+      "label": "Network Troubleshooting Tools",
+      "type": "Concept",
+      "domain": "domain_devops",
+      "aliases": [
+        "netstat",
+        "ss",
+        "curl",
+        "tcpdump",
+        "网络排查"
+      ],
+      "description": "Diagnoses ports, connectivity, and protocol behavior."
+    },
+    {
+      "id": "linux_file_permission",
+      "label": "File Permission",
+      "type": "Concept",
+      "domain": "domain_devops",
+      "aliases": [
+        "chmod",
+        "chown",
+        "umask",
+        "权限"
+      ],
+      "description": "Linux permissions affect read, write, execute, and deployment security."
+    },
+    {
+      "id": "shell_scripting",
+      "label": "Shell Scripting",
+      "type": "Concept",
+      "domain": "domain_devops",
+      "aliases": [
+        "bash",
+        "shell",
+        "pipe",
+        "管道",
+        "重定向"
+      ],
+      "description": "Automates operations and data processing with pipes and command composition."
+    },
+    {
+      "id": "pitfall_linux_permission_denied",
+      "label": "Permission and Path Issue",
+      "type": "Pitfall",
+      "domain": "domain_devops",
+      "aliases": [
+        "permission denied",
+        "权限不足"
+      ],
+      "description": "Deployment failures often come from permissions, users, working directory, or environment variables."
+    },
+    {
+      "id": "docker",
+      "label": "Docker",
+      "type": "Tech",
+      "domain": "domain_devops",
+      "aliases": [
+        "Docker",
+        "容器",
+        "镜像",
+        "Dockerfile",
+        "docker compose"
+      ],
+      "description": "Containerized delivery with consistent runtime and lightweight isolation."
+    },
+    {
+      "id": "docker_image_layer",
+      "label": "Image and Layer",
+      "type": "Concept",
+      "domain": "domain_devops",
+      "aliases": [
+        "image layer",
+        "镜像层",
+        "Dockerfile"
+      ],
+      "description": "Image layers and Dockerfile order affect cache reuse and image size."
+    },
+    {
+      "id": "docker_container_network",
+      "label": "Container Network",
+      "type": "Concept",
+      "domain": "domain_devops",
+      "aliases": [
+        "bridge network",
+        "container network",
+        "容器网络"
+      ],
+      "description": "Containers communicate through bridge, host, or custom networks."
+    },
+    {
+      "id": "docker_volume",
+      "label": "Docker Volume",
+      "type": "Concept",
+      "domain": "domain_devops",
+      "aliases": [
+        "volume",
+        "bind mount",
+        "数据卷"
+      ],
+      "description": "Volumes and bind mounts persist data and mount configuration."
+    },
+    {
+      "id": "docker_compose",
+      "label": "Docker Compose",
+      "type": "Concept",
+      "domain": "domain_devops",
+      "aliases": [
+        "docker compose",
+        "compose"
+      ],
+      "description": "Compose orchestrates local multi-container environments through YAML."
+    },
+    {
+      "id": "pitfall_docker_large_image",
+      "label": "Large Docker Image",
+      "type": "Pitfall",
+      "domain": "domain_devops",
+      "aliases": [
+        "large image",
+        "镜像过大"
+      ],
+      "description": "Uncleaned dependencies and build artifacts make images slow and risky to deploy."
+    },
+    {
+      "id": "kubernetes",
+      "label": "Kubernetes",
+      "type": "Tech",
+      "domain": "domain_devops",
+      "aliases": [
+        "Kubernetes",
+        "K8s",
+        "Pod",
+        "Deployment",
+        "Service",
+        "Ingress"
+      ],
+      "description": "Cloud-native orchestration for deployment, scheduling, service discovery, autoscaling, and self-healing."
+    },
+    {
+      "id": "k8s_pod_deployment",
+      "label": "Pod and Deployment",
+      "type": "Concept",
+      "domain": "domain_devops",
+      "aliases": [
+        "Pod",
+        "Deployment",
+        "ReplicaSet"
+      ],
+      "description": "Pod is the smallest scheduling unit; Deployment manages replicas and rolling updates."
+    },
+    {
+      "id": "k8s_service_ingress",
+      "label": "Service and Ingress",
+      "type": "Concept",
+      "domain": "domain_devops",
+      "aliases": [
+        "Service",
+        "Ingress",
+        "ClusterIP",
+        "NodePort"
+      ],
+      "description": "Service provides stable access; Ingress handles layer-7 routing."
+    },
+    {
+      "id": "k8s_config_secret",
+      "label": "ConfigMap and Secret",
+      "type": "Concept",
+      "domain": "domain_devops",
+      "aliases": [
+        "ConfigMap",
+        "Secret",
+        "配置管理"
+      ],
+      "description": "Configuration and secrets should be separated from images."
+    },
+    {
+      "id": "k8s_hpa_healthcheck",
+      "label": "HPA and Health Check",
+      "type": "Concept",
+      "domain": "domain_devops",
+      "aliases": [
+        "HPA",
+        "readinessProbe",
+        "livenessProbe",
+        "健康检查"
+      ],
+      "description": "HPA scales workload; probes control restart and traffic readiness."
+    },
+    {
+      "id": "pitfall_k8s_probe_misconfig",
+      "label": "Probe Misconfiguration",
+      "type": "Pitfall",
+      "domain": "domain_devops",
+      "aliases": [
+        "probe misconfig",
+        "探针配置"
+      ],
+      "description": "Bad probe path, timeout, or delay can cause restarts or premature traffic."
+    },
+    {
+      "id": "javascript",
+      "label": "JavaScript / TypeScript",
+      "type": "Tech",
+      "domain": "domain_frontend",
+      "aliases": [
+        "JavaScript",
+        "TypeScript",
+        "JS",
+        "TS",
+        "ES6",
+        "异步编程"
+      ],
+      "description": "Frontend foundation language topics around typing, closures, prototypes, async, and modules."
+    },
+    {
+      "id": "js_closure_scope",
+      "label": "Closure and Scope",
+      "type": "Concept",
+      "domain": "domain_frontend",
+      "aliases": [
+        "closure",
+        "scope",
+        "闭包",
+        "作用域"
+      ],
+      "description": "Closures retain access to lexical environment."
+    },
+    {
+      "id": "js_prototype_this",
+      "label": "Prototype and this",
+      "type": "Concept",
+      "domain": "domain_frontend",
+      "aliases": [
+        "prototype",
+        "this",
+        "原型链"
+      ],
+      "description": "Prototype chain controls property lookup; this depends on call form."
+    },
+    {
+      "id": "js_event_loop",
+      "label": "Event Loop",
+      "type": "Concept",
+      "domain": "domain_frontend",
+      "aliases": [
+        "event loop",
+        "microtask",
+        "macrotask",
+        "事件循环"
+      ],
+      "description": "Schedules macro tasks and microtasks in async execution."
+    },
+    {
+      "id": "typescript_type_system",
+      "label": "TypeScript Type System",
+      "type": "Concept",
+      "domain": "domain_frontend",
+      "aliases": [
+        "TypeScript",
+        "generic",
+        "interface",
+        "类型系统"
+      ],
+      "description": "Static types improve maintainability through generics, unions, and structural typing."
+    },
+    {
+      "id": "pitfall_js_async_order",
+      "label": "Async Execution Order Mistake",
+      "type": "Pitfall",
+      "domain": "domain_frontend",
+      "aliases": [
+        "Promise",
+        "setTimeout",
+        "async order"
+      ],
+      "description": "Misunderstanding microtask priority leads to wrong execution-order reasoning."
+    },
+    {
+      "id": "react_component_state",
+      "label": "Component and State",
+      "type": "Concept",
+      "domain": "domain_frontend",
+      "aliases": [
+        "component",
+        "state",
+        "props",
+        "组件",
+        "状态"
+      ],
+      "description": "Components describe UI; props flow down and state drives re-rendering."
+    },
+    {
+      "id": "react_hooks",
+      "label": "Hooks",
+      "type": "Concept",
+      "domain": "domain_frontend",
+      "aliases": [
+        "useState",
+        "useEffect",
+        "useMemo",
+        "Hooks"
+      ],
+      "description": "Hooks give function components state, effects, and memoization."
+    },
+    {
+      "id": "react_render_reconciliation",
+      "label": "Render and Reconciliation",
+      "type": "Concept",
+      "domain": "domain_frontend",
+      "aliases": [
+        "reconciliation",
+        "virtual DOM",
+        "diff",
+        "渲染"
+      ],
+      "description": "React computes UI updates through virtual DOM and reconciliation."
+    },
+    {
+      "id": "frontend_state_management",
+      "label": "Frontend State Management",
+      "type": "Concept",
+      "domain": "domain_frontend",
+      "aliases": [
+        "Redux",
+        "Zustand",
+        "Context",
+        "状态管理"
+      ],
+      "description": "Separates local state, server state, and global state."
+    },
+    {
+      "id": "pitfall_react_effect_loop",
+      "label": "useEffect Infinite Loop",
+      "type": "Pitfall",
+      "domain": "domain_frontend",
+      "aliases": [
+        "useEffect loop",
+        "依赖数组"
+      ],
+      "description": "Wrong dependencies or state updates inside effects can cause repeated rendering."
+    },
+    {
+      "id": "browser_runtime",
+      "label": "Browser Runtime",
+      "type": "Tech",
+      "domain": "domain_frontend",
+      "aliases": [
+        "浏览器",
+        "DOM",
+        "渲染流程",
+        "跨域",
+        "缓存",
+        "CORS"
+      ],
+      "description": "Runtime environment for frontend code, covering rendering, networking, isolation, and performance."
+    },
+    {
+      "id": "browser_render_pipeline",
+      "label": "Browser Render Pipeline",
+      "type": "Concept",
+      "domain": "domain_frontend",
+      "aliases": [
+        "render pipeline",
+        "layout",
+        "paint",
+        "composite",
+        "渲染流程"
+      ],
+      "description": "Builds DOM/CSSOM and runs layout, paint, and compositing."
+    },
+    {
+      "id": "browser_cache",
+      "label": "Browser Cache",
+      "type": "Concept",
+      "domain": "domain_frontend",
+      "aliases": [
+        "cache-control",
+        "ETag",
+        "强缓存",
+        "协商缓存"
+      ],
+      "description": "HTTP caching reduces network requests through Cache-Control, ETag, and related headers."
+    },
+    {
+      "id": "cors_same_origin",
+      "label": "Same-Origin Policy and CORS",
+      "type": "Concept",
+      "domain": "domain_frontend",
+      "aliases": [
+        "CORS",
+        "same origin",
+        "跨域",
+        "同源策略"
+      ],
+      "description": "Same-origin policy restricts cross-site access; CORS authorizes selected requests."
+    },
+    {
+      "id": "frontend_performance",
+      "label": "Frontend Performance",
+      "type": "Concept",
+      "domain": "domain_frontend",
+      "aliases": [
+        "LCP",
+        "FID",
+        "CLS",
+        "性能优化"
+      ],
+      "description": "Optimizes loading, interaction, and visual stability."
+    },
+    {
+      "id": "pitfall_cors_credentials",
+      "label": "CORS Credentials Misconfiguration",
+      "type": "Pitfall",
+      "domain": "domain_frontend",
+      "aliases": [
+        "CORS credentials",
+        "跨域凭证"
+      ],
+      "description": "Credentialed cross-origin requests cannot use wildcard origin."
+    },
+    {
+      "id": "web_security",
+      "label": "Web Security",
+      "type": "Tech",
+      "domain": "domain_security_quality",
+      "aliases": [
+        "Web 安全",
+        "SQL 注入",
+        "XSS",
+        "CSRF",
+        "SSRF",
+        "安全"
+      ],
+      "description": "Common web attacks and defenses around input, authorization, session, and outbound access."
+    },
+    {
+      "id": "sql_injection",
+      "label": "SQL Injection",
+      "type": "Concept",
+      "domain": "domain_security_quality",
+      "aliases": [
+        "SQL injection",
+        "SQL 注入"
+      ],
+      "description": "Attackers inject SQL; parameterized queries and least privilege are basic defenses."
+    },
+    {
+      "id": "xss",
+      "label": "XSS",
+      "type": "Concept",
+      "domain": "domain_security_quality",
+      "aliases": [
+        "cross site scripting",
+        "XSS",
+        "跨站脚本"
+      ],
+      "description": "Malicious scripts run in pages; escaping, CSP, and output handling matter."
+    },
+    {
+      "id": "csrf",
+      "label": "CSRF",
+      "type": "Concept",
+      "domain": "domain_security_quality",
+      "aliases": [
+        "cross site request forgery",
+        "CSRF",
+        "跨站请求伪造"
+      ],
+      "description": "Uses a user login session to trigger unintended requests; SameSite and CSRF tokens help."
+    },
+    {
+      "id": "ssrf",
+      "label": "SSRF",
+      "type": "Concept",
+      "domain": "domain_security_quality",
+      "aliases": [
+        "server side request forgery",
+        "SSRF"
+      ],
+      "description": "Tricks servers into accessing internal or sensitive addresses; whitelist and network isolation help."
+    },
+    {
+      "id": "pitfall_security_trust_input",
+      "label": "Trusting User Input",
+      "type": "Pitfall",
+      "domain": "domain_security_quality",
+      "aliases": [
+        "trust user input",
+        "输入校验"
+      ],
+      "description": "Treating user input as trusted amplifies injection, authorization, and business bypass risks."
+    },
+    {
+      "id": "auth_authorization",
+      "label": "Authentication and Authorization",
+      "type": "Tech",
+      "domain": "domain_security_quality",
+      "aliases": [
+        "认证",
+        "授权",
+        "JWT",
+        "OAuth2",
+        "RBAC",
+        "Session"
+      ],
+      "description": "Authentication identifies users; authorization decides what they can do."
+    },
+    {
+      "id": "session_cookie",
+      "label": "Session and Cookie",
+      "type": "Concept",
+      "domain": "domain_security_quality",
+      "aliases": [
+        "Session",
+        "Cookie",
+        "登录态"
+      ],
+      "description": "Server-side sessions associate user state with cookies."
+    },
+    {
+      "id": "jwt_token",
+      "label": "JWT",
+      "type": "Concept",
+      "domain": "domain_security_quality",
+      "aliases": [
+        "JWT",
+        "token",
+        "access token",
+        "refresh token"
+      ],
+      "description": "Self-contained tokens suit stateless auth but complicate revocation and leakage response."
+    },
+    {
+      "id": "oauth2",
+      "label": "OAuth2",
+      "type": "Concept",
+      "domain": "domain_security_quality",
+      "aliases": [
+        "OAuth2",
+        "OIDC",
+        "授权码"
+      ],
+      "description": "Third-party authorization; authorization-code flow with PKCE is safer."
+    },
+    {
+      "id": "rbac_abac",
+      "label": "RBAC/ABAC",
+      "type": "Concept",
+      "domain": "domain_security_quality",
+      "aliases": [
+        "RBAC",
+        "ABAC",
+        "权限模型"
+      ],
+      "description": "RBAC uses roles; ABAC uses attributes and policy for finer-grained control."
+    },
+    {
+      "id": "pitfall_auth_broken_access_control",
+      "label": "Broken Access Control",
+      "type": "Pitfall",
+      "domain": "domain_security_quality",
+      "aliases": [
+        "broken access control",
+        "越权"
+      ],
+      "description": "Checking only login or hiding buttons on frontend can allow horizontal or vertical privilege bypass."
+    },
+    {
+      "id": "testing",
+      "label": "Testing",
+      "type": "Tech",
+      "domain": "domain_security_quality",
+      "aliases": [
+        "测试",
+        "单元测试",
+        "集成测试",
+        "Mock",
+        "压测",
+        "pytest",
+        "JUnit"
+      ],
+      "description": "Automated verification that reduces regression risk."
+    },
+    {
+      "id": "unit_testing",
+      "label": "Unit Testing",
+      "type": "Concept",
+      "domain": "domain_security_quality",
+      "aliases": [
+        "unit test",
+        "JUnit",
+        "pytest",
+        "单元测试"
+      ],
+      "description": "Isolates small units and checks outputs, boundaries, and exception paths."
+    },
+    {
+      "id": "integration_testing",
+      "label": "Integration Testing",
+      "type": "Concept",
+      "domain": "domain_security_quality",
+      "aliases": [
+        "integration test",
+        "集成测试"
+      ],
+      "description": "Verifies cooperation among modules, database, or external services."
+    },
+    {
+      "id": "mocking",
+      "label": "Mock and Stub",
+      "type": "Concept",
+      "domain": "domain_security_quality",
+      "aliases": [
+        "mock",
+        "stub",
+        "打桩"
+      ],
+      "description": "Test doubles isolate dependencies; over-mocking lowers realism."
+    },
+    {
+      "id": "load_testing",
+      "label": "Load Testing",
+      "type": "Concept",
+      "domain": "domain_security_quality",
+      "aliases": [
+        "load test",
+        "stress test",
+        "压测"
+      ],
+      "description": "Simulates traffic to observe throughput, latency, error rate, and bottlenecks."
+    },
+    {
+      "id": "pitfall_flaky_test",
+      "label": "Flaky Test",
+      "type": "Pitfall",
+      "domain": "domain_security_quality",
+      "aliases": [
+        "flaky test",
+        "测试不稳定"
+      ],
+      "description": "Tests relying on time, order, external services, or shared state can fail intermittently."
+    },
+    {
+      "id": "observability_engineering",
+      "label": "Observability Engineering",
+      "type": "Tech",
+      "domain": "domain_security_quality",
+      "aliases": [
+        "可观测性",
+        "日志",
+        "监控",
+        "指标",
+        "Trace",
+        "Prometheus",
+        "告警"
+      ],
+      "description": "Logs, metrics, and tracing used to understand running systems and troubleshoot incidents."
+    },
+    {
+      "id": "logging",
+      "label": "Logging",
+      "type": "Concept",
+      "domain": "domain_security_quality",
+      "aliases": [
+        "log",
+        "logging",
+        "日志"
+      ],
+      "description": "Records business events and error context; structure and sensitive data matter."
+    },
+    {
+      "id": "metrics_monitoring",
+      "label": "Metrics Monitoring",
+      "type": "Concept",
+      "domain": "domain_security_quality",
+      "aliases": [
+        "metrics",
+        "Prometheus",
+        "Grafana",
+        "指标",
+        "监控"
+      ],
+      "description": "Observes throughput, latency, error rate, and resource utilization."
+    },
+    {
+      "id": "tracing",
+      "label": "Tracing",
+      "type": "Concept",
+      "domain": "domain_security_quality",
+      "aliases": [
+        "trace",
+        "OpenTelemetry",
+        "链路追踪"
+      ],
+      "description": "Captures cross-service request paths and durations."
+    },
+    {
+      "id": "alerting_slo",
+      "label": "Alerting and SLO",
+      "type": "Concept",
+      "domain": "domain_security_quality",
+      "aliases": [
+        "alert",
+        "SLO",
+        "告警"
+      ],
+      "description": "Alerts should track user impact and SLOs, not noisy low-value symptoms."
+    },
+    {
+      "id": "pitfall_alert_fatigue",
+      "label": "Alert Fatigue",
+      "type": "Pitfall",
+      "domain": "domain_security_quality",
+      "aliases": [
+        "alert fatigue",
+        "告警疲劳"
+      ],
+      "description": "Too many low-quality alerts make teams ignore real incidents."
+    },
+    {
+      "id": "react_frontend",
+      "label": "React",
+      "type": "Tech",
+      "domain": "domain_frontend",
+      "aliases": [
+        "React",
+        "Hooks",
+        "useState",
+        "useEffect",
+        "状态管理"
+      ],
+      "description": "Mainstream frontend UI framework around components, state, rendering, and Hooks."
+    }
   ],
-
   "edges": [
-
-    {"source": "nlp",               "target": "domain_ai",          "relation": "BELONGS_TO"},
-    {"source": "transformer",       "target": "domain_ai",          "relation": "BELONGS_TO"},
-    {"source": "llm",               "target": "domain_ai",          "relation": "BELONGS_TO"},
-    {"source": "embedding",         "target": "domain_ai",          "relation": "BELONGS_TO"},
-    {"source": "rag",               "target": "domain_ai",          "relation": "BELONGS_TO"},
-    {"source": "fine_tuning",       "target": "domain_ai",          "relation": "BELONGS_TO"},
-    {"source": "prompt_engineering","target": "domain_ai",          "relation": "BELONGS_TO"},
-    {"source": "llm_agent",         "target": "domain_ai",          "relation": "BELONGS_TO"},
-
-    {"source": "nlp",               "target": "transformer",        "relation": "LEADS_TO",
-     "question_hint": "NLP领域经历了从RNN到Transformer的范式转变，你能讲讲Transformer解决了RNN的哪些根本问题吗？"},
-    {"source": "nlp",               "target": "embedding",          "relation": "RELATED_TO"},
-    {"source": "nlp",               "target": "tokenization",       "relation": "HAS_COMPONENT"},
-
-    {"source": "transformer",       "target": "attention",          "relation": "HAS_COMPONENT"},
-    {"source": "transformer",       "target": "positional_encoding","relation": "HAS_COMPONENT"},
-    {"source": "transformer",       "target": "layer_norm",         "relation": "HAS_COMPONENT"},
-    {"source": "transformer",       "target": "ffn",                "relation": "HAS_COMPONENT"},
-    {"source": "transformer",       "target": "kv_cache",           "relation": "RELATED_TO"},
-
-    {"source": "transformer",       "target": "attention",          "relation": "LEADS_TO",
-     "question_hint": "Transformer的核心是Attention，你能从数学角度解释Q/K/V的含义，以及为什么要除以√d_k吗？"},
-    {"source": "attention",         "target": "mha",                "relation": "HAS_COMPONENT"},
-    {"source": "attention",         "target": "scaled_dot_product", "relation": "HAS_COMPONENT"},
-    {"source": "attention",         "target": "pitfall_attention_complexity", "relation": "HAS_PITFALL"},
-    {"source": "attention",         "target": "mha",                "relation": "LEADS_TO",
-     "question_hint": "多头注意力(MHA)相比单头有什么优势？每个head学到的是同样的东西吗？"},
-    {"source": "mha",               "target": "pitfall_attention_complexity","relation": "LEADS_TO",
-     "question_hint": "MHA的复杂度是O(n²)，在长文本场景下显存会爆炸，你了解哪些优化方案？比如FlashAttention或GQA？"},
-
-    {"source": "positional_encoding","target": "rope",              "relation": "LEADS_TO",
-     "question_hint": "原始的正弦位置编码有长度外推的限制，现在LLaMA/Qwen用的是RoPE，它解决了什么问题？"},
-    {"source": "positional_encoding","target": "pitfall_pe_extrapolation","relation": "HAS_PITFALL"},
-    {"source": "rope",              "target": "pitfall_pe_extrapolation","relation": "RELATED_TO"},
-
-    {"source": "kv_cache",          "target": "pitfall_kv_cache_memory","relation": "HAS_PITFALL"},
-    {"source": "kv_cache",          "target": "pitfall_kv_cache_memory","relation": "LEADS_TO",
-     "question_hint": "KV Cache是推理加速的关键，但batch_size一大显存就不够，你们是怎么处理这个问题的？了解PagedAttention吗？"},
-
-    {"source": "llm",               "target": "pretraining",        "relation": "HAS_COMPONENT"},
-    {"source": "llm",               "target": "rlhf",               "relation": "HAS_COMPONENT"},
-    {"source": "llm",               "target": "sft",                "relation": "HAS_COMPONENT"},
-    {"source": "llm",               "target": "tokenization",       "relation": "HAS_COMPONENT"},
-    {"source": "llm",               "target": "kv_cache",           "relation": "HAS_COMPONENT"},
-    {"source": "llm",               "target": "pitfall_hallucination","relation": "HAS_PITFALL"},
-    {"source": "llm",               "target": "transformer",        "relation": "REQUIRES"},
-
-    {"source": "llm",               "target": "pretraining",        "relation": "LEADS_TO",
-     "question_hint": "LLM的能力来自预训练，CLM(因果语言建模)的训练目标是什么？为什么Next Token Prediction能让模型涌现出推理能力？"},
-    {"source": "pretraining",       "target": "sft",                "relation": "LEADS_TO",
-     "question_hint": "预训练完成后模型并不会对话，SFT是怎么让它学会遵循指令的？数据质量和数量哪个更重要？"},
-    {"source": "sft",               "target": "rlhf",               "relation": "LEADS_TO",
-     "question_hint": "SFT之后还有RLHF，为什么SFT不够？RLHF的PPO训练过程你能讲一下吗？"},
-    {"source": "rlhf",              "target": "reward_model",       "relation": "HAS_COMPONENT"},
-    {"source": "rlhf",              "target": "pitfall_reward_hacking","relation": "HAS_PITFALL"},
-    {"source": "reward_model",      "target": "pitfall_reward_hacking","relation": "LEADS_TO",
-     "question_hint": "奖励模型是RLHF的核心，但它本身也可能被模型'欺骗'——你了解Reward Hacking是怎么发生的吗？"},
-
-    {"source": "tokenization",      "target": "bpe",                "relation": "HAS_COMPONENT"},
-    {"source": "tokenization",      "target": "bpe",                "relation": "LEADS_TO",
-     "question_hint": "GPT系列用BPE分词，你了解BPE的构建过程吗？中文和英文在tokenize时有什么本质差异？"},
-
-    {"source": "embedding",         "target": "word2vec",           "relation": "LEADS_TO",
-     "question_hint": "早期的词向量用Word2Vec，它和现在基于Transformer的Embedding有什么本质区别？一词多义问题是怎么解决的？"},
-    {"source": "word2vec",          "target": "sentence_transformer","relation": "LEADS_TO",
-     "question_hint": "Word2Vec是词级别的，RAG需要句子级别的向量，Sentence Transformer是怎么训练的？"},
-    {"source": "sentence_transformer","target": "contrastive_learning","relation": "REQUIRES"},
-    {"source": "contrastive_learning","target": "pitfall_embedding_collapse","relation": "HAS_PITFALL"},
-    {"source": "sentence_transformer","target": "pitfall_embedding_collapse","relation": "LEADS_TO",
-     "question_hint": "对比学习训练Embedding时有个常见问题叫向量空间坍缩，你遇到过吗？是怎么检测和避免的？"},
-    {"source": "embedding",         "target": "rag",                "relation": "RELATED_TO"},
-    {"source": "embedding",         "target": "hnsw",               "relation": "RELATED_TO"},
-
-    {"source": "rag",               "target": "vector_retrieval",   "relation": "HAS_COMPONENT"},
-    {"source": "rag",               "target": "chunking",           "relation": "HAS_COMPONENT"},
-    {"source": "rag",               "target": "reranking",          "relation": "HAS_COMPONENT"},
-    {"source": "rag",               "target": "pitfall_hallucination","relation": "RELATED_TO"},
-    {"source": "rag",               "target": "pitfall_lost_in_middle","relation": "HAS_PITFALL"},
-
-    {"source": "rag",               "target": "vector_retrieval",   "relation": "LEADS_TO",
-     "question_hint": "RAG的召回阶段你用的是什么检索方式？纯向量检索有什么局限性？"},
-    {"source": "vector_retrieval",  "target": "hnsw",               "relation": "HAS_COMPONENT"},
-    {"source": "vector_retrieval",  "target": "hybrid_search",      "relation": "LEADS_TO",
-     "question_hint": "纯向量检索对关键词精确匹配效果差，你们有没有引入混合检索？BM25和向量怎么融合分数？"},
-    {"source": "hybrid_search",     "target": "reranking",          "relation": "LEADS_TO",
-     "question_hint": "混合检索之后召回了很多候选，精排阶段你用的是什么Reranker？Cross-Encoder和Bi-Encoder的区别是什么？"},
-    {"source": "reranking",         "target": "chunking",           "relation": "LEADS_TO",
-     "question_hint": "Reranker的效果很依赖初始召回的chunk质量，你们的chunk策略是固定大小还是语义切分？"},
-    {"source": "chunking",          "target": "pitfall_lost_in_middle","relation": "LEADS_TO",
-     "question_hint": "即使检索到了相关chunk，塞进上下文还有个Lost-in-the-Middle问题，你了解吗？是怎么缓解的？"},
-    {"source": "hnsw",              "target": "vector_retrieval",   "relation": "RELATED_TO"},
-
-    {"source": "fine_tuning",       "target": "sft",                "relation": "HAS_COMPONENT"},
-    {"source": "fine_tuning",       "target": "lora",               "relation": "HAS_COMPONENT"},
-    {"source": "fine_tuning",       "target": "pitfall_catastrophic_forgetting","relation": "HAS_PITFALL"},
-
-    {"source": "fine_tuning",       "target": "lora",               "relation": "LEADS_TO",
-     "question_hint": "全量微调显存压力很大，你们用的是LoRA还是全参数微调？LoRA的rank怎么选的，有什么依据？"},
-    {"source": "lora",              "target": "qlora",              "relation": "LEADS_TO",
-     "question_hint": "LoRA还需要全精度加载基础模型，QLoRA在这基础上做了什么优化？NF4量化的原理是什么？"},
-    {"source": "qlora",             "target": "pitfall_catastrophic_forgetting","relation": "LEADS_TO",
-     "question_hint": "LoRA/QLoRA能一定程度缓解灾难性遗忘，你们在微调后有没有做通用能力的评估？具体怎么测的？"},
-    {"source": "fine_tuning",       "target": "rag",                "relation": "RELATED_TO"},
-
-    {"source": "prompt_engineering","target": "few_shot",           "relation": "HAS_COMPONENT"},
-    {"source": "prompt_engineering","target": "cot",                "relation": "HAS_COMPONENT"},
-    {"source": "prompt_engineering","target": "system_prompt",      "relation": "HAS_COMPONENT"},
-    {"source": "prompt_engineering","target": "pitfall_prompt_injection","relation": "HAS_PITFALL"},
-
-    {"source": "prompt_engineering","target": "few_shot",           "relation": "LEADS_TO",
-     "question_hint": "你在项目里怎么设计Prompt的？Few-shot示例的选取有什么讲究？动态few-shot和静态few-shot有什么区别？"},
-    {"source": "few_shot",          "target": "cot",                "relation": "LEADS_TO",
-     "question_hint": "Few-shot之外，CoT(思维链)也是常用技巧，你了解为什么让模型'think step by step'能提升准确率吗？"},
-    {"source": "cot",               "target": "system_prompt",      "relation": "LEADS_TO",
-     "question_hint": "CoT通常通过System Prompt引导，你们的System Prompt是怎么设计和迭代的？有没有做Prompt版本管理？"},
-    {"source": "system_prompt",     "target": "pitfall_prompt_injection","relation": "LEADS_TO",
-     "question_hint": "System Prompt设计不当会有Prompt Injection的风险，你们有没有做防御？常见的攻击手法是什么？"},
-
-    {"source": "llm_agent",         "target": "react",              "relation": "HAS_COMPONENT"},
-    {"source": "llm_agent",         "target": "tool_calling",       "relation": "HAS_COMPONENT"},
-    {"source": "llm_agent",         "target": "agent_memory",       "relation": "HAS_COMPONENT"},
-    {"source": "llm_agent",         "target": "cot",                "relation": "REQUIRES"},
-    {"source": "llm_agent",         "target": "pitfall_agent_loop", "relation": "HAS_PITFALL"},
-    {"source": "llm_agent",         "target": "rag",                "relation": "RELATED_TO"},
-
-    {"source": "llm_agent",         "target": "react",              "relation": "LEADS_TO",
-     "question_hint": "你们的Agent是怎么做任务规划的？用的是ReAct模式吗？Thought/Action/Observation分别负责什么？"},
-    {"source": "react",             "target": "tool_calling",       "relation": "LEADS_TO",
-     "question_hint": "ReAct的Action阶段依赖Tool Calling，LLM是怎么知道要调用哪个工具的？工具描述(schema)怎么设计？"},
-    {"source": "tool_calling",      "target": "agent_memory",       "relation": "LEADS_TO",
-     "question_hint": "多轮对话中Agent需要记住之前的操作，你们是怎么管理上下文的？短期记忆和长期记忆怎么区分？"},
-    {"source": "agent_memory",      "target": "pitfall_agent_loop", "relation": "LEADS_TO",
-     "question_hint": "如果工具调用一直失败，Agent会怎么处理？你们有没有遇到过Agent陷入死循环的问题？怎么检测和中断？"},
-
-    {"source": "llm",               "target": "prompt_engineering", "relation": "RELATED_TO"},
-    {"source": "llm",               "target": "fine_tuning",        "relation": "RELATED_TO"},
-    {"source": "llm",               "target": "llm_agent",          "relation": "RELATED_TO"},
-    {"source": "cot",               "target": "llm_agent",          "relation": "RELATED_TO"},
-    {"source": "prompt_engineering","target": "fine_tuning",        "relation": "RELATED_TO"},
-
-    {"source": "context_engineering","target": "domain_ai",         "relation": "BELONGS_TO"},
-    {"source": "multi_agent",        "target": "domain_ai",         "relation": "BELONGS_TO"},
-    {"source": "agent_framework",    "target": "domain_ai",         "relation": "BELONGS_TO"},
-    {"source": "llm_inference",      "target": "domain_ai",         "relation": "BELONGS_TO"},
-
-    {"source": "context_engineering","target": "context_window_mgmt","relation": "HAS_COMPONENT"},
-    {"source": "context_engineering","target": "pitfall_context_overflow","relation": "HAS_PITFALL"},
-    {"source": "context_engineering","target": "agent_memory",      "relation": "RELATED_TO"},
-    {"source": "context_engineering","target": "prompt_engineering", "relation": "RELATED_TO"},
-    {"source": "context_engineering","target": "context_window_mgmt","relation": "LEADS_TO",
-     "question_hint": "Context Engineering和Prompt Engineering有什么区别？当对话轮次很多、上下文快撑满时，你们是怎么决定保留哪些信息、丢弃哪些的？"},
-    {"source": "context_window_mgmt","target": "pitfall_context_overflow","relation": "LEADS_TO",
-     "question_hint": "上下文压缩有哪些常见策略？摘要压缩和滑动窗口各有什么适用场景？怎么评估压缩后信息损失？"},
-
-    {"source": "multi_agent",        "target": "agent_planning",    "relation": "HAS_COMPONENT"},
-    {"source": "multi_agent",        "target": "agent_reflection",  "relation": "HAS_COMPONENT"},
-    {"source": "multi_agent",        "target": "pitfall_multi_agent_conflict","relation": "HAS_PITFALL"},
-    {"source": "multi_agent",        "target": "llm_agent",         "relation": "RELATED_TO"},
-    {"source": "multi_agent",        "target": "agent_framework",   "relation": "RELATED_TO"},
-    {"source": "multi_agent",        "target": "agent_planning",    "relation": "LEADS_TO",
-     "question_hint": "在多智能体系统里，Supervisor怎么把任务拆解分配给子Agent？任务之间有依赖关系时是怎么处理的？"},
-    {"source": "agent_planning",     "target": "agent_reflection",  "relation": "LEADS_TO",
-     "question_hint": "子Agent执行完后怎么判断结果是否符合预期？你们的反思纠错机制是怎么设计的？最多允许几轮反思？"},
-    {"source": "agent_reflection",   "target": "pitfall_multi_agent_conflict","relation": "LEADS_TO",
-     "question_hint": "多个Agent各自反思后给出了相互矛盾的结论，你们是怎么做最终裁决的？有没有遇到这种冲突情况？"},
-
-    {"source": "agent_framework",    "target": "graph_state_machine","relation": "HAS_COMPONENT"},
-    {"source": "agent_framework",    "target": "observability",     "relation": "RELATED_TO"},
-    {"source": "agent_framework",    "target": "multi_agent",       "relation": "RELATED_TO"},
-    {"source": "agent_framework",    "target": "graph_state_machine","relation": "LEADS_TO",
-     "question_hint": "LangGraph用图状态机描述Agent控制流，你们是怎么设计节点和边的？条件路由是怎么实现的？遇到过环路（cycle）的问题吗？"},
-    {"source": "graph_state_machine","target": "observability",     "relation": "LEADS_TO",
-     "question_hint": "图状态机运行时每个节点的输入输出怎么追踪？你们用LangSmith还是自己搭的追踪方案？遇到Agent行为异常时怎么定位？"},
-    {"source": "observability",      "target": "pitfall_agent_loop","relation": "LEADS_TO",
-     "question_hint": "可观测性数据里你们关注哪些指标？怎么通过trace数据发现Agent在某个节点反复循环的问题？"},
-
-    {"source": "llm_inference",      "target": "paged_attention",   "relation": "HAS_COMPONENT"},
-    {"source": "llm_inference",      "target": "continuous_batching","relation": "HAS_COMPONENT"},
-    {"source": "llm_inference",      "target": "quantization",      "relation": "HAS_COMPONENT"},
-    {"source": "llm_inference",      "target": "pitfall_inference_latency","relation": "HAS_PITFALL"},
-    {"source": "llm_inference",      "target": "kv_cache",          "relation": "RELATED_TO"},
-    {"source": "llm_inference",      "target": "paged_attention",   "relation": "LEADS_TO",
-     "question_hint": "vLLM的核心创新是PagedAttention，你能解释一下它怎么解决KV Cache的显存碎片问题的？和传统静态分配相比有什么优势？"},
-    {"source": "paged_attention",    "target": "continuous_batching","relation": "LEADS_TO",
-     "question_hint": "PagedAttention解决了显存问题，但GPU利用率还是低，连续批处理是怎么提升吞吐的？iteration-level scheduling是什么意思？"},
-    {"source": "continuous_batching","target": "pitfall_inference_latency","relation": "LEADS_TO",
-     "question_hint": "连续批处理提高了吞吐，但可能加剧单个请求的TTFT延迟，你们是怎么在吞吐和延迟之间做权衡的？有没有做SLA保障？"},
-    {"source": "quantization",       "target": "pitfall_inference_latency","relation": "RELATED_TO"},
-    {"source": "kv_cache",           "target": "paged_attention",   "relation": "LEADS_TO",
-     "question_hint": "你提到了KV Cache，vLLM的PagedAttention就是为了更好地管理KV Cache显存，你了解它的分页原理吗？"},
-
-    {"source": "rlhf",               "target": "dpo",               "relation": "LEADS_TO",
-     "question_hint": "RLHF需要单独训练奖励模型，流程很复杂，DPO是怎么绕过这一步的？它的核心数学思想是什么？在实践中DPO有什么局限性？"},
-    {"source": "dpo",                "target": "sft",               "relation": "RELATED_TO"},
-
-    {"source": "tool_calling",       "target": "function_schema",   "relation": "HAS_COMPONENT"},
-    {"source": "tool_calling",       "target": "mcp",               "relation": "LEADS_TO",
-     "question_hint": "工具调用现在有了更标准化的协议MCP，你了解它吗？MCP和直接写Function Schema有什么区别？它解决了什么工程痛点？"},
-    {"source": "function_schema",    "target": "pitfall_tool_schema_ambiguity","relation": "HAS_PITFALL"},
-    {"source": "function_schema",    "target": "pitfall_tool_schema_ambiguity","relation": "LEADS_TO",
-     "question_hint": "你们在设计工具Schema时有没有遇到LLM经常调用错工具或者参数填错的问题？description怎么写才能减少歧义？"},
-    {"source": "mcp",                "target": "function_schema",   "relation": "RELATED_TO"},
-    {"source": "mcp",                "target": "agent_framework",   "relation": "RELATED_TO"},
-
-    {"source": "llm_agent",          "target": "context_engineering","relation": "RELATED_TO"},
-    {"source": "llm_agent",          "target": "multi_agent",       "relation": "LEADS_TO",
-     "question_hint": "单个Agent能力有限，你们有没有做多智能体系统？是Supervisor-Worker模式还是对等协商？怎么处理子Agent失败的情况？"},
-    {"source": "llm_agent",          "target": "observability",     "relation": "RELATED_TO"},
-
-    {"source": "llm",                "target": "llm_inference",     "relation": "RELATED_TO"},
-    {"source": "llm",                "target": "context_engineering","relation": "RELATED_TO"},
-    {"source": "fine_tuning",        "target": "dpo",               "relation": "HAS_COMPONENT"},
-    {"source": "prompt_engineering", "target": "context_engineering","relation": "LEADS_TO",
-     "question_hint": "Prompt Engineering是优化单次输入，Context Engineering是管理整个上下文窗口，你在工程实践中怎么区分这两个层次的优化？"}
+    {
+      "source": "nlp",
+      "target": "domain_ai",
+      "relation": "BELONGS_TO"
+    },
+    {
+      "source": "transformer",
+      "target": "domain_ai",
+      "relation": "BELONGS_TO"
+    },
+    {
+      "source": "llm",
+      "target": "domain_ai",
+      "relation": "BELONGS_TO"
+    },
+    {
+      "source": "embedding",
+      "target": "domain_ai",
+      "relation": "BELONGS_TO"
+    },
+    {
+      "source": "rag",
+      "target": "domain_ai",
+      "relation": "BELONGS_TO"
+    },
+    {
+      "source": "fine_tuning",
+      "target": "domain_ai",
+      "relation": "BELONGS_TO"
+    },
+    {
+      "source": "prompt_engineering",
+      "target": "domain_ai",
+      "relation": "BELONGS_TO"
+    },
+    {
+      "source": "llm_agent",
+      "target": "domain_ai",
+      "relation": "BELONGS_TO"
+    },
+    {
+      "source": "nlp",
+      "target": "transformer",
+      "relation": "LEADS_TO",
+      "question_hint": "NLP领域经历了从RNN到Transformer的范式转变，你能讲讲Transformer解决了RNN的哪些根本问题吗？"
+    },
+    {
+      "source": "nlp",
+      "target": "embedding",
+      "relation": "RELATED_TO"
+    },
+    {
+      "source": "nlp",
+      "target": "tokenization",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "transformer",
+      "target": "attention",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "transformer",
+      "target": "positional_encoding",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "transformer",
+      "target": "layer_norm",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "transformer",
+      "target": "ffn",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "transformer",
+      "target": "kv_cache",
+      "relation": "RELATED_TO"
+    },
+    {
+      "source": "transformer",
+      "target": "attention",
+      "relation": "LEADS_TO",
+      "question_hint": "Transformer的核心是Attention，你能从数学角度解释Q/K/V的含义，以及为什么要除以√d_k吗？"
+    },
+    {
+      "source": "attention",
+      "target": "mha",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "attention",
+      "target": "scaled_dot_product",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "attention",
+      "target": "pitfall_attention_complexity",
+      "relation": "HAS_PITFALL"
+    },
+    {
+      "source": "attention",
+      "target": "mha",
+      "relation": "LEADS_TO",
+      "question_hint": "多头注意力(MHA)相比单头有什么优势？每个head学到的是同样的东西吗？"
+    },
+    {
+      "source": "mha",
+      "target": "pitfall_attention_complexity",
+      "relation": "LEADS_TO",
+      "question_hint": "MHA的复杂度是O(n²)，在长文本场景下显存会爆炸，你了解哪些优化方案？比如FlashAttention或GQA？"
+    },
+    {
+      "source": "positional_encoding",
+      "target": "rope",
+      "relation": "LEADS_TO",
+      "question_hint": "原始的正弦位置编码有长度外推的限制，现在LLaMA/Qwen用的是RoPE，它解决了什么问题？"
+    },
+    {
+      "source": "positional_encoding",
+      "target": "pitfall_pe_extrapolation",
+      "relation": "HAS_PITFALL"
+    },
+    {
+      "source": "rope",
+      "target": "pitfall_pe_extrapolation",
+      "relation": "RELATED_TO"
+    },
+    {
+      "source": "kv_cache",
+      "target": "pitfall_kv_cache_memory",
+      "relation": "HAS_PITFALL"
+    },
+    {
+      "source": "kv_cache",
+      "target": "pitfall_kv_cache_memory",
+      "relation": "LEADS_TO",
+      "question_hint": "KV Cache是推理加速的关键，但batch_size一大显存就不够，你们是怎么处理这个问题的？了解PagedAttention吗？"
+    },
+    {
+      "source": "llm",
+      "target": "pretraining",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "llm",
+      "target": "rlhf",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "llm",
+      "target": "sft",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "llm",
+      "target": "tokenization",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "llm",
+      "target": "kv_cache",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "llm",
+      "target": "pitfall_hallucination",
+      "relation": "HAS_PITFALL"
+    },
+    {
+      "source": "llm",
+      "target": "transformer",
+      "relation": "REQUIRES"
+    },
+    {
+      "source": "llm",
+      "target": "pretraining",
+      "relation": "LEADS_TO",
+      "question_hint": "LLM的能力来自预训练，CLM(因果语言建模)的训练目标是什么？为什么Next Token Prediction能让模型涌现出推理能力？"
+    },
+    {
+      "source": "pretraining",
+      "target": "sft",
+      "relation": "LEADS_TO",
+      "question_hint": "预训练完成后模型并不会对话，SFT是怎么让它学会遵循指令的？数据质量和数量哪个更重要？"
+    },
+    {
+      "source": "sft",
+      "target": "rlhf",
+      "relation": "LEADS_TO",
+      "question_hint": "SFT之后还有RLHF，为什么SFT不够？RLHF的PPO训练过程你能讲一下吗？"
+    },
+    {
+      "source": "rlhf",
+      "target": "reward_model",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "rlhf",
+      "target": "pitfall_reward_hacking",
+      "relation": "HAS_PITFALL"
+    },
+    {
+      "source": "reward_model",
+      "target": "pitfall_reward_hacking",
+      "relation": "LEADS_TO",
+      "question_hint": "奖励模型是RLHF的核心，但它本身也可能被模型'欺骗'——你了解Reward Hacking是怎么发生的吗？"
+    },
+    {
+      "source": "tokenization",
+      "target": "bpe",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "tokenization",
+      "target": "bpe",
+      "relation": "LEADS_TO",
+      "question_hint": "GPT系列用BPE分词，你了解BPE的构建过程吗？中文和英文在tokenize时有什么本质差异？"
+    },
+    {
+      "source": "embedding",
+      "target": "word2vec",
+      "relation": "LEADS_TO",
+      "question_hint": "早期的词向量用Word2Vec，它和现在基于Transformer的Embedding有什么本质区别？一词多义问题是怎么解决的？"
+    },
+    {
+      "source": "word2vec",
+      "target": "sentence_transformer",
+      "relation": "LEADS_TO",
+      "question_hint": "Word2Vec是词级别的，RAG需要句子级别的向量，Sentence Transformer是怎么训练的？"
+    },
+    {
+      "source": "sentence_transformer",
+      "target": "contrastive_learning",
+      "relation": "REQUIRES"
+    },
+    {
+      "source": "contrastive_learning",
+      "target": "pitfall_embedding_collapse",
+      "relation": "HAS_PITFALL"
+    },
+    {
+      "source": "sentence_transformer",
+      "target": "pitfall_embedding_collapse",
+      "relation": "LEADS_TO",
+      "question_hint": "对比学习训练Embedding时有个常见问题叫向量空间坍缩，你遇到过吗？是怎么检测和避免的？"
+    },
+    {
+      "source": "embedding",
+      "target": "rag",
+      "relation": "RELATED_TO"
+    },
+    {
+      "source": "embedding",
+      "target": "hnsw",
+      "relation": "RELATED_TO"
+    },
+    {
+      "source": "rag",
+      "target": "vector_retrieval",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "rag",
+      "target": "chunking",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "rag",
+      "target": "reranking",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "rag",
+      "target": "pitfall_hallucination",
+      "relation": "RELATED_TO"
+    },
+    {
+      "source": "rag",
+      "target": "pitfall_lost_in_middle",
+      "relation": "HAS_PITFALL"
+    },
+    {
+      "source": "rag",
+      "target": "vector_retrieval",
+      "relation": "LEADS_TO",
+      "question_hint": "RAG的召回阶段你用的是什么检索方式？纯向量检索有什么局限性？"
+    },
+    {
+      "source": "vector_retrieval",
+      "target": "hnsw",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "vector_retrieval",
+      "target": "hybrid_search",
+      "relation": "LEADS_TO",
+      "question_hint": "纯向量检索对关键词精确匹配效果差，你们有没有引入混合检索？BM25和向量怎么融合分数？"
+    },
+    {
+      "source": "hybrid_search",
+      "target": "reranking",
+      "relation": "LEADS_TO",
+      "question_hint": "混合检索之后召回了很多候选，精排阶段你用的是什么Reranker？Cross-Encoder和Bi-Encoder的区别是什么？"
+    },
+    {
+      "source": "reranking",
+      "target": "chunking",
+      "relation": "LEADS_TO",
+      "question_hint": "Reranker的效果很依赖初始召回的chunk质量，你们的chunk策略是固定大小还是语义切分？"
+    },
+    {
+      "source": "chunking",
+      "target": "pitfall_lost_in_middle",
+      "relation": "LEADS_TO",
+      "question_hint": "即使检索到了相关chunk，塞进上下文还有个Lost-in-the-Middle问题，你了解吗？是怎么缓解的？"
+    },
+    {
+      "source": "hnsw",
+      "target": "vector_retrieval",
+      "relation": "RELATED_TO"
+    },
+    {
+      "source": "fine_tuning",
+      "target": "sft",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "fine_tuning",
+      "target": "lora",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "fine_tuning",
+      "target": "pitfall_catastrophic_forgetting",
+      "relation": "HAS_PITFALL"
+    },
+    {
+      "source": "fine_tuning",
+      "target": "lora",
+      "relation": "LEADS_TO",
+      "question_hint": "全量微调显存压力很大，你们用的是LoRA还是全参数微调？LoRA的rank怎么选的，有什么依据？"
+    },
+    {
+      "source": "lora",
+      "target": "qlora",
+      "relation": "LEADS_TO",
+      "question_hint": "LoRA还需要全精度加载基础模型，QLoRA在这基础上做了什么优化？NF4量化的原理是什么？"
+    },
+    {
+      "source": "qlora",
+      "target": "pitfall_catastrophic_forgetting",
+      "relation": "LEADS_TO",
+      "question_hint": "LoRA/QLoRA能一定程度缓解灾难性遗忘，你们在微调后有没有做通用能力的评估？具体怎么测的？"
+    },
+    {
+      "source": "fine_tuning",
+      "target": "rag",
+      "relation": "RELATED_TO"
+    },
+    {
+      "source": "prompt_engineering",
+      "target": "few_shot",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "prompt_engineering",
+      "target": "cot",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "prompt_engineering",
+      "target": "system_prompt",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "prompt_engineering",
+      "target": "pitfall_prompt_injection",
+      "relation": "HAS_PITFALL"
+    },
+    {
+      "source": "prompt_engineering",
+      "target": "few_shot",
+      "relation": "LEADS_TO",
+      "question_hint": "你在项目里怎么设计Prompt的？Few-shot示例的选取有什么讲究？动态few-shot和静态few-shot有什么区别？"
+    },
+    {
+      "source": "few_shot",
+      "target": "cot",
+      "relation": "LEADS_TO",
+      "question_hint": "Few-shot之外，CoT(思维链)也是常用技巧，你了解为什么让模型'think step by step'能提升准确率吗？"
+    },
+    {
+      "source": "cot",
+      "target": "system_prompt",
+      "relation": "LEADS_TO",
+      "question_hint": "CoT通常通过System Prompt引导，你们的System Prompt是怎么设计和迭代的？有没有做Prompt版本管理？"
+    },
+    {
+      "source": "system_prompt",
+      "target": "pitfall_prompt_injection",
+      "relation": "LEADS_TO",
+      "question_hint": "System Prompt设计不当会有Prompt Injection的风险，你们有没有做防御？常见的攻击手法是什么？"
+    },
+    {
+      "source": "llm_agent",
+      "target": "react",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "llm_agent",
+      "target": "tool_calling",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "llm_agent",
+      "target": "agent_memory",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "llm_agent",
+      "target": "cot",
+      "relation": "REQUIRES"
+    },
+    {
+      "source": "llm_agent",
+      "target": "pitfall_agent_loop",
+      "relation": "HAS_PITFALL"
+    },
+    {
+      "source": "llm_agent",
+      "target": "rag",
+      "relation": "RELATED_TO"
+    },
+    {
+      "source": "llm_agent",
+      "target": "react",
+      "relation": "LEADS_TO",
+      "question_hint": "你们的Agent是怎么做任务规划的？用的是ReAct模式吗？Thought/Action/Observation分别负责什么？"
+    },
+    {
+      "source": "react",
+      "target": "tool_calling",
+      "relation": "LEADS_TO",
+      "question_hint": "ReAct的Action阶段依赖Tool Calling，LLM是怎么知道要调用哪个工具的？工具描述(schema)怎么设计？"
+    },
+    {
+      "source": "tool_calling",
+      "target": "agent_memory",
+      "relation": "LEADS_TO",
+      "question_hint": "多轮对话中Agent需要记住之前的操作，你们是怎么管理上下文的？短期记忆和长期记忆怎么区分？"
+    },
+    {
+      "source": "agent_memory",
+      "target": "pitfall_agent_loop",
+      "relation": "LEADS_TO",
+      "question_hint": "如果工具调用一直失败，Agent会怎么处理？你们有没有遇到过Agent陷入死循环的问题？怎么检测和中断？"
+    },
+    {
+      "source": "llm",
+      "target": "prompt_engineering",
+      "relation": "RELATED_TO"
+    },
+    {
+      "source": "llm",
+      "target": "fine_tuning",
+      "relation": "RELATED_TO"
+    },
+    {
+      "source": "llm",
+      "target": "llm_agent",
+      "relation": "RELATED_TO"
+    },
+    {
+      "source": "cot",
+      "target": "llm_agent",
+      "relation": "RELATED_TO"
+    },
+    {
+      "source": "prompt_engineering",
+      "target": "fine_tuning",
+      "relation": "RELATED_TO"
+    },
+    {
+      "source": "context_engineering",
+      "target": "domain_ai",
+      "relation": "BELONGS_TO"
+    },
+    {
+      "source": "multi_agent",
+      "target": "domain_ai",
+      "relation": "BELONGS_TO"
+    },
+    {
+      "source": "agent_framework",
+      "target": "domain_ai",
+      "relation": "BELONGS_TO"
+    },
+    {
+      "source": "llm_inference",
+      "target": "domain_ai",
+      "relation": "BELONGS_TO"
+    },
+    {
+      "source": "context_engineering",
+      "target": "context_window_mgmt",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "context_engineering",
+      "target": "pitfall_context_overflow",
+      "relation": "HAS_PITFALL"
+    },
+    {
+      "source": "context_engineering",
+      "target": "agent_memory",
+      "relation": "RELATED_TO"
+    },
+    {
+      "source": "context_engineering",
+      "target": "prompt_engineering",
+      "relation": "RELATED_TO"
+    },
+    {
+      "source": "context_engineering",
+      "target": "context_window_mgmt",
+      "relation": "LEADS_TO",
+      "question_hint": "Context Engineering和Prompt Engineering有什么区别？当对话轮次很多、上下文快撑满时，你们是怎么决定保留哪些信息、丢弃哪些的？"
+    },
+    {
+      "source": "context_window_mgmt",
+      "target": "pitfall_context_overflow",
+      "relation": "LEADS_TO",
+      "question_hint": "上下文压缩有哪些常见策略？摘要压缩和滑动窗口各有什么适用场景？怎么评估压缩后信息损失？"
+    },
+    {
+      "source": "multi_agent",
+      "target": "agent_planning",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "multi_agent",
+      "target": "agent_reflection",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "multi_agent",
+      "target": "pitfall_multi_agent_conflict",
+      "relation": "HAS_PITFALL"
+    },
+    {
+      "source": "multi_agent",
+      "target": "llm_agent",
+      "relation": "RELATED_TO"
+    },
+    {
+      "source": "multi_agent",
+      "target": "agent_framework",
+      "relation": "RELATED_TO"
+    },
+    {
+      "source": "multi_agent",
+      "target": "agent_planning",
+      "relation": "LEADS_TO",
+      "question_hint": "在多智能体系统里，Supervisor怎么把任务拆解分配给子Agent？任务之间有依赖关系时是怎么处理的？"
+    },
+    {
+      "source": "agent_planning",
+      "target": "agent_reflection",
+      "relation": "LEADS_TO",
+      "question_hint": "子Agent执行完后怎么判断结果是否符合预期？你们的反思纠错机制是怎么设计的？最多允许几轮反思？"
+    },
+    {
+      "source": "agent_reflection",
+      "target": "pitfall_multi_agent_conflict",
+      "relation": "LEADS_TO",
+      "question_hint": "多个Agent各自反思后给出了相互矛盾的结论，你们是怎么做最终裁决的？有没有遇到这种冲突情况？"
+    },
+    {
+      "source": "agent_framework",
+      "target": "graph_state_machine",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "agent_framework",
+      "target": "observability",
+      "relation": "RELATED_TO"
+    },
+    {
+      "source": "agent_framework",
+      "target": "multi_agent",
+      "relation": "RELATED_TO"
+    },
+    {
+      "source": "agent_framework",
+      "target": "graph_state_machine",
+      "relation": "LEADS_TO",
+      "question_hint": "LangGraph用图状态机描述Agent控制流，你们是怎么设计节点和边的？条件路由是怎么实现的？遇到过环路（cycle）的问题吗？"
+    },
+    {
+      "source": "graph_state_machine",
+      "target": "observability",
+      "relation": "LEADS_TO",
+      "question_hint": "图状态机运行时每个节点的输入输出怎么追踪？你们用LangSmith还是自己搭的追踪方案？遇到Agent行为异常时怎么定位？"
+    },
+    {
+      "source": "observability",
+      "target": "pitfall_agent_loop",
+      "relation": "LEADS_TO",
+      "question_hint": "可观测性数据里你们关注哪些指标？怎么通过trace数据发现Agent在某个节点反复循环的问题？"
+    },
+    {
+      "source": "llm_inference",
+      "target": "paged_attention",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "llm_inference",
+      "target": "continuous_batching",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "llm_inference",
+      "target": "quantization",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "llm_inference",
+      "target": "pitfall_inference_latency",
+      "relation": "HAS_PITFALL"
+    },
+    {
+      "source": "llm_inference",
+      "target": "kv_cache",
+      "relation": "RELATED_TO"
+    },
+    {
+      "source": "llm_inference",
+      "target": "paged_attention",
+      "relation": "LEADS_TO",
+      "question_hint": "vLLM的核心创新是PagedAttention，你能解释一下它怎么解决KV Cache的显存碎片问题的？和传统静态分配相比有什么优势？"
+    },
+    {
+      "source": "paged_attention",
+      "target": "continuous_batching",
+      "relation": "LEADS_TO",
+      "question_hint": "PagedAttention解决了显存问题，但GPU利用率还是低，连续批处理是怎么提升吞吐的？iteration-level scheduling是什么意思？"
+    },
+    {
+      "source": "continuous_batching",
+      "target": "pitfall_inference_latency",
+      "relation": "LEADS_TO",
+      "question_hint": "连续批处理提高了吞吐，但可能加剧单个请求的TTFT延迟，你们是怎么在吞吐和延迟之间做权衡的？有没有做SLA保障？"
+    },
+    {
+      "source": "quantization",
+      "target": "pitfall_inference_latency",
+      "relation": "RELATED_TO"
+    },
+    {
+      "source": "kv_cache",
+      "target": "paged_attention",
+      "relation": "LEADS_TO",
+      "question_hint": "你提到了KV Cache，vLLM的PagedAttention就是为了更好地管理KV Cache显存，你了解它的分页原理吗？"
+    },
+    {
+      "source": "rlhf",
+      "target": "dpo",
+      "relation": "LEADS_TO",
+      "question_hint": "RLHF需要单独训练奖励模型，流程很复杂，DPO是怎么绕过这一步的？它的核心数学思想是什么？在实践中DPO有什么局限性？"
+    },
+    {
+      "source": "dpo",
+      "target": "sft",
+      "relation": "RELATED_TO"
+    },
+    {
+      "source": "tool_calling",
+      "target": "function_schema",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "tool_calling",
+      "target": "mcp",
+      "relation": "LEADS_TO",
+      "question_hint": "工具调用现在有了更标准化的协议MCP，你了解它吗？MCP和直接写Function Schema有什么区别？它解决了什么工程痛点？"
+    },
+    {
+      "source": "function_schema",
+      "target": "pitfall_tool_schema_ambiguity",
+      "relation": "HAS_PITFALL"
+    },
+    {
+      "source": "function_schema",
+      "target": "pitfall_tool_schema_ambiguity",
+      "relation": "LEADS_TO",
+      "question_hint": "你们在设计工具Schema时有没有遇到LLM经常调用错工具或者参数填错的问题？description怎么写才能减少歧义？"
+    },
+    {
+      "source": "mcp",
+      "target": "function_schema",
+      "relation": "RELATED_TO"
+    },
+    {
+      "source": "mcp",
+      "target": "agent_framework",
+      "relation": "RELATED_TO"
+    },
+    {
+      "source": "llm_agent",
+      "target": "context_engineering",
+      "relation": "RELATED_TO"
+    },
+    {
+      "source": "llm_agent",
+      "target": "multi_agent",
+      "relation": "LEADS_TO",
+      "question_hint": "单个Agent能力有限，你们有没有做多智能体系统？是Supervisor-Worker模式还是对等协商？怎么处理子Agent失败的情况？"
+    },
+    {
+      "source": "llm_agent",
+      "target": "observability",
+      "relation": "RELATED_TO"
+    },
+    {
+      "source": "llm",
+      "target": "llm_inference",
+      "relation": "RELATED_TO"
+    },
+    {
+      "source": "llm",
+      "target": "context_engineering",
+      "relation": "RELATED_TO"
+    },
+    {
+      "source": "fine_tuning",
+      "target": "dpo",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "prompt_engineering",
+      "target": "context_engineering",
+      "relation": "LEADS_TO",
+      "question_hint": "Prompt Engineering是优化单次输入，Context Engineering是管理整个上下文窗口，你在工程实践中怎么区分这两个层次的优化？"
+    },
+    {
+      "source": "data_structures",
+      "target": "domain_cs_core",
+      "relation": "BELONGS_TO"
+    },
+    {
+      "source": "data_structures",
+      "target": "array_linked_list",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "data_structures",
+      "target": "array_linked_list",
+      "relation": "LEADS_TO",
+      "question_hint": "Array and Linked List is a common follow-up under Data Structures. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "data_structures",
+      "target": "stack_queue",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "array_linked_list",
+      "target": "stack_queue",
+      "relation": "LEADS_TO",
+      "question_hint": "Stack and Queue is a common follow-up under Data Structures. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "data_structures",
+      "target": "hash_table",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "stack_queue",
+      "target": "hash_table",
+      "relation": "LEADS_TO",
+      "question_hint": "Hash Table is a common follow-up under Data Structures. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "data_structures",
+      "target": "tree_graph",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "hash_table",
+      "target": "tree_graph",
+      "relation": "LEADS_TO",
+      "question_hint": "Tree and Graph is a common follow-up under Data Structures. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "data_structures",
+      "target": "pitfall_hash_collision",
+      "relation": "HAS_PITFALL"
+    },
+    {
+      "source": "tree_graph",
+      "target": "pitfall_hash_collision",
+      "relation": "LEADS_TO",
+      "question_hint": "If a project hits Hash Collision Degradation, how would you diagnose and prevent it?"
+    },
+    {
+      "source": "algorithms",
+      "target": "domain_cs_core",
+      "relation": "BELONGS_TO"
+    },
+    {
+      "source": "algorithms",
+      "target": "complexity_analysis",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "algorithms",
+      "target": "complexity_analysis",
+      "relation": "LEADS_TO",
+      "question_hint": "Complexity Analysis is a common follow-up under Algorithms. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "algorithms",
+      "target": "sorting_searching",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "complexity_analysis",
+      "target": "sorting_searching",
+      "relation": "LEADS_TO",
+      "question_hint": "Sorting and Searching is a common follow-up under Algorithms. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "algorithms",
+      "target": "dynamic_programming",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "sorting_searching",
+      "target": "dynamic_programming",
+      "relation": "LEADS_TO",
+      "question_hint": "Dynamic Programming is a common follow-up under Algorithms. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "algorithms",
+      "target": "dfs_bfs_backtracking",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "dynamic_programming",
+      "target": "dfs_bfs_backtracking",
+      "relation": "LEADS_TO",
+      "question_hint": "DFS/BFS and Backtracking is a common follow-up under Algorithms. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "algorithms",
+      "target": "pitfall_dp_state_explosion",
+      "relation": "HAS_PITFALL"
+    },
+    {
+      "source": "dfs_bfs_backtracking",
+      "target": "pitfall_dp_state_explosion",
+      "relation": "LEADS_TO",
+      "question_hint": "If a project hits DP State Explosion, how would you diagnose and prevent it?"
+    },
+    {
+      "source": "operating_systems",
+      "target": "domain_cs_core",
+      "relation": "BELONGS_TO"
+    },
+    {
+      "source": "operating_systems",
+      "target": "process_thread",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "operating_systems",
+      "target": "process_thread",
+      "relation": "LEADS_TO",
+      "question_hint": "Process and Thread is a common follow-up under Operating Systems. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "operating_systems",
+      "target": "concurrency_locking",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "process_thread",
+      "target": "concurrency_locking",
+      "relation": "LEADS_TO",
+      "question_hint": "Concurrency and Locking is a common follow-up under Operating Systems. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "operating_systems",
+      "target": "virtual_memory",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "concurrency_locking",
+      "target": "virtual_memory",
+      "relation": "LEADS_TO",
+      "question_hint": "Virtual Memory is a common follow-up under Operating Systems. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "operating_systems",
+      "target": "io_multiplexing",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "virtual_memory",
+      "target": "io_multiplexing",
+      "relation": "LEADS_TO",
+      "question_hint": "IO Multiplexing is a common follow-up under Operating Systems. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "operating_systems",
+      "target": "pitfall_deadlock",
+      "relation": "HAS_PITFALL"
+    },
+    {
+      "source": "io_multiplexing",
+      "target": "pitfall_deadlock",
+      "relation": "LEADS_TO",
+      "question_hint": "If a project hits Deadlock, how would you diagnose and prevent it?"
+    },
+    {
+      "source": "computer_networks",
+      "target": "domain_cs_core",
+      "relation": "BELONGS_TO"
+    },
+    {
+      "source": "computer_networks",
+      "target": "tcp_udp",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "computer_networks",
+      "target": "tcp_udp",
+      "relation": "LEADS_TO",
+      "question_hint": "TCP and UDP is a common follow-up under Computer Networks. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "computer_networks",
+      "target": "http_https",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "tcp_udp",
+      "target": "http_https",
+      "relation": "LEADS_TO",
+      "question_hint": "HTTP and HTTPS is a common follow-up under Computer Networks. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "computer_networks",
+      "target": "dns_cdn",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "http_https",
+      "target": "dns_cdn",
+      "relation": "LEADS_TO",
+      "question_hint": "DNS and CDN is a common follow-up under Computer Networks. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "computer_networks",
+      "target": "websocket_long_connection",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "dns_cdn",
+      "target": "websocket_long_connection",
+      "relation": "LEADS_TO",
+      "question_hint": "WebSocket and Long Connection is a common follow-up under Computer Networks. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "computer_networks",
+      "target": "pitfall_tcp_head_of_line",
+      "relation": "HAS_PITFALL"
+    },
+    {
+      "source": "websocket_long_connection",
+      "target": "pitfall_tcp_head_of_line",
+      "relation": "LEADS_TO",
+      "question_hint": "If a project hits Head-of-Line Blocking, how would you diagnose and prevent it?"
+    },
+    {
+      "source": "java",
+      "target": "domain_backend",
+      "relation": "BELONGS_TO"
+    },
+    {
+      "source": "java",
+      "target": "jvm_memory_model",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "java",
+      "target": "jvm_memory_model",
+      "relation": "LEADS_TO",
+      "question_hint": "JVM Memory Model is a common follow-up under Java. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "java",
+      "target": "java_gc",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "jvm_memory_model",
+      "target": "java_gc",
+      "relation": "LEADS_TO",
+      "question_hint": "Java GC is a common follow-up under Java. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "java",
+      "target": "java_collections",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "java_gc",
+      "target": "java_collections",
+      "relation": "LEADS_TO",
+      "question_hint": "Java Collections is a common follow-up under Java. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "java",
+      "target": "java_thread_pool",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "java_collections",
+      "target": "java_thread_pool",
+      "relation": "LEADS_TO",
+      "question_hint": "Java Thread Pool is a common follow-up under Java. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "java",
+      "target": "pitfall_thread_pool_oom",
+      "relation": "HAS_PITFALL"
+    },
+    {
+      "source": "java_thread_pool",
+      "target": "pitfall_thread_pool_oom",
+      "relation": "LEADS_TO",
+      "question_hint": "If a project hits Thread Pool Queue Buildup, how would you diagnose and prevent it?"
+    },
+    {
+      "source": "spring_boot",
+      "target": "domain_backend",
+      "relation": "BELONGS_TO"
+    },
+    {
+      "source": "spring_boot",
+      "target": "spring_ioc",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "spring_boot",
+      "target": "spring_ioc",
+      "relation": "LEADS_TO",
+      "question_hint": "IoC Container is a common follow-up under Spring Boot. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "spring_boot",
+      "target": "spring_aop",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "spring_ioc",
+      "target": "spring_aop",
+      "relation": "LEADS_TO",
+      "question_hint": "AOP is a common follow-up under Spring Boot. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "spring_boot",
+      "target": "spring_mvc",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "spring_aop",
+      "target": "spring_mvc",
+      "relation": "LEADS_TO",
+      "question_hint": "Spring MVC Request Flow is a common follow-up under Spring Boot. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "spring_boot",
+      "target": "spring_transaction",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "spring_mvc",
+      "target": "spring_transaction",
+      "relation": "LEADS_TO",
+      "question_hint": "Spring Transaction is a common follow-up under Spring Boot. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "spring_boot",
+      "target": "pitfall_spring_transaction_invalid",
+      "relation": "HAS_PITFALL"
+    },
+    {
+      "source": "spring_transaction",
+      "target": "pitfall_spring_transaction_invalid",
+      "relation": "LEADS_TO",
+      "question_hint": "If a project hits @Transactional Not Effective, how would you diagnose and prevent it?"
+    },
+    {
+      "source": "python",
+      "target": "domain_backend",
+      "relation": "BELONGS_TO"
+    },
+    {
+      "source": "python",
+      "target": "python_gil",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "python",
+      "target": "python_gil",
+      "relation": "LEADS_TO",
+      "question_hint": "GIL is a common follow-up under Python. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "python",
+      "target": "python_asyncio",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "python_gil",
+      "target": "python_asyncio",
+      "relation": "LEADS_TO",
+      "question_hint": "asyncio and Coroutine is a common follow-up under Python. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "python",
+      "target": "python_web_frameworks",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "python_asyncio",
+      "target": "python_web_frameworks",
+      "relation": "LEADS_TO",
+      "question_hint": "Python Web Frameworks is a common follow-up under Python. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "python",
+      "target": "python_packaging",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "python_web_frameworks",
+      "target": "python_packaging",
+      "relation": "LEADS_TO",
+      "question_hint": "Python Packaging is a common follow-up under Python. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "python",
+      "target": "pitfall_python_blocking_async",
+      "relation": "HAS_PITFALL"
+    },
+    {
+      "source": "python_packaging",
+      "target": "pitfall_python_blocking_async",
+      "relation": "LEADS_TO",
+      "question_hint": "If a project hits Blocking Call in Async Code, how would you diagnose and prevent it?"
+    },
+    {
+      "source": "api_design",
+      "target": "domain_backend",
+      "relation": "BELONGS_TO"
+    },
+    {
+      "source": "api_design",
+      "target": "restful_api",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "api_design",
+      "target": "restful_api",
+      "relation": "LEADS_TO",
+      "question_hint": "RESTful API is a common follow-up under API Design. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "api_design",
+      "target": "api_idempotency",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "restful_api",
+      "target": "api_idempotency",
+      "relation": "LEADS_TO",
+      "question_hint": "API Idempotency is a common follow-up under API Design. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "api_design",
+      "target": "rate_limiting",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "api_idempotency",
+      "target": "rate_limiting",
+      "relation": "LEADS_TO",
+      "question_hint": "Rate Limiting and Degradation is a common follow-up under API Design. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "api_design",
+      "target": "api_pagination_versioning",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "rate_limiting",
+      "target": "api_pagination_versioning",
+      "relation": "LEADS_TO",
+      "question_hint": "Pagination and Versioning is a common follow-up under API Design. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "api_design",
+      "target": "pitfall_api_backward_incompatible",
+      "relation": "HAS_PITFALL"
+    },
+    {
+      "source": "api_pagination_versioning",
+      "target": "pitfall_api_backward_incompatible",
+      "relation": "LEADS_TO",
+      "question_hint": "If a project hits Backward-Incompatible API Change, how would you diagnose and prevent it?"
+    },
+    {
+      "source": "mysql",
+      "target": "domain_database",
+      "relation": "BELONGS_TO"
+    },
+    {
+      "source": "mysql",
+      "target": "mysql_index",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "mysql",
+      "target": "mysql_index",
+      "relation": "LEADS_TO",
+      "question_hint": "MySQL Index is a common follow-up under MySQL. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "mysql",
+      "target": "mysql_transaction",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "mysql_index",
+      "target": "mysql_transaction",
+      "relation": "LEADS_TO",
+      "question_hint": "Transaction and Isolation is a common follow-up under MySQL. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "mysql",
+      "target": "mysql_locking",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "mysql_transaction",
+      "target": "mysql_locking",
+      "relation": "LEADS_TO",
+      "question_hint": "MySQL Locking is a common follow-up under MySQL. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "mysql",
+      "target": "mysql_execution_plan",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "mysql_locking",
+      "target": "mysql_execution_plan",
+      "relation": "LEADS_TO",
+      "question_hint": "Execution Plan is a common follow-up under MySQL. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "mysql",
+      "target": "pitfall_mysql_index_miss",
+      "relation": "HAS_PITFALL"
+    },
+    {
+      "source": "mysql_execution_plan",
+      "target": "pitfall_mysql_index_miss",
+      "relation": "LEADS_TO",
+      "question_hint": "If a project hits Index Miss, how would you diagnose and prevent it?"
+    },
+    {
+      "source": "redis",
+      "target": "domain_database",
+      "relation": "BELONGS_TO"
+    },
+    {
+      "source": "redis",
+      "target": "redis_data_structures",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "redis",
+      "target": "redis_data_structures",
+      "relation": "LEADS_TO",
+      "question_hint": "Redis Data Structures is a common follow-up under Redis. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "redis",
+      "target": "redis_cache_patterns",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "redis_data_structures",
+      "target": "redis_cache_patterns",
+      "relation": "LEADS_TO",
+      "question_hint": "Cache Patterns is a common follow-up under Redis. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "redis",
+      "target": "redis_persistence",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "redis_cache_patterns",
+      "target": "redis_persistence",
+      "relation": "LEADS_TO",
+      "question_hint": "Redis Persistence is a common follow-up under Redis. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "redis",
+      "target": "redis_distributed_lock",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "redis_persistence",
+      "target": "redis_distributed_lock",
+      "relation": "LEADS_TO",
+      "question_hint": "Redis Distributed Lock is a common follow-up under Redis. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "redis",
+      "target": "pitfall_cache_breakdown",
+      "relation": "HAS_PITFALL"
+    },
+    {
+      "source": "redis_distributed_lock",
+      "target": "pitfall_cache_breakdown",
+      "relation": "LEADS_TO",
+      "question_hint": "If a project hits Cache Penetration/Breakdown/Avalanche, how would you diagnose and prevent it?"
+    },
+    {
+      "source": "message_queue",
+      "target": "domain_distributed",
+      "relation": "BELONGS_TO"
+    },
+    {
+      "source": "message_queue",
+      "target": "mq_delivery_semantics",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "message_queue",
+      "target": "mq_delivery_semantics",
+      "relation": "LEADS_TO",
+      "question_hint": "Delivery Semantics is a common follow-up under Message Queue. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "message_queue",
+      "target": "mq_ordering",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "mq_delivery_semantics",
+      "target": "mq_ordering",
+      "relation": "LEADS_TO",
+      "question_hint": "Message Ordering is a common follow-up under Message Queue. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "message_queue",
+      "target": "mq_retry_dlq",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "mq_ordering",
+      "target": "mq_retry_dlq",
+      "relation": "LEADS_TO",
+      "question_hint": "Retry and Dead Letter Queue is a common follow-up under Message Queue. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "message_queue",
+      "target": "kafka_partition_consumer_group",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "mq_retry_dlq",
+      "target": "kafka_partition_consumer_group",
+      "relation": "LEADS_TO",
+      "question_hint": "Kafka Partition and Consumer Group is a common follow-up under Message Queue. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "message_queue",
+      "target": "pitfall_mq_duplicate_consumption",
+      "relation": "HAS_PITFALL"
+    },
+    {
+      "source": "kafka_partition_consumer_group",
+      "target": "pitfall_mq_duplicate_consumption",
+      "relation": "LEADS_TO",
+      "question_hint": "If a project hits Duplicate Message Consumption, how would you diagnose and prevent it?"
+    },
+    {
+      "source": "microservices",
+      "target": "domain_distributed",
+      "relation": "BELONGS_TO"
+    },
+    {
+      "source": "microservices",
+      "target": "service_discovery",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "microservices",
+      "target": "service_discovery",
+      "relation": "LEADS_TO",
+      "question_hint": "Service Discovery is a common follow-up under Microservices. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "microservices",
+      "target": "rpc_http",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "service_discovery",
+      "target": "rpc_http",
+      "relation": "LEADS_TO",
+      "question_hint": "RPC and HTTP Call is a common follow-up under Microservices. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "microservices",
+      "target": "circuit_breaker",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "rpc_http",
+      "target": "circuit_breaker",
+      "relation": "LEADS_TO",
+      "question_hint": "Circuit Breaker and Fallback is a common follow-up under Microservices. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "microservices",
+      "target": "distributed_tracing",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "circuit_breaker",
+      "target": "distributed_tracing",
+      "relation": "LEADS_TO",
+      "question_hint": "Distributed Tracing is a common follow-up under Microservices. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "microservices",
+      "target": "pitfall_retry_storm",
+      "relation": "HAS_PITFALL"
+    },
+    {
+      "source": "distributed_tracing",
+      "target": "pitfall_retry_storm",
+      "relation": "LEADS_TO",
+      "question_hint": "If a project hits Retry Storm, how would you diagnose and prevent it?"
+    },
+    {
+      "source": "system_design",
+      "target": "domain_distributed",
+      "relation": "BELONGS_TO"
+    },
+    {
+      "source": "system_design",
+      "target": "capacity_estimation",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "system_design",
+      "target": "capacity_estimation",
+      "relation": "LEADS_TO",
+      "question_hint": "Capacity Estimation is a common follow-up under System Design. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "system_design",
+      "target": "load_balancing",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "capacity_estimation",
+      "target": "load_balancing",
+      "relation": "LEADS_TO",
+      "question_hint": "Load Balancing is a common follow-up under System Design. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "system_design",
+      "target": "sharding_replication",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "load_balancing",
+      "target": "sharding_replication",
+      "relation": "LEADS_TO",
+      "question_hint": "Sharding and Replication is a common follow-up under System Design. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "system_design",
+      "target": "consistency_availability",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "sharding_replication",
+      "target": "consistency_availability",
+      "relation": "LEADS_TO",
+      "question_hint": "Consistency and Availability is a common follow-up under System Design. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "system_design",
+      "target": "pitfall_hot_key_hot_partition",
+      "relation": "HAS_PITFALL"
+    },
+    {
+      "source": "consistency_availability",
+      "target": "pitfall_hot_key_hot_partition",
+      "relation": "LEADS_TO",
+      "question_hint": "If a project hits Hot Key / Hot Partition, how would you diagnose and prevent it?"
+    },
+    {
+      "source": "linux",
+      "target": "domain_devops",
+      "relation": "BELONGS_TO"
+    },
+    {
+      "source": "linux",
+      "target": "linux_process_tools",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "linux",
+      "target": "linux_process_tools",
+      "relation": "LEADS_TO",
+      "question_hint": "Process and Resource Tools is a common follow-up under Linux. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "linux",
+      "target": "linux_network_tools",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "linux_process_tools",
+      "target": "linux_network_tools",
+      "relation": "LEADS_TO",
+      "question_hint": "Network Troubleshooting Tools is a common follow-up under Linux. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "linux",
+      "target": "linux_file_permission",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "linux_network_tools",
+      "target": "linux_file_permission",
+      "relation": "LEADS_TO",
+      "question_hint": "File Permission is a common follow-up under Linux. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "linux",
+      "target": "shell_scripting",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "linux_file_permission",
+      "target": "shell_scripting",
+      "relation": "LEADS_TO",
+      "question_hint": "Shell Scripting is a common follow-up under Linux. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "linux",
+      "target": "pitfall_linux_permission_denied",
+      "relation": "HAS_PITFALL"
+    },
+    {
+      "source": "shell_scripting",
+      "target": "pitfall_linux_permission_denied",
+      "relation": "LEADS_TO",
+      "question_hint": "If a project hits Permission and Path Issue, how would you diagnose and prevent it?"
+    },
+    {
+      "source": "docker",
+      "target": "domain_devops",
+      "relation": "BELONGS_TO"
+    },
+    {
+      "source": "docker",
+      "target": "docker_image_layer",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "docker",
+      "target": "docker_image_layer",
+      "relation": "LEADS_TO",
+      "question_hint": "Image and Layer is a common follow-up under Docker. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "docker",
+      "target": "docker_container_network",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "docker_image_layer",
+      "target": "docker_container_network",
+      "relation": "LEADS_TO",
+      "question_hint": "Container Network is a common follow-up under Docker. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "docker",
+      "target": "docker_volume",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "docker_container_network",
+      "target": "docker_volume",
+      "relation": "LEADS_TO",
+      "question_hint": "Docker Volume is a common follow-up under Docker. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "docker",
+      "target": "docker_compose",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "docker_volume",
+      "target": "docker_compose",
+      "relation": "LEADS_TO",
+      "question_hint": "Docker Compose is a common follow-up under Docker. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "docker",
+      "target": "pitfall_docker_large_image",
+      "relation": "HAS_PITFALL"
+    },
+    {
+      "source": "docker_compose",
+      "target": "pitfall_docker_large_image",
+      "relation": "LEADS_TO",
+      "question_hint": "If a project hits Large Docker Image, how would you diagnose and prevent it?"
+    },
+    {
+      "source": "kubernetes",
+      "target": "domain_devops",
+      "relation": "BELONGS_TO"
+    },
+    {
+      "source": "kubernetes",
+      "target": "k8s_pod_deployment",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "kubernetes",
+      "target": "k8s_pod_deployment",
+      "relation": "LEADS_TO",
+      "question_hint": "Pod and Deployment is a common follow-up under Kubernetes. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "kubernetes",
+      "target": "k8s_service_ingress",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "k8s_pod_deployment",
+      "target": "k8s_service_ingress",
+      "relation": "LEADS_TO",
+      "question_hint": "Service and Ingress is a common follow-up under Kubernetes. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "kubernetes",
+      "target": "k8s_config_secret",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "k8s_service_ingress",
+      "target": "k8s_config_secret",
+      "relation": "LEADS_TO",
+      "question_hint": "ConfigMap and Secret is a common follow-up under Kubernetes. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "kubernetes",
+      "target": "k8s_hpa_healthcheck",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "k8s_config_secret",
+      "target": "k8s_hpa_healthcheck",
+      "relation": "LEADS_TO",
+      "question_hint": "HPA and Health Check is a common follow-up under Kubernetes. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "kubernetes",
+      "target": "pitfall_k8s_probe_misconfig",
+      "relation": "HAS_PITFALL"
+    },
+    {
+      "source": "k8s_hpa_healthcheck",
+      "target": "pitfall_k8s_probe_misconfig",
+      "relation": "LEADS_TO",
+      "question_hint": "If a project hits Probe Misconfiguration, how would you diagnose and prevent it?"
+    },
+    {
+      "source": "javascript",
+      "target": "domain_frontend",
+      "relation": "BELONGS_TO"
+    },
+    {
+      "source": "javascript",
+      "target": "js_closure_scope",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "javascript",
+      "target": "js_closure_scope",
+      "relation": "LEADS_TO",
+      "question_hint": "Closure and Scope is a common follow-up under JavaScript / TypeScript. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "javascript",
+      "target": "js_prototype_this",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "js_closure_scope",
+      "target": "js_prototype_this",
+      "relation": "LEADS_TO",
+      "question_hint": "Prototype and this is a common follow-up under JavaScript / TypeScript. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "javascript",
+      "target": "js_event_loop",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "js_prototype_this",
+      "target": "js_event_loop",
+      "relation": "LEADS_TO",
+      "question_hint": "Event Loop is a common follow-up under JavaScript / TypeScript. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "javascript",
+      "target": "typescript_type_system",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "js_event_loop",
+      "target": "typescript_type_system",
+      "relation": "LEADS_TO",
+      "question_hint": "TypeScript Type System is a common follow-up under JavaScript / TypeScript. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "javascript",
+      "target": "pitfall_js_async_order",
+      "relation": "HAS_PITFALL"
+    },
+    {
+      "source": "typescript_type_system",
+      "target": "pitfall_js_async_order",
+      "relation": "LEADS_TO",
+      "question_hint": "If a project hits Async Execution Order Mistake, how would you diagnose and prevent it?"
+    },
+    {
+      "source": "react_frontend",
+      "target": "domain_frontend",
+      "relation": "BELONGS_TO"
+    },
+    {
+      "source": "react_frontend",
+      "target": "react_component_state",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "react_frontend",
+      "target": "react_component_state",
+      "relation": "LEADS_TO",
+      "question_hint": "Component and State is a common follow-up under React. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "react_frontend",
+      "target": "react_hooks",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "react_component_state",
+      "target": "react_hooks",
+      "relation": "LEADS_TO",
+      "question_hint": "Hooks is a common follow-up under React. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "react_frontend",
+      "target": "react_render_reconciliation",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "react_hooks",
+      "target": "react_render_reconciliation",
+      "relation": "LEADS_TO",
+      "question_hint": "Render and Reconciliation is a common follow-up under React. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "react_frontend",
+      "target": "frontend_state_management",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "react_render_reconciliation",
+      "target": "frontend_state_management",
+      "relation": "LEADS_TO",
+      "question_hint": "Frontend State Management is a common follow-up under React. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "react_frontend",
+      "target": "pitfall_react_effect_loop",
+      "relation": "HAS_PITFALL"
+    },
+    {
+      "source": "frontend_state_management",
+      "target": "pitfall_react_effect_loop",
+      "relation": "LEADS_TO",
+      "question_hint": "If a project hits useEffect Infinite Loop, how would you diagnose and prevent it?"
+    },
+    {
+      "source": "browser_runtime",
+      "target": "domain_frontend",
+      "relation": "BELONGS_TO"
+    },
+    {
+      "source": "browser_runtime",
+      "target": "browser_render_pipeline",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "browser_runtime",
+      "target": "browser_render_pipeline",
+      "relation": "LEADS_TO",
+      "question_hint": "Browser Render Pipeline is a common follow-up under Browser Runtime. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "browser_runtime",
+      "target": "browser_cache",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "browser_render_pipeline",
+      "target": "browser_cache",
+      "relation": "LEADS_TO",
+      "question_hint": "Browser Cache is a common follow-up under Browser Runtime. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "browser_runtime",
+      "target": "cors_same_origin",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "browser_cache",
+      "target": "cors_same_origin",
+      "relation": "LEADS_TO",
+      "question_hint": "Same-Origin Policy and CORS is a common follow-up under Browser Runtime. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "browser_runtime",
+      "target": "frontend_performance",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "cors_same_origin",
+      "target": "frontend_performance",
+      "relation": "LEADS_TO",
+      "question_hint": "Frontend Performance is a common follow-up under Browser Runtime. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "browser_runtime",
+      "target": "pitfall_cors_credentials",
+      "relation": "HAS_PITFALL"
+    },
+    {
+      "source": "frontend_performance",
+      "target": "pitfall_cors_credentials",
+      "relation": "LEADS_TO",
+      "question_hint": "If a project hits CORS Credentials Misconfiguration, how would you diagnose and prevent it?"
+    },
+    {
+      "source": "web_security",
+      "target": "domain_security_quality",
+      "relation": "BELONGS_TO"
+    },
+    {
+      "source": "web_security",
+      "target": "sql_injection",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "web_security",
+      "target": "sql_injection",
+      "relation": "LEADS_TO",
+      "question_hint": "SQL Injection is a common follow-up under Web Security. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "web_security",
+      "target": "xss",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "sql_injection",
+      "target": "xss",
+      "relation": "LEADS_TO",
+      "question_hint": "XSS is a common follow-up under Web Security. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "web_security",
+      "target": "csrf",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "xss",
+      "target": "csrf",
+      "relation": "LEADS_TO",
+      "question_hint": "CSRF is a common follow-up under Web Security. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "web_security",
+      "target": "ssrf",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "csrf",
+      "target": "ssrf",
+      "relation": "LEADS_TO",
+      "question_hint": "SSRF is a common follow-up under Web Security. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "web_security",
+      "target": "pitfall_security_trust_input",
+      "relation": "HAS_PITFALL"
+    },
+    {
+      "source": "ssrf",
+      "target": "pitfall_security_trust_input",
+      "relation": "LEADS_TO",
+      "question_hint": "If a project hits Trusting User Input, how would you diagnose and prevent it?"
+    },
+    {
+      "source": "auth_authorization",
+      "target": "domain_security_quality",
+      "relation": "BELONGS_TO"
+    },
+    {
+      "source": "auth_authorization",
+      "target": "session_cookie",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "auth_authorization",
+      "target": "session_cookie",
+      "relation": "LEADS_TO",
+      "question_hint": "Session and Cookie is a common follow-up under Authentication and Authorization. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "auth_authorization",
+      "target": "jwt_token",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "session_cookie",
+      "target": "jwt_token",
+      "relation": "LEADS_TO",
+      "question_hint": "JWT is a common follow-up under Authentication and Authorization. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "auth_authorization",
+      "target": "oauth2",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "jwt_token",
+      "target": "oauth2",
+      "relation": "LEADS_TO",
+      "question_hint": "OAuth2 is a common follow-up under Authentication and Authorization. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "auth_authorization",
+      "target": "rbac_abac",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "oauth2",
+      "target": "rbac_abac",
+      "relation": "LEADS_TO",
+      "question_hint": "RBAC/ABAC is a common follow-up under Authentication and Authorization. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "auth_authorization",
+      "target": "pitfall_auth_broken_access_control",
+      "relation": "HAS_PITFALL"
+    },
+    {
+      "source": "rbac_abac",
+      "target": "pitfall_auth_broken_access_control",
+      "relation": "LEADS_TO",
+      "question_hint": "If a project hits Broken Access Control, how would you diagnose and prevent it?"
+    },
+    {
+      "source": "testing",
+      "target": "domain_security_quality",
+      "relation": "BELONGS_TO"
+    },
+    {
+      "source": "testing",
+      "target": "unit_testing",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "testing",
+      "target": "unit_testing",
+      "relation": "LEADS_TO",
+      "question_hint": "Unit Testing is a common follow-up under Testing. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "testing",
+      "target": "integration_testing",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "unit_testing",
+      "target": "integration_testing",
+      "relation": "LEADS_TO",
+      "question_hint": "Integration Testing is a common follow-up under Testing. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "testing",
+      "target": "mocking",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "integration_testing",
+      "target": "mocking",
+      "relation": "LEADS_TO",
+      "question_hint": "Mock and Stub is a common follow-up under Testing. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "testing",
+      "target": "load_testing",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "mocking",
+      "target": "load_testing",
+      "relation": "LEADS_TO",
+      "question_hint": "Load Testing is a common follow-up under Testing. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "testing",
+      "target": "pitfall_flaky_test",
+      "relation": "HAS_PITFALL"
+    },
+    {
+      "source": "load_testing",
+      "target": "pitfall_flaky_test",
+      "relation": "LEADS_TO",
+      "question_hint": "If a project hits Flaky Test, how would you diagnose and prevent it?"
+    },
+    {
+      "source": "observability_engineering",
+      "target": "domain_security_quality",
+      "relation": "BELONGS_TO"
+    },
+    {
+      "source": "observability_engineering",
+      "target": "logging",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "observability_engineering",
+      "target": "logging",
+      "relation": "LEADS_TO",
+      "question_hint": "Logging is a common follow-up under Observability Engineering. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "observability_engineering",
+      "target": "metrics_monitoring",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "logging",
+      "target": "metrics_monitoring",
+      "relation": "LEADS_TO",
+      "question_hint": "Metrics Monitoring is a common follow-up under Observability Engineering. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "observability_engineering",
+      "target": "tracing",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "metrics_monitoring",
+      "target": "tracing",
+      "relation": "LEADS_TO",
+      "question_hint": "Tracing is a common follow-up under Observability Engineering. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "observability_engineering",
+      "target": "alerting_slo",
+      "relation": "HAS_COMPONENT"
+    },
+    {
+      "source": "tracing",
+      "target": "alerting_slo",
+      "relation": "LEADS_TO",
+      "question_hint": "Alerting and SLO is a common follow-up under Observability Engineering. Explain its mechanism, trade-offs, and common pitfalls."
+    },
+    {
+      "source": "observability_engineering",
+      "target": "pitfall_alert_fatigue",
+      "relation": "HAS_PITFALL"
+    },
+    {
+      "source": "alerting_slo",
+      "target": "pitfall_alert_fatigue",
+      "relation": "LEADS_TO",
+      "question_hint": "If a project hits Alert Fatigue, how would you diagnose and prevent it?"
+    },
+    {
+      "source": "algorithms",
+      "target": "data_structures",
+      "relation": "RELATED_TO"
+    },
+    {
+      "source": "operating_systems",
+      "target": "java",
+      "relation": "RELATED_TO"
+    },
+    {
+      "source": "computer_networks",
+      "target": "api_design",
+      "relation": "RELATED_TO"
+    },
+    {
+      "source": "api_design",
+      "target": "spring_boot",
+      "relation": "RELATED_TO"
+    },
+    {
+      "source": "spring_boot",
+      "target": "mysql",
+      "relation": "RELATED_TO"
+    },
+    {
+      "source": "spring_boot",
+      "target": "redis",
+      "relation": "RELATED_TO"
+    },
+    {
+      "source": "mysql",
+      "target": "redis",
+      "relation": "RELATED_TO"
+    },
+    {
+      "source": "redis",
+      "target": "system_design",
+      "relation": "RELATED_TO"
+    },
+    {
+      "source": "message_queue",
+      "target": "microservices",
+      "relation": "RELATED_TO"
+    },
+    {
+      "source": "microservices",
+      "target": "system_design",
+      "relation": "RELATED_TO"
+    },
+    {
+      "source": "docker",
+      "target": "kubernetes",
+      "relation": "RELATED_TO"
+    },
+    {
+      "source": "linux",
+      "target": "docker",
+      "relation": "RELATED_TO"
+    },
+    {
+      "source": "kubernetes",
+      "target": "microservices",
+      "relation": "RELATED_TO"
+    },
+    {
+      "source": "javascript",
+      "target": "react_frontend",
+      "relation": "RELATED_TO"
+    },
+    {
+      "source": "browser_runtime",
+      "target": "web_security",
+      "relation": "RELATED_TO"
+    },
+    {
+      "source": "auth_authorization",
+      "target": "web_security",
+      "relation": "RELATED_TO"
+    },
+    {
+      "source": "testing",
+      "target": "observability_engineering",
+      "relation": "RELATED_TO"
+    },
+    {
+      "source": "observability_engineering",
+      "target": "microservices",
+      "relation": "RELATED_TO"
+    },
+    {
+      "source": "computer_networks",
+      "target": "browser_runtime",
+      "relation": "RELATED_TO"
+    }
   ]
 }

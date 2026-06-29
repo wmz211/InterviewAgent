@@ -22,16 +22,7 @@ from app.agents.nodes.hr_self_intro import hr_self_intro_node
 from app.agents.nodes.hr_behavioral import hr_behavioral_node
 from app.agents.nodes.hr_career     import hr_career_node
 from app.agents.nodes.wrap_up       import wrap_up_node
-
-ALL_PHASES = [
-    "greeting",
-    # tech track
-    "resume_dive", "jd_tech", "coding_test",
-    # hr track
-    "hr_self_intro", "hr_behavioral", "hr_career",
-    # shared
-    "wrap_up",
-]
+from app.core.practice import ALL_PHASES, build_practice_metadata
 
 
 async def dispatch(state: InterviewState) -> dict:
@@ -90,14 +81,21 @@ def make_initial_state(
     resume_summary: str,
     jd_text: str,
     interview_mode: str = "tech",
+    flow_mode: str = "full_interview",
+    selected_phase: str = "",
 ) -> dict:
+    practice = build_practice_metadata(
+        interview_mode=interview_mode,
+        flow_mode=flow_mode,
+        selected_phase=selected_phase,
+    )
     return {
         "session_id":         session_id,
         "candidate_name":     "",
         "resume_summary":     resume_summary,
         "jd_text":            jd_text,
         "messages":           [],
-        "current_node":       "greeting",
+        "current_node":       practice["initial_phase"],
         "current_topic":      "",
         "context_summary":    "",
         "node_scores":        {},
@@ -106,4 +104,6 @@ def make_initial_state(
         "should_transition":  False,
         "interview_complete": False,
         "interview_mode":     interview_mode,
+        "practice_mode":      practice["practice_mode"],
+        "selected_phase":     practice["selected_phase"],
     }

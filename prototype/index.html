@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InterviewAgent — Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300;1,9..144,600&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg0: #f7f4ee;
+  --bg1: #efeae1;
+  --bg2: #e8e3d8;
+  --bg3: #dfd9cc;
+  --b0:  #e0dace;
+  --b1:  #cdc6b8;
+  --t0:  #1c1a16;
+  --t1:  #5c5449;
+  --t2:  #9c9488;
+  --acc: #c96214;
+  --acc-h: #b8570f;
+  --acc-lo: rgba(201,98,20,.1);
+  --ok: #16a34a;
+  --font: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --serif: 'Fraunces', Georgia, serif;
+  --ease: cubic-bezier(.4,0,.2,1);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg0); color: var(--t0);
+  font-family: var(--font); font-size: 14px; line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+::selection { background: rgba(201,98,20,.15); }
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-thumb { background: var(--b1); border-radius: 4px; }
+
+/* ── Proto nav ── */
+.proto-nav {
+  height: 32px;
+  background: var(--bg1);
+  border-bottom: 1px solid var(--b0);
+  display: flex; align-items: center; gap: 4px;
+  padding: 0 24px;
+  font-size: 11px; font-weight: 500; color: var(--t2);
+  letter-spacing: .02em;
+}
+.proto-nav a { color: var(--t2); text-decoration: none; padding: 0 6px; transition: color .15s; }
+.proto-nav a:hover { color: var(--acc); }
+.proto-nav .sep { color: var(--b1); margin: 0 2px; }
+.proto-nav .tag {
+  margin-left: 0;
+  font-size: 10px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase;
+  color: var(--acc); border: 1px solid rgba(201,98,20,.3);
+  padding: 1px 7px; border-radius: 99px;
+}
+
+/* ── Header ── */
+header {
+  background: var(--bg0);
+  border-bottom: 1px solid var(--b0);
+  padding: 20px 40px 18px;
+}
+.logo-line {
+  font-family: var(--serif);
+  font-size: 28px; font-weight: 300; letter-spacing: -.02em;
+  color: var(--t0); line-height: 1;
+}
+.logo-line em { font-style: italic; color: var(--acc); }
+.logo-sub {
+  margin-top: 4px; font-size: 12.5px; color: var(--t2); font-weight: 300;
+  letter-spacing: .01em;
+}
+
+/* ── Main ── */
+main { max-width: 840px; margin: 44px auto; padding: 0 24px 80px; }
+
+/* ── Section label ── */
+.sec-label {
+  font-size: 10.5px; font-weight: 600; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--t2); margin-bottom: 20px;
+}
+
+/* ── Flow diagram ── */
+.flow-wrap { display: flex; flex-direction: column; align-items: center; gap: 0; }
+
+.flow-node-full {
+  width: 100%; max-width: 480px;
+  background: var(--bg1); border: 1px solid var(--b0);
+  border-radius: 12px; padding: 16px 22px;
+  display: flex; align-items: center; gap: 16px;
+  text-decoration: none; color: inherit;
+  transition: border-color .18s var(--ease), background .18s var(--ease);
+  cursor: pointer;
+}
+.flow-node-full:hover {
+  border-color: var(--b1); background: var(--bg2);
+}
+.flow-node-full.accent { border-color: rgba(201,98,20,.35); background: var(--acc-lo); }
+.fn-tag {
+  font-size: 10px; font-weight: 600; letter-spacing: .07em;
+  text-transform: uppercase; color: var(--t2);
+  background: var(--bg2); border: 1px solid var(--b0);
+  padding: 2px 8px; border-radius: 99px; white-space: nowrap; flex-shrink: 0;
+}
+.flow-node-full.accent .fn-tag {
+  background: rgba(201,98,20,.12); border-color: rgba(201,98,20,.25);
+  color: var(--acc);
+}
+.fn-name { font-size: 13.5px; font-weight: 500; flex: 1; }
+.fn-desc { font-size: 12px; color: var(--t2); }
+.fn-arrow {
+  color: var(--t2); flex-shrink: 0;
+  transition: color .15s, transform .15s;
+}
+.flow-node-full:hover .fn-arrow { color: var(--acc); transform: translateX(2px); }
+
+/* Connector */
+.connector {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 0; padding: 0;
+}
+.conn-line { width: 1px; height: 20px; background: var(--b1); }
+.conn-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--b1); margin: 0;
+}
+.conn-label {
+  font-size: 10.5px; color: var(--t2); letter-spacing: .04em;
+  padding: 2px 0 2px;
+}
+
+/* Branch section */
+.branch-section {
+  width: 100%; max-width: 480px;
+  border: 1px solid var(--b0); border-radius: 12px; overflow: hidden;
+}
+.branch-header {
+  padding: 10px 22px;
+  background: var(--bg1); border-bottom: 1px solid var(--b0);
+  font-size: 10.5px; font-weight: 600; letter-spacing: .07em;
+  text-transform: uppercase; color: var(--t2);
+  display: flex; gap: 8px; align-items: center;
+}
+.branch-header-sep {
+  flex: 1; height: 1px; background: var(--b0);
+}
+.branch-cols { display: grid; grid-template-columns: 1fr 1fr; }
+.branch-col {
+  padding: 18px 20px;
+  background: var(--bg0);
+}
+.branch-col:first-child { border-right: 1px solid var(--b0); }
+.branch-col-title {
+  font-size: 11px; font-weight: 600; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--t1);
+  margin-bottom: 14px; padding-bottom: 10px;
+  border-bottom: 1px solid var(--b0);
+}
+.phase-list-mini { display: flex; flex-direction: column; gap: 0; position: relative; }
+.phase-list-mini::before {
+  content: ''; position: absolute; left: 6px; top: 8px; bottom: 8px;
+  width: 1px; background: var(--b1); z-index: 0;
+}
+.ph-mini {
+  position: relative; z-index: 1;
+  display: flex; align-items: center; gap: 10px;
+  padding: 6px 0; text-decoration: none; color: inherit;
+  transition: all .15s;
+  cursor: pointer;
+}
+.ph-mini:hover .ph-mini-label { color: var(--acc); }
+.ph-mini-dot {
+  width: 13px; height: 13px; border-radius: 50%;
+  border: 1.5px solid var(--b1); background: var(--bg0);
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .2s;
+}
+.ph-mini:hover .ph-mini-dot { border-color: var(--acc); background: var(--acc-lo); }
+.ph-mini-label { font-size: 12.5px; color: var(--t1); transition: color .15s; }
+
+/* ── Page index ── */
+.page-index {
+  margin-top: 56px;
+  border-top: 1px solid var(--b0);
+  padding-top: 32px;
+}
+.page-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+.page-card {
+  background: var(--bg1); border: 1px solid var(--b0);
+  border-radius: 10px; padding: 16px 18px;
+  text-decoration: none; color: inherit;
+  transition: border-color .18s, background .18s;
+  display: block;
+}
+.page-card:hover { border-color: var(--b1); background: var(--bg2); }
+.pc-tag {
+  font-size: 10px; font-weight: 600; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--acc);
+  margin-bottom: 8px; display: block;
+}
+.pc-name { font-size: 13px; font-weight: 600; color: var(--t0); margin-bottom: 4px; }
+.pc-desc { font-size: 12px; color: var(--t2); line-height: 1.5; }
+.pc-file {
+  margin-top: 10px; font-size: 11px; font-family: monospace;
+  color: var(--t2); opacity: .7;
+}
+</style>
+</head>
+<body>
+
+<nav class="proto-nav">
+  <span class="tag">Prototype</span>
+  <span class="sep">·</span>
+  <a href="index.html">Overview</a>
+  <span class="sep">/</span>
+  <a href="setup.html">Setup</a>
+  <span class="sep">/</span>
+  <a href="interview-tech.html">Tech</a>
+  <span class="sep">/</span>
+  <a href="interview-hr.html">HR</a>
+  <span class="sep">/</span>
+  <a href="wrapup.html">Wrap-up</a>
+  <span class="sep">/</span>
+  <a href="report.html">Report</a>
+  <span class="sep">/</span>
+  <a href="sessions.html">Sessions</a>
+</nav>
+
+<header>
+  <div class="logo-line">Interview<em>Agent</em></div>
+  <div class="logo-sub">Prototype · Page Flow Overview</div>
+</header>
+
+<main>
+
+  <div class="sec-label">Interaction Flow</div>
+
+  <div class="flow-wrap">
+
+    <!-- SETUP -->
+    <a class="flow-node-full accent" href="setup.html">
+      <span class="fn-tag">Setup</span>
+      <span class="fn-name">信息录入</span>
+      <span class="fn-desc">上传简历 &amp; JD，选择面试模式</span>
+      <svg class="fn-arrow" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8m-3-3 3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+
+    <div class="connector">
+      <div class="conn-line"></div>
+      <div class="conn-dot"></div>
+      <div class="conn-label">选择面试模式</div>
+      <div class="conn-dot"></div>
+      <div class="conn-line"></div>
+    </div>
+
+    <!-- Branch: Tech / HR -->
+    <div class="branch-section">
+      <div class="branch-header">
+        <span>Tech Track</span>
+        <div class="branch-header-sep"></div>
+        <span>HR Track</span>
+      </div>
+      <div class="branch-cols">
+        <!-- Tech -->
+        <div class="branch-col">
+          <div class="branch-col-title">技术面试</div>
+          <div class="phase-list-mini">
+            <a class="ph-mini" href="interview-tech.html#greeting">
+              <div class="ph-mini-dot"></div>
+              <span class="ph-mini-label">开场寒暄</span>
+            </a>
+            <a class="ph-mini" href="interview-tech.html#resume_dive">
+              <div class="ph-mini-dot"></div>
+              <span class="ph-mini-label">简历深挖</span>
+            </a>
+            <a class="ph-mini" href="interview-tech.html#jd_tech">
+              <div class="ph-mini-dot"></div>
+              <span class="ph-mini-label">JD 技术考察</span>
+            </a>
+            <a class="ph-mini" href="interview-tech.html#coding_test">
+              <div class="ph-mini-dot"></div>
+              <span class="ph-mini-label">算法编程</span>
+            </a>
+          </div>
+        </div>
+        <!-- HR -->
+        <div class="branch-col">
+          <div class="branch-col-title">HR 综合面试</div>
+          <div class="phase-list-mini">
+            <a class="ph-mini" href="interview-hr.html#greeting">
+              <div class="ph-mini-dot"></div>
+              <span class="ph-mini-label">开场寒暄</span>
+            </a>
+            <a class="ph-mini" href="interview-hr.html#hr_self_intro">
+              <div class="ph-mini-dot"></div>
+              <span class="ph-mini-label">自我介绍</span>
+            </a>
+            <a class="ph-mini" href="interview-hr.html#hr_behavioral">
+              <div class="ph-mini-dot"></div>
+              <span class="ph-mini-label">行为面试</span>
+            </a>
+            <a class="ph-mini" href="interview-hr.html#hr_career">
+              <div class="ph-mini-dot"></div>
+              <span class="ph-mini-label">职业规划</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="connector">
+      <div class="conn-line"></div>
+      <div class="conn-dot"></div>
+      <div class="conn-label">双轨汇聚</div>
+      <div class="conn-dot"></div>
+      <div class="conn-line"></div>
+    </div>
+
+    <!-- WRAP UP -->
+    <a class="flow-node-full" href="wrapup.html">
+      <span class="fn-tag">Shared</span>
+      <span class="fn-name">收尾 Q&amp;A</span>
+      <span class="fn-desc">候选人反问，触发 EvaluationEngine</span>
+      <svg class="fn-arrow" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8m-3-3 3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+
+    <div class="connector"><div class="conn-line"></div></div>
+
+    <!-- REPORT -->
+    <a class="flow-node-full" href="report.html">
+      <span class="fn-tag">Report</span>
+      <span class="fn-name">评估报告</span>
+      <span class="fn-desc">总分 · 五维度 · 薄弱项分析</span>
+      <svg class="fn-arrow" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8m-3-3 3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+
+    <div class="connector"><div class="conn-line"></div></div>
+
+    <!-- SESSIONS -->
+    <a class="flow-node-full" href="sessions.html">
+      <span class="fn-tag">History</span>
+      <span class="fn-name">历史记录</span>
+      <span class="fn-desc">已完成面试列表，可重新查看报告</span>
+      <svg class="fn-arrow" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8m-3-3 3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+
+  </div>
+
+  <!-- Page index -->
+  <div class="page-index">
+    <div class="sec-label" style="margin-bottom:16px;">All Pages</div>
+    <div class="page-grid">
+      <a class="page-card" href="setup.html">
+        <span class="pc-tag">Setup</span>
+        <div class="pc-name">信息录入</div>
+        <div class="pc-desc">简历上传、JD 输入、面试模式选择</div>
+        <div class="pc-file">setup.html</div>
+      </a>
+      <a class="page-card" href="interview-tech.html">
+        <span class="pc-tag">Tech Track</span>
+        <div class="pc-name">技术面试</div>
+        <div class="pc-desc">4 阶段技术面试，侧边栏相切换</div>
+        <div class="pc-file">interview-tech.html</div>
+      </a>
+      <a class="page-card" href="interview-hr.html">
+        <span class="pc-tag">HR Track</span>
+        <div class="pc-name">HR 综合面试</div>
+        <div class="pc-desc">4 阶段综合面试，行为与职业规划</div>
+        <div class="pc-file">interview-hr.html</div>
+      </a>
+      <a class="page-card" href="wrapup.html">
+        <span class="pc-tag">Shared</span>
+        <div class="pc-name">收尾阶段</div>
+        <div class="pc-desc">双轨汇聚，触发评估引擎</div>
+        <div class="pc-file">wrapup.html</div>
+      </a>
+      <a class="page-card" href="report.html">
+        <span class="pc-tag">Report</span>
+        <div class="pc-name">评估报告</div>
+        <div class="pc-desc">总分、维度评分、薄弱项与学习建议</div>
+        <div class="pc-file">report.html</div>
+      </a>
+      <a class="page-card" href="sessions.html">
+        <span class="pc-tag">History</span>
+        <div class="pc-name">历史记录</div>
+        <div class="pc-desc">已完成面试汇总，筛选与回顾</div>
+        <div class="pc-file">sessions.html</div>
+      </a>
+    </div>
+  </div>
+
+</main>
+</body>
+</html>

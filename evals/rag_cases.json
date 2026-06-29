@@ -1,0 +1,663 @@
+[
+  {
+    "id": "kg_001_leads_to_nlp_to_transformer",
+    "language": "zh",
+    "source_node_id": "nlp",
+    "target_node_id": "transformer",
+    "relation": "LEADS_TO",
+    "query": "请围绕NLP继续追问Transformer，关注自然语言处理、transformer模型以及基于自注意力的序列建模架构，彻底取代RNN，成为现代LLM的基础",
+    "expected_node_ids": [
+      "nlp",
+      "transformer",
+      "attention",
+      "positional_encoding"
+    ]
+  },
+  {
+    "id": "kg_002_related_to_nlp_to_embedding",
+    "language": "en",
+    "source_node_id": "nlp",
+    "target_node_id": "embedding",
+    "relation": "RELATED_TO",
+    "query": "Interview follow-up from NLP to Embedding: 自然语言处理, 词向量, 让计算机理解和生成人类语言的技术领域，是LLM的基础学科",
+    "expected_node_ids": [
+      "nlp",
+      "embedding",
+      "word2vec",
+      "rag"
+    ]
+  },
+  {
+    "id": "kg_003_has_component_nlp_to_tokenization",
+    "language": "mixed",
+    "source_node_id": "nlp",
+    "target_node_id": "tokenization",
+    "relation": "HAS_COMPONENT",
+    "query": "NLP 面试追问到 Tokenization: explain 自然语言处理, 分词, 将原始文本切割为模型可处理的token单元，直接影响语言理解边界",
+    "expected_node_ids": [
+      "nlp",
+      "tokenization",
+      "bpe"
+    ]
+  },
+  {
+    "id": "kg_004_has_component_transformer_to_attention",
+    "language": "zh",
+    "source_node_id": "transformer",
+    "target_node_id": "attention",
+    "relation": "HAS_COMPONENT",
+    "query": "请围绕Transformer继续追问Attention Mechanism，关注transformer模型、注意力机制以及通过Q/K/V矩阵计算序列元素两两相关性，复杂度O(n²)",
+    "expected_node_ids": [
+      "transformer",
+      "attention",
+      "mha",
+      "scaled_dot_product",
+      "nlp"
+    ]
+  },
+  {
+    "id": "kg_005_has_component_transformer_to_positional_encoding",
+    "language": "en",
+    "source_node_id": "transformer",
+    "target_node_id": "positional_encoding",
+    "relation": "HAS_COMPONENT",
+    "query": "Interview follow-up from Transformer to Positional Encoding: transformer模型, 位置编码, 基于自注意力的序列建模架构，彻底取代RNN，成为现代LLM的基础",
+    "expected_node_ids": [
+      "transformer",
+      "positional_encoding",
+      "rope",
+      "nlp"
+    ]
+  },
+  {
+    "id": "kg_006_has_component_transformer_to_layer_norm",
+    "language": "mixed",
+    "source_node_id": "transformer",
+    "target_node_id": "layer_norm",
+    "relation": "HAS_COMPONENT",
+    "query": "Transformer 面试追问到 Layer Normalization: explain transformer模型, 层归一化, 对特征维度归一化，Pre-LN(前置)比Post-LN训练更稳定",
+    "expected_node_ids": [
+      "transformer",
+      "layer_norm",
+      "nlp"
+    ]
+  },
+  {
+    "id": "kg_007_has_component_transformer_to_ffn",
+    "language": "zh",
+    "source_node_id": "transformer",
+    "target_node_id": "ffn",
+    "relation": "HAS_COMPONENT",
+    "query": "请围绕Transformer继续追问Feed-Forward Network，关注transformer模型、前馈网络以及Transformer中每个位置独立的两层全连接，通常用SwiGLU激活",
+    "expected_node_ids": [
+      "transformer",
+      "ffn",
+      "nlp"
+    ]
+  },
+  {
+    "id": "kg_008_related_to_transformer_to_kv_cache",
+    "language": "en",
+    "source_node_id": "transformer",
+    "target_node_id": "kv_cache",
+    "relation": "RELATED_TO",
+    "query": "Interview follow-up from Transformer to KV Cache: transformer模型, 键值缓存, 基于自注意力的序列建模架构，彻底取代RNN，成为现代LLM的基础",
+    "expected_node_ids": [
+      "transformer",
+      "kv_cache",
+      "pitfall_kv_cache_memory",
+      "paged_attention",
+      "nlp"
+    ]
+  },
+  {
+    "id": "kg_009_leads_to_transformer_to_attention",
+    "language": "mixed",
+    "source_node_id": "transformer",
+    "target_node_id": "attention",
+    "relation": "LEADS_TO",
+    "query": "Transformer 面试追问到 Attention Mechanism: explain transformer模型, 注意力机制, 通过Q/K/V矩阵计算序列元素两两相关性，复杂度O(n²)",
+    "expected_node_ids": [
+      "transformer",
+      "attention",
+      "mha",
+      "scaled_dot_product",
+      "nlp"
+    ]
+  },
+  {
+    "id": "kg_010_has_component_attention_to_mha",
+    "language": "zh",
+    "source_node_id": "attention",
+    "target_node_id": "mha",
+    "relation": "HAS_COMPONENT",
+    "query": "请围绕Attention Mechanism继续追问Multi-Head Attention，关注注意力机制、多头注意力以及将Attention分到h个子空间并行计算再拼接，捕获不同粒度的语义",
+    "expected_node_ids": [
+      "attention",
+      "mha",
+      "pitfall_attention_complexity",
+      "transformer"
+    ]
+  },
+  {
+    "id": "kg_011_has_component_attention_to_scaled_dot_product",
+    "language": "en",
+    "source_node_id": "attention",
+    "target_node_id": "scaled_dot_product",
+    "relation": "HAS_COMPONENT",
+    "query": "Interview follow-up from Attention Mechanism to Scaled Dot-Product Attention: 注意力机制, 缩放点积注意力, 通过Q/K/V矩阵计算序列元素两两相关性，复杂度O(n²)",
+    "expected_node_ids": [
+      "attention",
+      "scaled_dot_product",
+      "transformer"
+    ]
+  },
+  {
+    "id": "kg_012_leads_to_attention_to_mha",
+    "language": "mixed",
+    "source_node_id": "attention",
+    "target_node_id": "mha",
+    "relation": "LEADS_TO",
+    "query": "Attention Mechanism 面试追问到 Multi-Head Attention: explain 注意力机制, 多头注意力, 将Attention分到h个子空间并行计算再拼接，捕获不同粒度的语义",
+    "expected_node_ids": [
+      "attention",
+      "mha",
+      "pitfall_attention_complexity",
+      "transformer"
+    ]
+  },
+  {
+    "id": "kg_013_leads_to_mha_to_pitfall_attention_complexity",
+    "language": "zh",
+    "source_node_id": "mha",
+    "target_node_id": "pitfall_attention_complexity",
+    "relation": "LEADS_TO",
+    "query": "请围绕Multi-Head Attention继续追问Attention O(n²)复杂度，关注多头注意力、Attention O(n²)复杂度以及Self-Attention时间和显存复杂度随序列长度平方增长，长文本时显存爆炸",
+    "expected_node_ids": [
+      "mha",
+      "pitfall_attention_complexity",
+      "attention"
+    ]
+  },
+  {
+    "id": "kg_014_leads_to_positional_encoding_to_rope",
+    "language": "en",
+    "source_node_id": "positional_encoding",
+    "target_node_id": "rope",
+    "relation": "LEADS_TO",
+    "query": "Interview follow-up from Positional Encoding to RoPE: 位置编码, 旋转位置编码, 向embedding注入位置信息，原始Transformer用正弦余弦函数",
+    "expected_node_ids": [
+      "positional_encoding",
+      "rope",
+      "pitfall_pe_extrapolation",
+      "transformer"
+    ]
+  },
+  {
+    "id": "kg_015_related_to_rope_to_pitfall_pe_extrapolation",
+    "language": "mixed",
+    "source_node_id": "rope",
+    "target_node_id": "pitfall_pe_extrapolation",
+    "relation": "RELATED_TO",
+    "query": "RoPE 面试追问到 位置编码外推失效: explain 旋转位置编码, 位置编码外推失效, 模型在超出训练长度的序列上性能骤降，绝对位置编码无法外推",
+    "expected_node_ids": [
+      "rope",
+      "pitfall_pe_extrapolation",
+      "positional_encoding"
+    ]
+  },
+  {
+    "id": "kg_016_leads_to_kv_cache_to_pitfall_kv_cache_memory",
+    "language": "zh",
+    "source_node_id": "kv_cache",
+    "target_node_id": "pitfall_kv_cache_memory",
+    "relation": "LEADS_TO",
+    "query": "请围绕KV Cache继续追问KV Cache显存占用，关注键值缓存、KV Cache显存占用以及长序列推理时KV Cache显存随batch_size和序列长度线性增长，OOM风险",
+    "expected_node_ids": [
+      "kv_cache",
+      "pitfall_kv_cache_memory",
+      "transformer"
+    ]
+  },
+  {
+    "id": "kg_017_has_component_llm_to_pretraining",
+    "language": "en",
+    "source_node_id": "llm",
+    "target_node_id": "pretraining",
+    "relation": "HAS_COMPONENT",
+    "query": "Interview follow-up from LLM to 预训练 (Pre-training): 大语言模型, 预训练, 在海量文本上预训练的超大规模语言模型，如GPT/Qwen/LLaMA系列",
+    "expected_node_ids": [
+      "llm",
+      "pretraining",
+      "sft"
+    ]
+  },
+  {
+    "id": "kg_018_has_component_llm_to_rlhf",
+    "language": "mixed",
+    "source_node_id": "llm",
+    "target_node_id": "rlhf",
+    "relation": "HAS_COMPONENT",
+    "query": "LLM 面试追问到 RLHF: explain 大语言模型, 人类反馈强化学习, 通过人类偏好数据训练奖励模型，再用PPO优化LLM对齐人类价值观",
+    "expected_node_ids": [
+      "llm",
+      "rlhf",
+      "reward_model",
+      "dpo"
+    ]
+  },
+  {
+    "id": "kg_019_has_component_llm_to_sft",
+    "language": "zh",
+    "source_node_id": "llm",
+    "target_node_id": "sft",
+    "relation": "HAS_COMPONENT",
+    "query": "请围绕LLM继续追问SFT (指令微调)，关注大语言模型、有监督微调以及用高质量指令-回复对进行监督训练，让模型学会遵循用户指令",
+    "expected_node_ids": [
+      "llm",
+      "sft",
+      "rlhf"
+    ]
+  },
+  {
+    "id": "kg_020_has_component_llm_to_tokenization",
+    "language": "en",
+    "source_node_id": "llm",
+    "target_node_id": "tokenization",
+    "relation": "HAS_COMPONENT",
+    "query": "Interview follow-up from LLM to Tokenization: 大语言模型, 分词, 在海量文本上预训练的超大规模语言模型，如GPT/Qwen/LLaMA系列",
+    "expected_node_ids": [
+      "llm",
+      "tokenization",
+      "bpe"
+    ]
+  },
+  {
+    "id": "kg_021_has_component_llm_to_kv_cache",
+    "language": "mixed",
+    "source_node_id": "llm",
+    "target_node_id": "kv_cache",
+    "relation": "HAS_COMPONENT",
+    "query": "LLM 面试追问到 KV Cache: explain 大语言模型, 键值缓存, 缓存历史token的K/V矩阵避免重复计算，推理加速的核心机制",
+    "expected_node_ids": [
+      "llm",
+      "kv_cache",
+      "pitfall_kv_cache_memory",
+      "paged_attention"
+    ]
+  },
+  {
+    "id": "kg_022_requires_llm_to_transformer",
+    "language": "zh",
+    "source_node_id": "llm",
+    "target_node_id": "transformer",
+    "relation": "REQUIRES",
+    "query": "请围绕LLM继续追问Transformer，关注大语言模型、transformer模型以及基于自注意力的序列建模架构，彻底取代RNN，成为现代LLM的基础",
+    "expected_node_ids": [
+      "llm",
+      "transformer",
+      "attention",
+      "positional_encoding"
+    ]
+  },
+  {
+    "id": "kg_023_leads_to_llm_to_pretraining",
+    "language": "en",
+    "source_node_id": "llm",
+    "target_node_id": "pretraining",
+    "relation": "LEADS_TO",
+    "query": "Interview follow-up from LLM to 预训练 (Pre-training): 大语言模型, 预训练, 在海量文本上预训练的超大规模语言模型，如GPT/Qwen/LLaMA系列",
+    "expected_node_ids": [
+      "llm",
+      "pretraining",
+      "sft"
+    ]
+  },
+  {
+    "id": "kg_024_leads_to_pretraining_to_sft",
+    "language": "mixed",
+    "source_node_id": "pretraining",
+    "target_node_id": "sft",
+    "relation": "LEADS_TO",
+    "query": "预训练 (Pre-training) 面试追问到 SFT (指令微调): explain 预训练, 有监督微调, 用高质量指令-回复对进行监督训练，让模型学会遵循用户指令",
+    "expected_node_ids": [
+      "pretraining",
+      "sft",
+      "rlhf",
+      "llm"
+    ]
+  },
+  {
+    "id": "kg_025_leads_to_sft_to_rlhf",
+    "language": "zh",
+    "source_node_id": "sft",
+    "target_node_id": "rlhf",
+    "relation": "LEADS_TO",
+    "query": "请围绕SFT (指令微调)继续追问RLHF，关注有监督微调、人类反馈强化学习以及通过人类偏好数据训练奖励模型，再用PPO优化LLM对齐人类价值观",
+    "expected_node_ids": [
+      "sft",
+      "rlhf",
+      "reward_model",
+      "dpo",
+      "llm"
+    ]
+  },
+  {
+    "id": "kg_026_has_component_rlhf_to_reward_model",
+    "language": "en",
+    "source_node_id": "rlhf",
+    "target_node_id": "reward_model",
+    "relation": "HAS_COMPONENT",
+    "query": "Interview follow-up from RLHF to Reward Model: 人类反馈强化学习, 奖励模型, 通过人类偏好数据训练奖励模型，再用PPO优化LLM对齐人类价值观",
+    "expected_node_ids": [
+      "rlhf",
+      "reward_model",
+      "pitfall_reward_hacking",
+      "llm"
+    ]
+  },
+  {
+    "id": "kg_027_leads_to_reward_model_to_pitfall_reward_hacking",
+    "language": "mixed",
+    "source_node_id": "reward_model",
+    "target_node_id": "pitfall_reward_hacking",
+    "relation": "LEADS_TO",
+    "query": "Reward Model 面试追问到 奖励黑客 (Reward Hacking): explain 奖励模型, 奖励黑客 (Reward Hacking), 模型找到奖励模型的漏洞获得高分但实际输出无意义，RLHF的核心风险",
+    "expected_node_ids": [
+      "reward_model",
+      "pitfall_reward_hacking",
+      "rlhf"
+    ]
+  },
+  {
+    "id": "kg_028_has_component_tokenization_to_bpe",
+    "language": "zh",
+    "source_node_id": "tokenization",
+    "target_node_id": "bpe",
+    "relation": "HAS_COMPONENT",
+    "query": "请围绕Tokenization继续追问BPE (字节对编码)，关注分词、byte pair encoding以及GPT系列采用的分词算法，迭代合并高频字符对，平衡词表大小与覆盖率",
+    "expected_node_ids": [
+      "tokenization",
+      "bpe",
+      "nlp"
+    ]
+  },
+  {
+    "id": "kg_029_leads_to_tokenization_to_bpe",
+    "language": "en",
+    "source_node_id": "tokenization",
+    "target_node_id": "bpe",
+    "relation": "LEADS_TO",
+    "query": "Interview follow-up from Tokenization to BPE (字节对编码): 分词, byte pair encoding, 将原始文本切割为模型可处理的token单元，直接影响语言理解边界",
+    "expected_node_ids": [
+      "tokenization",
+      "bpe",
+      "nlp"
+    ]
+  },
+  {
+    "id": "kg_030_leads_to_embedding_to_word2vec",
+    "language": "mixed",
+    "source_node_id": "embedding",
+    "target_node_id": "word2vec",
+    "relation": "LEADS_TO",
+    "query": "Embedding 面试追问到 Word2Vec: explain 词向量, 词嵌入, 早期静态词向量，通过预测上下文学习语义，不能处理一词多义",
+    "expected_node_ids": [
+      "embedding",
+      "word2vec",
+      "sentence_transformer",
+      "nlp"
+    ]
+  },
+  {
+    "id": "kg_031_leads_to_word2vec_to_sentence_transformer",
+    "language": "zh",
+    "source_node_id": "word2vec",
+    "target_node_id": "sentence_transformer",
+    "relation": "LEADS_TO",
+    "query": "请围绕Word2Vec继续追问Sentence Transformer，关注词嵌入、句向量以及基于BERT的句级别向量模型，通过对比学习优化语义相似度",
+    "expected_node_ids": [
+      "word2vec",
+      "sentence_transformer",
+      "contrastive_learning",
+      "pitfall_embedding_collapse",
+      "embedding"
+    ]
+  },
+  {
+    "id": "kg_032_requires_sentence_transformer_to_contrastive_learning",
+    "language": "en",
+    "source_node_id": "sentence_transformer",
+    "target_node_id": "contrastive_learning",
+    "relation": "REQUIRES",
+    "query": "Interview follow-up from Sentence Transformer to 对比学习: 句向量, contrastive learning, 基于BERT的句级别向量模型，通过对比学习优化语义相似度",
+    "expected_node_ids": [
+      "sentence_transformer",
+      "contrastive_learning",
+      "word2vec"
+    ]
+  },
+  {
+    "id": "kg_033_leads_to_sentence_transformer_to_pitfall_embedding_collapse",
+    "language": "mixed",
+    "source_node_id": "sentence_transformer",
+    "target_node_id": "pitfall_embedding_collapse",
+    "relation": "LEADS_TO",
+    "query": "Sentence Transformer 面试追问到 Embedding空间坍缩: explain 句向量, Embedding空间坍缩, 训练不充分时所有向量聚集在小区域，余弦相似度失去区分能力",
+    "expected_node_ids": [
+      "sentence_transformer",
+      "pitfall_embedding_collapse",
+      "word2vec"
+    ]
+  },
+  {
+    "id": "kg_034_related_to_embedding_to_rag",
+    "language": "zh",
+    "source_node_id": "embedding",
+    "target_node_id": "rag",
+    "relation": "RELATED_TO",
+    "query": "请围绕Embedding继续追问RAG，关注词向量、检索增强生成以及通过外部知识检索增强LLM生成，减少幻觉，支持知识更新",
+    "expected_node_ids": [
+      "embedding",
+      "rag",
+      "vector_retrieval",
+      "chunking",
+      "nlp"
+    ]
+  },
+  {
+    "id": "kg_035_related_to_embedding_to_hnsw",
+    "language": "en",
+    "source_node_id": "embedding",
+    "target_node_id": "hnsw",
+    "relation": "RELATED_TO",
+    "query": "Interview follow-up from Embedding to HNSW: 词向量, 分层可导航小世界, 将文本映射到稠密向量空间，是语义检索和RAG的基础",
+    "expected_node_ids": [
+      "embedding",
+      "hnsw",
+      "vector_retrieval",
+      "nlp"
+    ]
+  },
+  {
+    "id": "kg_036_has_component_rag_to_vector_retrieval",
+    "language": "mixed",
+    "source_node_id": "rag",
+    "target_node_id": "vector_retrieval",
+    "relation": "HAS_COMPONENT",
+    "query": "RAG 面试追问到 向量检索: explain 检索增强生成, dense retrieval, 将文本embedding化后用近似最近邻(ANN)算法召回语义相似文档",
+    "expected_node_ids": [
+      "rag",
+      "vector_retrieval",
+      "hnsw",
+      "hybrid_search",
+      "embedding"
+    ]
+  },
+  {
+    "id": "kg_037_has_component_rag_to_chunking",
+    "language": "zh",
+    "source_node_id": "rag",
+    "target_node_id": "chunking",
+    "relation": "HAS_COMPONENT",
+    "query": "请围绕RAG继续追问Chunking策略，关注检索增强生成、文本切块以及文档切割粒度直接影响检索精度：过大上下文冗余，过小语义不完整",
+    "expected_node_ids": [
+      "rag",
+      "chunking",
+      "pitfall_lost_in_middle",
+      "embedding"
+    ]
+  },
+  {
+    "id": "kg_038_has_component_rag_to_reranking",
+    "language": "en",
+    "source_node_id": "rag",
+    "target_node_id": "reranking",
+    "relation": "HAS_COMPONENT",
+    "query": "Interview follow-up from RAG to Reranking (重排序): 检索增强生成, 重排, 通过外部知识检索增强LLM生成，减少幻觉，支持知识更新",
+    "expected_node_ids": [
+      "rag",
+      "reranking",
+      "chunking",
+      "embedding"
+    ]
+  },
+  {
+    "id": "kg_039_related_to_rag_to_pitfall_hallucination",
+    "language": "mixed",
+    "source_node_id": "rag",
+    "target_node_id": "pitfall_hallucination",
+    "relation": "RELATED_TO",
+    "query": "RAG 面试追问到 LLM幻觉 (Hallucination): explain 检索增强生成, LLM幻觉 (Hallucination), LLM自信地生成与事实不符的内容，根源是统计语言模型缺乏事实锚定",
+    "expected_node_ids": [
+      "rag",
+      "pitfall_hallucination",
+      "embedding"
+    ]
+  },
+  {
+    "id": "kg_040_leads_to_rag_to_vector_retrieval",
+    "language": "zh",
+    "source_node_id": "rag",
+    "target_node_id": "vector_retrieval",
+    "relation": "LEADS_TO",
+    "query": "请围绕RAG继续追问向量检索，关注检索增强生成、dense retrieval以及将文本embedding化后用近似最近邻(ANN)算法召回语义相似文档",
+    "expected_node_ids": [
+      "rag",
+      "vector_retrieval",
+      "hnsw",
+      "hybrid_search",
+      "embedding"
+    ]
+  },
+  {
+    "id": "kg_041_has_component_vector_retrieval_to_hnsw",
+    "language": "en",
+    "source_node_id": "vector_retrieval",
+    "target_node_id": "hnsw",
+    "relation": "HAS_COMPONENT",
+    "query": "Interview follow-up from 向量检索 to HNSW: dense retrieval, 分层可导航小世界, 将文本embedding化后用近似最近邻(ANN)算法召回语义相似文档",
+    "expected_node_ids": [
+      "vector_retrieval",
+      "hnsw",
+      "rag"
+    ]
+  },
+  {
+    "id": "kg_042_leads_to_vector_retrieval_to_hybrid_search",
+    "language": "mixed",
+    "source_node_id": "vector_retrieval",
+    "target_node_id": "hybrid_search",
+    "relation": "LEADS_TO",
+    "query": "向量检索 面试追问到 混合检索 (Hybrid Search): explain dense retrieval, hybrid retrieval, 结合BM25关键词检索和向量语义检索，互补提升召回率",
+    "expected_node_ids": [
+      "vector_retrieval",
+      "hybrid_search",
+      "reranking",
+      "rag"
+    ]
+  },
+  {
+    "id": "kg_043_leads_to_hybrid_search_to_reranking",
+    "language": "zh",
+    "source_node_id": "hybrid_search",
+    "target_node_id": "reranking",
+    "relation": "LEADS_TO",
+    "query": "请围绕混合检索 (Hybrid Search)继续追问Reranking (重排序)，关注hybrid retrieval、重排以及用精度更高的Cross-Encoder对初步召回结果重新打分排序，精排阶段",
+    "expected_node_ids": [
+      "hybrid_search",
+      "reranking",
+      "chunking",
+      "vector_retrieval"
+    ]
+  },
+  {
+    "id": "kg_044_leads_to_reranking_to_chunking",
+    "language": "en",
+    "source_node_id": "reranking",
+    "target_node_id": "chunking",
+    "relation": "LEADS_TO",
+    "query": "Interview follow-up from Reranking (重排序) to Chunking策略: 重排, 文本切块, 用精度更高的Cross-Encoder对初步召回结果重新打分排序，精排阶段",
+    "expected_node_ids": [
+      "reranking",
+      "chunking",
+      "pitfall_lost_in_middle",
+      "rag"
+    ]
+  },
+  {
+    "id": "kg_045_leads_to_chunking_to_pitfall_lost_in_middle",
+    "language": "mixed",
+    "source_node_id": "chunking",
+    "target_node_id": "pitfall_lost_in_middle",
+    "relation": "LEADS_TO",
+    "query": "Chunking策略 面试追问到 Lost-in-the-Middle: explain 文本切块, Lost-in-the-Middle, LLM对长上下文中间段落的关注度显著低于首尾，影响RAG准确率",
+    "expected_node_ids": [
+      "chunking",
+      "pitfall_lost_in_middle",
+      "rag"
+    ]
+  },
+  {
+    "id": "kg_046_related_to_hnsw_to_vector_retrieval",
+    "language": "zh",
+    "source_node_id": "hnsw",
+    "target_node_id": "vector_retrieval",
+    "relation": "RELATED_TO",
+    "query": "请围绕HNSW继续追问向量检索，关注分层可导航小世界、dense retrieval以及将文本embedding化后用近似最近邻(ANN)算法召回语义相似文档",
+    "expected_node_ids": [
+      "hnsw",
+      "vector_retrieval",
+      "hybrid_search",
+      "embedding"
+    ]
+  },
+  {
+    "id": "kg_047_has_component_fine_tuning_to_sft",
+    "language": "en",
+    "source_node_id": "fine_tuning",
+    "target_node_id": "sft",
+    "relation": "HAS_COMPONENT",
+    "query": "Interview follow-up from Fine-tuning to SFT (指令微调): 微调, 有监督微调, 在预训练模型基础上用特定数据进一步训练，使模型适配下游任务",
+    "expected_node_ids": [
+      "fine_tuning",
+      "sft",
+      "rlhf",
+      "llm"
+    ]
+  },
+  {
+    "id": "kg_048_has_component_fine_tuning_to_lora",
+    "language": "mixed",
+    "source_node_id": "fine_tuning",
+    "target_node_id": "lora",
+    "relation": "HAS_COMPONENT",
+    "query": "Fine-tuning 面试追问到 LoRA: explain 微调, 低秩适应, 冻结原始权重，只训练低秩分解的增量矩阵ΔW=AB，大幅降低显存",
+    "expected_node_ids": [
+      "fine_tuning",
+      "lora",
+      "qlora",
+      "llm"
+    ]
+  }
+]

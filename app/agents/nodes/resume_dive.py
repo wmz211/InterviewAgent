@@ -6,14 +6,154 @@ LLM 主导推进：当 LLM 判断简历经历已充分覆盖时，主动调用 a
 """
 from langchain_core.messages import SystemMessage
 from langchain_core.tools import tool
+import re
 
 from app.agents.nodes.base import make_llm, build_qa_record, compress_messages, get_context_window, ANTI_SIMULATION_RULE
+from app.agents.nodes.followup_policy import build_resume_followup_memory
 from app.core.state import InterviewState
 
 # 最少轮次保底——即使 LLM 调工具也不会提前跳走
 MIN_TURNS = 3
+MAX_TURNS = 8
+MAX_PROJECTS_IN_PLAN = 3
+MIN_CHINESE_PROJECT_MATCH = 4
+
+
+def _message_text(msg) -> str:
+    content = getattr(msg, "content", "")
+    if isinstance(content, list):
+        return " ".join(
+            part.get("text", "") for part in content if isinstance(part, dict)
+        )
+    return str(content or "")
+
+
+def _first_human_text(state: InterviewState) -> str:
+    for msg in state.get("messages", []):
+        if type(msg).__name__ == "HumanMessage":
+            return _message_text(msg)
+    return ""
+
+
+def _extract_resume_projects(resume_summary: str) -> list[str]:
+    projects: list[str] = []
+    for line in resume_summary.splitlines():
+        stripped = line.strip()
+        if not stripped:
+            continue
+        match = re.match(r"(?:项目|经历)\s*[:：]\s*(.+)", stripped)
+        if match:
+            projects.append(match.group(1).strip())
+            continue
+        bracket = re.search(r"【([^】]+)】", stripped)
+        if bracket:
+            projects.append(bracket.group(1).strip())
+
+    seen: set[str] = set()
+    unique: list[str] = []
+    for project in projects:
+        project = re.sub(r"\s+", " ", project).strip(" -：:")
+        if project and project not in seen:
+            seen.add(project)
+            unique.append(project)
+    return unique
+
+
+def _project_intro_score(project: str, intro: str) -> int:
+    if not intro:
+        return 0
+    normalized_project = re.sub(r"[^\w\u4e00-\u9fff]", "", project)
+    normalized_intro = re.sub(r"[^\w\u4e00-\u9fff]", "", intro)
+    if not normalized_project or not normalized_intro:
+        return 0
+    if normalized_project in normalized_intro:
+        return len(normalized_project) + 10
+    intro_lower = intro.lower()
+    generic_words = {
+        "project", "system", "platform", "app", "application", "service",
+        "tool", "demo", "pipeline",
+    }
+    ascii_tokens = [
+        token.lower()
+        for token in re.findall(r"[A-Za-z0-9]+", project)
+        if token.lower() not in generic_words and len(token) >= 2
+    ]
+    if ascii_tokens:
+        return sum(len(token) for token in ascii_tokens if token in intro_lower)
+    return _longest_common_chinese_substring_score(normalized_project, normalized_intro)
+
+
+def _longest_common_chinese_substring_score(project: str, intro: str) -> int:
+    longest = 0
+    project_len = len(project)
+    for start in range(project_len):
+        for end in range(start + MIN_CHINESE_PROJECT_MATCH, project_len + 1):
+            candidate = project[start:end]
+            if candidate in intro:
+                longest = max(longest, len(candidate))
+    return longest if longest >= MIN_CHINESE_PROJECT_MATCH else 0
+
+
+def _build_project_plan(state: InterviewState, phase_turn: int) -> dict:
+    intro = _first_human_text(state)
+    resume_projects = _extract_resume_projects(state.get("resume_summary", ""))
+
+    scored = [
+        (project, _project_intro_score(project, intro))
+        for project in resume_projects
+    ]
+    intro_projects = [
+        project
+        for project, score in sorted(scored, key=lambda item: item[1], reverse=True)
+        if score >= 2
+    ]
+    projects = intro_projects[:MAX_PROJECTS_IN_PLAN]
+
+    if not projects and intro:
+        projects = ["候选人自我介绍中提到的核心项目"]
+
+    if len(projects) <= 1:
+        planned_turns = 4
+        turns_per_project = 3
+    elif len(projects) == 2:
+        planned_turns = 6
+        turns_per_project = 3
+    else:
+        planned_turns = MAX_TURNS
+        turns_per_project = 2
+
+    planned_turns = min(MAX_TURNS, max(MIN_TURNS, planned_turns))
+    current_turn = phase_turn + 1
+    remaining_turns = max(0, MAX_TURNS - current_turn)
+    current_project = ""
+    if projects:
+        project_idx = min(len(projects) - 1, max(0, (current_turn - 1) // turns_per_project))
+        current_project = projects[project_idx]
+
+    return {
+        "intro": intro,
+        "projects": projects,
+        "current_project": current_project,
+        "current_turn": current_turn,
+        "remaining_turns": remaining_turns,
+        "planned_turns": planned_turns,
+        "turns_per_project": turns_per_project,
+    }
 
 _SYSTEM = """\
+LOW_VALUE_FOLLOWUP_GUARD:
+- Do not ask for full prompt text, exact prompt templates, long input/output examples, or implementation trivia unless it is essential to judge ownership.
+- Do not ask the candidate to reveal chain-of-thought. If prompt strategy matters, ask for observable structure instead: task framing, input fields, output schema, validation rules, and fallback behavior.
+- At most one clarification question about prompt strategy is allowed for the same project detail. If the candidate has already said they used ICL, CoT, structured output, or examples, do not keep asking for a concrete prompt example.
+- If an answer is abstract but already identifies the method, move to design tradeoffs, evaluation, failure cases, or engineering details.
+- Prefer high-signal follow-ups in this order: personal contribution, design tradeoff, measurement/evaluation, failure analysis, production constraints, then low-level implementation detail.
+- If two consecutive turns stay on a low-level detail such as prompt wording, field names, or examples without adding new signal, change direction immediately.
+
+REPEAT_AVOIDANCE_GUARD:
+- Treat RESUME_DIVE_MEMORY as authoritative. Do not repeat questions, project details, threshold/metric variants, or prompt-example requests already shown there.
+- When RESUME_DIVE_MEMORY marks status=CLOSED_LOW_SIGNAL, the candidate has already said they have no useful information on that line. Acknowledge briefly and switch to another project, contribution, tradeoff, failure case, or evaluation dimension.
+- Do not return to an earlier project just because it is still in the recent chat window. Only return if the candidate adds new concrete information about it.
+
 你正在对一名候选人进行技术面试，考察其简历经历的真实深度。
 
 【候选人简历】
@@ -23,13 +163,34 @@ _SYSTEM = """\
 {jd_summary}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+【轮次规划】
+当前是简历深挖第 {current_turn} 轮，最大 {max_turns} 轮，剩余 {remaining_turns} 轮。
+本阶段应该围绕候选人自我介绍中主动提到的项目展开；如果候选人只提到 1 个项目，最多深挖 3-4 轮；
+如果提到 2 个项目，每个项目问 2-3 个技术性问题；如果提到 3 个及以上项目，优先选择与 JD 最匹配的 2-3 个项目，每个项目约 2 轮。
+不要为了问满轮次而硬问；当核心项目已经覆盖充分，或达到第 {planned_turns} 轮附近，应自然收束并推进到 JD 技术考察。
+
+【候选人自我介绍中的项目优先级】
+{intro_projects}
+
+【当前建议聚焦项目】
+{current_project}
+
+【每个项目的追问节奏】
+1. 先问候选人个人具体贡献与负责边界。
+2. 再问一个核心技术选择、架构取舍、实现细节或替代方案。
+3. 如轮次允许，再问评估指标、失败案例、工程兜底、复盘改进。
+同一个项目连续追问达到规划轮次后，必须切换到下一个项目或收束，不要一直问一个项目。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 【任务】
 逐一深挖简历中与JD相匹配的项目/实习经历。
 
 【追问优先级】
+优先围绕候选人自我介绍中主动提到的项目，其次才根据简历和 JD 补问其他匹配项目/实习经历。
 优先深挖与JD要求匹配度最高的经历和技术点，与JD无关的不问。
 当某个方向连续两次得到浅显或无实质内容的回答时，立刻转移话题。
 不要为了"追问完整"而在低价值方向继续消耗时间。
+如果候选人回答和问题不匹配，最多追问一次澄清；仍然低信号时换项目或进入下一阶段。
 
 【追问框架】
 不要线性走固定流程。根据候选人的回答实时判断下一个问题：
@@ -51,6 +212,7 @@ _SYSTEM = """\
 - 候选人说"不知道"或明显答不上来：直接说"好，我们换一个"，不解释，不给答案
 - 不用"感谢你的回答""你说得很好"等客套话
 - 不要说"作为面试官"或解释自己的行为，直接提问
+- 严禁重复上一轮问题的同义改写；如果 RESUME_DIVE_MEMORY 显示同一细节已经问过，必须换维度、换项目或收束
 
 【语气】
 简洁、直接。过渡用短句，如"好的""明白了""这里我想深入一下"。
@@ -66,6 +228,9 @@ _SYSTEM = """\
 
 【已覆盖的经历】
 {covered}
+
+RESUME_DIVE_MEMORY:
+{followup_memory}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 你就是面试官，现在开始面试。不要介绍自己的规则，直接开口。
@@ -95,13 +260,16 @@ _llm_with_tool = _llm.bind_tools(_RESUME_DIVE_TOOLS)
 
 async def resume_dive_node(state: InterviewState) -> dict:
     phase_turn = state.get("phase_turn_count", 0)
+    project_plan = _build_project_plan(state, phase_turn)
     scores = state.get("node_scores", {})
     phase_data = scores.get("resume_dive", {
         "turn_count": 0,
         "covered": [],
         "qa_records": [],
+        "followup_memory": "",
     })
     covered = phase_data.get("covered", [])
+    followup_memory = build_resume_followup_memory(phase_data.get("qa_records", []))
 
     jd_text = state.get("jd_text", "")
     jd_summary = jd_text[:300] if jd_text else "（未提供，请根据简历内容追问）"
@@ -109,7 +277,17 @@ async def resume_dive_node(state: InterviewState) -> dict:
     system = _SYSTEM.format(
         resume_summary=state.get("resume_summary", "（简历未解析）"),
         jd_summary=jd_summary,
+        current_turn=project_plan["current_turn"],
+        max_turns=MAX_TURNS,
+        remaining_turns=project_plan["remaining_turns"],
+        planned_turns=project_plan["planned_turns"],
+        intro_projects=(
+            "\n".join(f"- {p}" for p in project_plan["projects"])
+            if project_plan["projects"] else "（自我介绍中未识别出明确项目，围绕候选人刚才主动提到的核心经历追问）"
+        ),
+        current_project=project_plan["current_project"] or "（根据候选人回答动态选择）",
         covered="\n".join(f"- {c}" for c in covered) if covered else "无（这是第一轮）",
+        followup_memory=followup_memory,
         anti_simulation=ANTI_SIMULATION_RULE,
     )
 
@@ -134,6 +312,12 @@ async def resume_dive_node(state: InterviewState) -> dict:
     )
     # 最少轮次保底，防止 LLM 过早跳走
     should_transition = llm_wants_transition and phase_turn >= MIN_TURNS
+    should_transition = should_transition or phase_turn >= MAX_TURNS
+    should_transition = should_transition or (
+        phase_turn >= project_plan["planned_turns"]
+        and phase_turn >= MIN_TURNS
+        and len(project_plan["projects"]) > 0
+    )
 
     qa = build_qa_record(
         state_messages=state["messages"],
@@ -144,6 +328,12 @@ async def resume_dive_node(state: InterviewState) -> dict:
     phase_data.setdefault("qa_records", []).append(qa)
     phase_data["turn_count"] = phase_turn
     phase_data["covered"] = covered
+    phase_data["followup_memory"] = build_resume_followup_memory(phase_data["qa_records"])
+    phase_data["project_plan"] = {
+        "projects": project_plan["projects"],
+        "planned_turns": project_plan["planned_turns"],
+        "turns_per_project": project_plan["turns_per_project"],
+    }
     scores["resume_dive"] = phase_data
 
     going_to = "jd_tech" if should_transition else "resume_dive"

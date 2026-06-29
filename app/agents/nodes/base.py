@@ -207,28 +207,36 @@ MAX_TOOL_ITERATIONS = 8
 CONTEXT_WINDOW_SIZE = 10  # recent messages passed to LLM per turn
 
 
+def _inject_context_summary(system: str, context_summary: str, *, new_phase: bool) -> str:
+    if not context_summary:
+        return system
+    if new_phase:
+        return system + (
+            "\n\n【跨阶段背景】以下摘要仅作为背景和去重依据，"
+            "不得延续上一阶段的项目深挖或追问链；进入当前阶段后必须严格按照当前阶段任务提问："
+            f"「{context_summary}」"
+        )
+    return system + (
+        f"\n\n注意：以下是你之前面试阶段的私有备忘，只作为你提问时的参考背景，"
+        f"绝对不能出现在你说的任何一句话里：「{context_summary}」"
+    )
+
+
 def get_context_window(state: InterviewState, system: str, is_new_phase: bool = False) -> list:
     """
     Build the message list to pass to LLM.
     - Injects context_summary at the TOP of system prompt as internal memory
     - Only sends the most recent CONTEXT_WINDOW_SIZE messages, not full history
-    - is_new_phase=True appends a phase-boundary reminder to prevent LLM from
-      continuing the previous phase's topic when context window spans phases
+    - is_new_phase=True includes only the new phase system prompt plus a
+      constrained summary, never previous raw messages.
     """
-    messages = state.get("messages", [])
     context_summary = state.get("context_summary", "")
+    if is_new_phase:
+        system = _inject_context_summary(system, context_summary, new_phase=True)
+        return [SystemMessage(content=system)]
 
-    if context_summary:
-        system = system + (
-            f"\n\n注意：以下是你之前面试阶段的私有备忘，只作为你提问时的参考背景，"
-            f"绝对不能出现在你说的任何一句话里：「{context_summary}」"
-        )
-
-    if is_new_phase and messages:
-        system += (
-            "\n\n【重要】这是本阶段第一轮。下方对话历史属于上一阶段，"
-            "不要延续其中的话题，严格按照当前阶段任务重新开始。"
-        )
+    messages = state.get("messages", [])
+    system = _inject_context_summary(system, context_summary, new_phase=False)
 
     recent = messages[-CONTEXT_WINDOW_SIZE:] if len(messages) > CONTEXT_WINDOW_SIZE else messages
     return [SystemMessage(content=system)] + recent
@@ -291,5 +299,3 @@ async def llm_tool_loop(llm, messages: list, tools: list) -> tuple[list, object]
         iterations += 1
 
     return new_messages, response
-
-

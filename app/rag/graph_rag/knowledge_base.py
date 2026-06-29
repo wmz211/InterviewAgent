@@ -17,6 +17,7 @@ import json
 import re
 from functools import lru_cache
 from pathlib import Path
+from threading import Lock
 
 from loguru import logger
 
@@ -29,29 +30,38 @@ from app.rag.graph_rag.schema import KGNode
 
 _gliner_model = None   # GLiNER | "unavailable"
 _embed_model  = None   # SentenceTransformer | "unavailable"
+_gliner_lock = Lock()
+_embed_lock = Lock()
+_hf_model_load_lock = Lock()
 
 def _get_gliner():
     global _gliner_model
     if _gliner_model is None:
-        try:
-            from gliner import GLiNER
-            _gliner_model = GLiNER.from_pretrained("knowledgator/gliner-x-base")
-            logger.info("GLiNER loaded: knowledgator/gliner-x-base")
-        except Exception as e:
-            logger.warning(f"GLiNER unavailable ({e}); will use regex fallback")
-            _gliner_model = "unavailable"
+        with _gliner_lock:
+            if _gliner_model is None:
+                try:
+                    with _hf_model_load_lock:
+                        from gliner import GLiNER
+                        _gliner_model = GLiNER.from_pretrained("knowledgator/gliner-x-base")
+                    logger.info("GLiNER loaded: knowledgator/gliner-x-base")
+                except Exception as e:
+                    logger.warning(f"GLiNER unavailable ({e}); will use regex fallback")
+                    _gliner_model = "unavailable"
     return None if _gliner_model == "unavailable" else _gliner_model
 
 def _get_embed_model():
     global _embed_model
     if _embed_model is None:
-        try:
-            from sentence_transformers import SentenceTransformer
-            _embed_model = SentenceTransformer("BAAI/bge-m3")
-            logger.info("SentenceTransformer loaded: BAAI/bge-m3")
-        except Exception as e:
-            logger.warning(f"SentenceTransformer unavailable ({e}); vector search disabled")
-            _embed_model = "unavailable"
+        with _embed_lock:
+            if _embed_model is None:
+                try:
+                    with _hf_model_load_lock:
+                        from sentence_transformers import SentenceTransformer
+                        _embed_model = SentenceTransformer("BAAI/bge-m3")
+                    logger.info("SentenceTransformer loaded: BAAI/bge-m3")
+                except Exception as e:
+                    logger.warning(f"SentenceTransformer unavailable ({e}); vector search disabled")
+                    _embed_model = "unavailable"
     return None if _embed_model == "unavailable" else _embed_model
 
 

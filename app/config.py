@@ -38,6 +38,8 @@ class Settings(BaseSettings):
     chroma_collection_questions: str = "interview_questions"
     chroma_collection_algorithms: str = "algorithm_problems"
     chroma_collection_hr: str = "hr_questions"
+    chroma_collection_graph_nodes: str = "tech_graph_nodes"
+    local_embedding_model_name: str = "BAAI/bge-m3"
 
     # --- Neo4j / Graph ---
     neo4j_uri: str = "bolt://localhost:7687"
@@ -51,6 +53,17 @@ class Settings(BaseSettings):
     app_host: str = "0.0.0.0"
     app_port: int = 8000
     log_level: str = "DEBUG"
+    cors_allowed_origins: str = ""
+    preload_gliner_on_startup: bool = True
+    preload_knowledge_graph_on_startup: bool = True
+
+    # --- Auth ---
+    secret_key: str = "change-me-in-production"  # override via SECRET_KEY env var
+    admin_emails: str = "admin@example.com"
+
+    # --- Redis ---
+    redis_url: str = ""   # e.g. redis://localhost:6379/0 — empty = use in-memory store
+    session_ttl_seconds: int = 7200  # 2 hours，面试超时自动清理
 
     # --- Session ---
     session_timeout_seconds: int = 3600

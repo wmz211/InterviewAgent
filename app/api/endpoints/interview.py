@@ -22,14 +22,23 @@ import os
 from pathlib import Path
 from datetime import datetime
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from loguru import logger
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.auth.deps import get_current_user
+from app.db.database import get_db
+from app.db.interview_messages import replace_interview_messages
+from app.db.interview_sessions import update_interview_session_from_state
+from app.db.models import User
+from app.agents.nodes.jd_tech import prepare_jd_tech_phase_data
 from app.audio.tts import tts_bytes
 from app.core.interview_graph import get_interview_graph
 from app.core.session_store import get_session_store
+from app.core.session_security import session_belongs_to_user
+from app.core.practice import is_valid_phase_for_mode
 from app.audio.handler import _extract_last_ai_text
 from langchain_core.messages import HumanMessage
 
@@ -64,24 +73,46 @@ class TurnResponse(BaseModel):
     tts_audio_b64: str = ""
 
 
+async def _get_owned_state(session_id: str, current_user: User) -> dict:
+    store = get_session_store()
+    state = await store.get(session_id)
+    if state is None or not session_belongs_to_user(state, current_user.id):
+        raise HTTPException(status_code=404, detail="Session not found")
+    return dict(state)
+
+
 # ── Endpoints ──────────────────────────────────────────────────────────
 
 @router.post("/start", response_model=StartResponse)
-async def start_interview(body: StartRequest):
+async def start_interview(
+    body: StartRequest,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
     """
     Run the first greeting turn and return the interviewer's opening text.
     The session must already exist (created by POST /upload/).
     """
     store = get_session_store()
-    state = await store.get(body.session_id)
-    if state is None:
-        raise HTTPException(status_code=404, detail="Session not found. Call /upload first.")
+    state = await _get_owned_state(body.session_id, current_user)
+    if state.get("interview_mode", "tech") == "tech":
+        jd_phase = state.get("node_scores", {}).get("jd_tech", {})
+        if not jd_phase.get("chain"):
+            try:
+                state.setdefault("node_scores", {})["jd_tech"] = prepare_jd_tech_phase_data(
+                    state.get("jd_text", ""),
+                    jd_phase,
+                )
+            except Exception as e:
+                logger.warning(f"JD tech prewarm failed on interview start: {e}")
 
     graph = get_interview_graph()
     result = await graph.ainvoke(dict(state))
     state = dict(state)
     state.update(result)
     await store.set(body.session_id, state)
+    await update_interview_session_from_state(db, body.session_id, state, mark_started=True)
+    await replace_interview_messages(db, body.session_id, state)
 
     greeting_text = _extract_last_ai_text(result.get("messages", []))
     tts_b64 = ""
@@ -102,12 +133,9 @@ async def start_interview(body: StartRequest):
 
 
 @router.get("/{session_id}/state")
-async def get_state(session_id: str):
+async def get_state(session_id: str, current_user: User = Depends(get_current_user)):
     """Return a lightweight snapshot of the current interview state."""
-    store = get_session_store()
-    state = await store.get(session_id)
-    if state is None:
-        raise HTTPException(status_code=404, detail="Session not found")
+    state = await _get_owned_state(session_id, current_user)
 
     return {
         "session_id":        session_id,
@@ -118,21 +146,24 @@ async def get_state(session_id: str):
         "candidate_name":    state.get("candidate_name"),
         "node_scores":       state.get("node_scores"),
         "message_count":     len(state.get("messages", [])),
+        "practice_mode":     state.get("practice_mode", False),
+        "selected_phase":    state.get("selected_phase", ""),
     }
 
 
 @router.post("/{session_id}/turn", response_model=TurnResponse)
-async def text_turn(session_id: str, body: TurnRequest):
+async def text_turn(
+    session_id: str,
+    body: TurnRequest,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
     """
     Text-only fallback endpoint (no audio pipeline required).
     Useful for testing and non-audio clients.
     """
     store = get_session_store()
-    state = await store.get(session_id)
-    if state is None:
-        raise HTTPException(status_code=404, detail="Session not found")
-
-    state = dict(state)
+    state = await _get_owned_state(session_id, current_user)
     state["messages"] = list(state.get("messages", [])) + [
         HumanMessage(content=body.user_text)
     ]
@@ -141,6 +172,8 @@ async def text_turn(session_id: str, body: TurnRequest):
     result = await graph.ainvoke(state)
     state.update(result)
     await store.set(session_id, state)
+    await update_interview_session_from_state(db, session_id, state)
+    await replace_interview_messages(db, session_id, state)
 
     ai_text = _extract_last_ai_text(result.get("messages", []))
     tts_b64 = ""
@@ -162,7 +195,12 @@ async def text_turn(session_id: str, body: TurnRequest):
 
 
 @router.post("/{session_id}/turn/stream")
-async def stream_turn(session_id: str, body: TurnRequest):
+async def stream_turn(
+    session_id: str,
+    body: TurnRequest,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
     """
     Streaming version of the text turn endpoint using SSE.
     Tokens are pushed to the client as they are generated by the LLM.
@@ -174,11 +212,7 @@ async def stream_turn(session_id: str, body: TurnRequest):
       data: {"type": "error",  "detail": "..."}
     """
     store = get_session_store()
-    state = await store.get(session_id)
-    if state is None:
-        raise HTTPException(status_code=404, detail="Session not found")
-
-    state = dict(state)
+    state = await _get_owned_state(session_id, current_user)
     state["messages"] = list(state.get("messages", [])) + [
         HumanMessage(content=body.user_text)
     ]
@@ -223,6 +257,8 @@ async def stream_turn(session_id: str, body: TurnRequest):
         # Persist updated state
         state.update(final_out)
         await store.set(session_id, state)
+        await update_interview_session_from_state(db, session_id, state)
+        await replace_interview_messages(db, session_id, state)
         logger.info(f"Stream turn done: session={session_id} node={final_out.get('current_node')}")
 
         yield f"data: {_json.dumps({'type': 'done', 'current_node': final_out.get('current_node', ''), 'phase_turn_count': final_out.get('phase_turn_count', 0), 'should_transition': final_out.get('should_transition', False), 'interview_complete': final_out.get('interview_complete', False)}, ensure_ascii=False)}\n\n"
@@ -234,32 +270,33 @@ async def stream_turn(session_id: str, body: TurnRequest):
     )
 
 
-VALID_PHASES = {"greeting", "resume_dive", "jd_tech", "coding_test", "wrap_up"}
-
-
 @router.post("/{session_id}/set_phase")
-async def set_phase(session_id: str, body: dict):
-    """Force-jump to any interview phase (for debugging / custom flow)."""
+async def set_phase(
+    session_id: str,
+    body: dict,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Let the session owner choose a valid interview phase to practice."""
     store = get_session_store()
-    state = await store.get(session_id)
-    if state is None:
-        raise HTTPException(status_code=404, detail="Session not found")
+    state = await _get_owned_state(session_id, current_user)
 
     phase = body.get("phase", "")
-    if phase not in VALID_PHASES:
+    if not is_valid_phase_for_mode(state.get("interview_mode", "tech"), phase):
         raise HTTPException(status_code=400, detail=f"Invalid phase: {phase}")
 
-    state = dict(state)
     state["current_node"] = phase
+    state["selected_phase"] = phase
     state["phase_turn_count"] = 0
     state["should_transition"] = False
     await store.set(session_id, state)
+    await update_interview_session_from_state(db, session_id, state)
     logger.info(f"Phase jump: session={session_id} → {phase}")
     return {"current_node": phase}
 
 
 @router.get("/{session_id}/report")
-async def get_report(session_id: str):
+async def get_report(session_id: str, current_user: User = Depends(get_current_user)):
     """
     Return the full evaluation report after interview_complete=True.
 
@@ -270,10 +307,7 @@ async def get_report(session_id: str):
       - weak_items: questions the candidate answered poorly, with correct answers and study suggestions
       - strengths, improvement_areas
     """
-    store = get_session_store()
-    state = await store.get(session_id)
-    if state is None:
-        raise HTTPException(status_code=404, detail="Session not found")
+    state = await _get_owned_state(session_id, current_user)
 
     if not state.get("interview_complete"):
         raise HTTPException(status_code=409, detail="Interview not yet complete")
@@ -317,16 +351,15 @@ async def get_report(session_id: str):
         "phase_details":   phase_details,
         "total_messages":  len(state.get("messages", [])),
         "interview_mode":  state.get("interview_mode", "tech"),
+        "practice_mode":   state.get("practice_mode", False),
+        "selected_phase":  state.get("selected_phase", ""),
     }
 
 
 @router.get("/{session_id}/messages")
-async def get_messages(session_id: str):
+async def get_messages(session_id: str, current_user: User = Depends(get_current_user)):
     """Return the full conversation transcript for a completed session."""
-    store = get_session_store()
-    state = await store.get(session_id)
-    if state is None:
-        raise HTTPException(status_code=404, detail="Session not found")
+    state = await _get_owned_state(session_id, current_user)
 
     raw = state.get("messages", [])
     result = []
@@ -349,9 +382,9 @@ async def get_messages(session_id: str):
 
 
 @router.get("/sessions")
-async def list_sessions():
+async def list_sessions(current_user: User = Depends(get_current_user)):
     """
-    返回所有已完成面试的摘要列表，从 ./data/sessions/ 目录读取。
+    返回当前用户已完成面试的摘要列表，从 ./data/sessions/ 目录读取。
     按完成时间倒序排列（最新的在前）。
     """
     sessions_dir = Path("./data/sessions")
@@ -363,6 +396,9 @@ async def list_sessions():
         try:
             with open(p, "r", encoding="utf-8") as f:
                 data = _json.load(f)
+            # 只返回属于当前用户的 session
+            if data.get("user_id") != current_user.id:
+                continue
             evaluation = data.get("node_scores", {}).get("evaluation", {})
             mtime = p.stat().st_mtime
             sessions.append({

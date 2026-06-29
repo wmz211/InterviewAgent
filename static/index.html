@@ -153,6 +153,24 @@ textarea, input { font-family: var(--font); }
 }
 .jd-zone textarea::placeholder { color: var(--t2); }
 
+.reuse-panel {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--b0);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  background: var(--bg0);
+}
+@media (max-width: 580px) { .reuse-panel { grid-template-columns: 1fr; } }
+.reuse-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.reuse-field select {
+  width: 100%; min-width: 0; padding: 9px 10px;
+  border: 1px solid var(--b1); border-radius: 8px;
+  background: var(--bg1); color: var(--t0); font-size: 12.5px; outline: none;
+}
+.reuse-field select:focus { border-color: var(--acc); }
+.reuse-hint { min-height: 16px; font-size: 11.5px; line-height: 1.35; color: var(--t2); overflow-wrap: anywhere; }
+
 .setup-footer {
   padding: 16px 20px;
   border-top: 1px solid var(--b0);
@@ -771,12 +789,60 @@ textarea, input { font-family: var(--font); }
 }
 #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 #toast.err { border-color: rgba(248,113,113,.4); color: var(--err); }
+
+/* Auth */
+#v-auth { display:flex; align-items:center; justify-content:center; background:var(--bg0); }
+#v-auth::before { content:''; position:fixed; inset:0; pointer-events:none; z-index:0; background:radial-gradient(ellipse 70% 50% at 50% 0%, rgba(201,98,20,.06) 0%, transparent 65%); }
+.auth-inner { position:relative; z-index:1; width:100%; max-width:400px; padding:48px 28px; display:flex; flex-direction:column; gap:28px; }
+.auth-logo { text-align:center; }
+.auth-logo h1 { font-family:var(--serif); font-size:38px; font-weight:300; letter-spacing:-.02em; color:var(--t0); line-height:1; }
+.auth-logo h1 em { font-style:italic; color:var(--acc); }
+.auth-logo p { margin-top:8px; color:var(--t1); font-size:13px; font-weight:300; }
+.auth-card { background:var(--bg1); border:1px solid var(--b0); border-radius:16px; padding:28px 24px; display:flex; flex-direction:column; gap:16px; }
+.auth-title { font-size:15px; font-weight:600; color:var(--t0); margin-bottom:4px; }
+.auth-field { display:flex; flex-direction:column; gap:6px; margin-bottom:12px; }
+.auth-field label { font-size:11.5px; font-weight:600; color:var(--t2); letter-spacing:.05em; text-transform:uppercase; }
+.auth-field input { padding:10px 13px; background:var(--bg0); border:1px solid var(--b1); border-radius:8px; outline:none; font-size:13.5px; color:var(--t0); transition:border-color .18s; }
+.auth-field input:focus { border-color:var(--acc); }
+.auth-err { padding:9px 13px; margin-bottom:12px; background:rgba(248,113,113,.08); border:1px solid rgba(248,113,113,.2); border-radius:7px; color:var(--err); font-size:12.5px; }
+.auth-switch { text-align:center; font-size:12.5px; color:var(--t2); margin-top:12px; }
+.auth-switch a { color:var(--acc); cursor:pointer; text-decoration:none; }
+.auth-switch a:hover { text-decoration:underline; }
 </style>
 </head>
 <body>
 
+<!-- ════════════════ AUTH ════════════════ -->
+<div id="v-auth" class="view active">
+  <div class="auth-inner">
+    <div class="auth-logo">
+      <h1>Interview<em>Agent</em></h1>
+      <p>AI 驱动的大厂面试模拟系统</p>
+    </div>
+    <div class="auth-card">
+      <div id="authLogin">
+        <div class="auth-title">登录</div>
+        <div class="auth-field"><label>邮箱</label><input type="email" id="loginEmail" placeholder="your@email.com" autocomplete="email"></div>
+        <div class="auth-field"><label>密码</label><input type="password" id="loginPassword" placeholder="至少 6 位" autocomplete="current-password"></div>
+        <div class="auth-err hidden" id="loginErr"></div>
+        <button class="btn-primary" id="btnLogin" style="width:100%;margin-top:4px">登录</button>
+        <div class="auth-switch">还没有账号？<a onclick="switchAuth('register')">立即注册</a></div>
+      </div>
+      <div id="authRegister" class="hidden">
+        <div class="auth-title">注册</div>
+        <div class="auth-field"><label>邮箱</label><input type="email" id="regEmail" placeholder="your@email.com" autocomplete="email"></div>
+        <div class="auth-field"><label>用户名</label><input type="text" id="regUsername" placeholder="你的名字" autocomplete="username"></div>
+        <div class="auth-field"><label>密码</label><input type="password" id="regPassword" placeholder="至少 6 位" autocomplete="new-password"></div>
+        <div class="auth-err hidden" id="regErr"></div>
+        <button class="btn-primary" id="btnRegister" style="width:100%;margin-top:4px">注册</button>
+        <div class="auth-switch">已有账号？<a onclick="switchAuth('login')">返回登录</a></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ════════════════ SETUP ════════════════ -->
-<div id="v-setup" class="view active">
+<div id="v-setup" class="view">
   <div class="setup-inner">
     <div class="setup-logo">
       <h1>Interview<em>Agent</em></h1>
@@ -802,6 +868,22 @@ textarea, input { font-family: var(--font); }
     </div>
 
     <div class="setup-card">
+      <div class="reuse-panel">
+        <div class="reuse-field">
+          <div class="field-label">历史简历</div>
+          <select id="reuseResumeSelect">
+            <option value="">上传新的简历</option>
+          </select>
+          <div class="reuse-hint" id="reuseResumeHint"></div>
+        </div>
+        <div class="reuse-field">
+          <div class="field-label">历史 JD</div>
+          <select id="reuseJdSelect">
+            <option value="">粘贴新的 JD</option>
+          </select>
+          <div class="reuse-hint" id="reuseJdHint"></div>
+        </div>
+      </div>
       <div class="setup-card-body">
         <!-- Upload -->
         <div class="drop-zone" id="dropZone" style="position:relative">
@@ -825,6 +907,10 @@ textarea, input { font-family: var(--font); }
         <div class="setup-meta" id="setupMeta">请选择简历文件</div>
         <button class="btn-hist" onclick="openHistory()">历史记录</button>
         <button class="btn-primary" id="btnStart" disabled>开始面试</button>
+      </div>
+      <div style="padding:10px 20px 16px;border-top:1px solid var(--b0);display:flex;align-items:center;justify-content:space-between;">
+        <span id="setupUserName" style="font-size:12px;color:var(--t2)"></span>
+        <button onclick="logout()" style="font-size:12px;color:var(--t2);text-decoration:underline;cursor:pointer">退出登录</button>
       </div>
     </div>
 
@@ -976,6 +1062,133 @@ textarea, input { font-family: var(--font); }
 <div id="toast"></div>
 
 <script>
+const TOKEN_KEY = 'ia_token';
+const USER_KEY = 'ia_user';
+
+function getToken() {
+  return localStorage.getItem(TOKEN_KEY) || '';
+}
+
+function getAuthHeaders(json = true) {
+  const headers = {};
+  const token = getToken();
+  if (token) headers.Authorization = 'Bearer ' + token;
+  if (json) headers['Content-Type'] = 'application/json';
+  return headers;
+}
+
+function saveAuth(token, user) {
+  localStorage.setItem(TOKEN_KEY, token);
+  localStorage.setItem(USER_KEY, JSON.stringify(user));
+}
+
+function clearAuth() {
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(USER_KEY);
+}
+
+function getSavedUser() {
+  try { return JSON.parse(localStorage.getItem(USER_KEY) || 'null'); }
+  catch { return null; }
+}
+
+function applyUser(user) {
+  const name = user?.username || user?.email || '';
+  const el = document.getElementById('setupUserName');
+  if (el) el.textContent = name;
+}
+
+function logout() {
+  clearAuth();
+  showView('v-auth');
+}
+
+function switchAuth(mode) {
+  document.getElementById('authLogin').classList.toggle('hidden', mode !== 'login');
+  document.getElementById('authRegister').classList.toggle('hidden', mode !== 'register');
+}
+
+async function fetchMe(token) {
+  const r = await fetch('/api/v1/auth/me', { headers: { Authorization: 'Bearer ' + token } });
+  if (!r.ok) throw new Error('登录已过期，请重新登录');
+  return r.json();
+}
+
+async function enterSetupWithToken(token) {
+  const user = await fetchMe(token);
+  saveAuth(token, user);
+  applyUser(user);
+  showView('v-setup');
+}
+
+document.getElementById('btnLogin').addEventListener('click', async () => {
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const errEl = document.getElementById('loginErr');
+  errEl.classList.add('hidden');
+  if (!email || !password) { errEl.textContent = '请填写邮箱和密码'; errEl.classList.remove('hidden'); return; }
+  const btn = document.getElementById('btnLogin');
+  btn.disabled = true; btn.innerHTML = '<span class="ld"></span>登录中...';
+  try {
+    const r = await fetch('/api/v1/auth/login', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json' },
+      body:JSON.stringify({ email, password }),
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.detail || '登录失败');
+    await enterSetupWithToken(data.access_token);
+  } catch (e) {
+    errEl.textContent = e.message;
+    errEl.classList.remove('hidden');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '登录';
+  }
+});
+
+document.getElementById('btnRegister').addEventListener('click', async () => {
+  const email = document.getElementById('regEmail').value.trim();
+  const username = document.getElementById('regUsername').value.trim();
+  const password = document.getElementById('regPassword').value;
+  const errEl = document.getElementById('regErr');
+  errEl.classList.add('hidden');
+  if (!email || !username || !password) { errEl.textContent = '请填写所有字段'; errEl.classList.remove('hidden'); return; }
+  if (password.length < 6) { errEl.textContent = '密码至少 6 位'; errEl.classList.remove('hidden'); return; }
+  const btn = document.getElementById('btnRegister');
+  btn.disabled = true; btn.innerHTML = '<span class="ld"></span>注册中...';
+  try {
+    const r = await fetch('/api/v1/auth/register', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json' },
+      body:JSON.stringify({ email, username, password }),
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.detail || '注册失败');
+    await enterSetupWithToken(data.access_token);
+  } catch (e) {
+    errEl.textContent = e.message;
+    errEl.classList.remove('hidden');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '注册';
+  }
+});
+
+document.getElementById('loginPassword').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('btnLogin').click();
+});
+document.getElementById('regPassword').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('btnRegister').click();
+});
+
+window.addEventListener('DOMContentLoaded', async () => {
+  const token = getToken();
+  if (!token) return;
+  try { await enterSetupWithToken(token); }
+  catch { clearAuth(); showView('v-auth'); }
+});
+
 /* ══════════════════════════════════════════════════════════════
    Constants & State
 ══════════════════════════════════════════════════════════════ */
@@ -1029,6 +1242,7 @@ function showView(id) {
     v.classList.remove('active');
   });
   document.getElementById(id).classList.add('active');
+  if (id === 'v-setup' && typeof loadReuseOptions === 'function') loadReuseOptions();
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -1050,8 +1264,15 @@ const $file  = document.getElementById('resumeFile');
 const $drop  = document.getElementById('dropZone');
 const $start = document.getElementById('btnStart');
 const $meta  = document.getElementById('setupMeta');
+const $reuseResume = document.getElementById('reuseResumeSelect');
+const $reuseJd = document.getElementById('reuseJdSelect');
+let reuseOptions = { resumes: [], jds: [] };
+let selectedReuseResumeId = '';
+let selectedReuseJdId = '';
 
 $file.addEventListener('change', onFile);
+$reuseResume.addEventListener('change', onReuseResumeChange);
+$reuseJd.addEventListener('change', onReuseJdChange);
 $drop.addEventListener('dragover', e => { e.preventDefault(); $drop.classList.add('over'); });
 $drop.addEventListener('dragleave', () => $drop.classList.remove('over'));
 $drop.addEventListener('drop', e => {
@@ -1062,15 +1283,81 @@ $drop.addEventListener('drop', e => {
 function onFile() {
   const f = $file.files[0];
   if (!f) return;
+  selectedReuseResumeId = '';
+  $reuseResume.value = '';
+  document.getElementById('reuseResumeHint').textContent = '';
   document.getElementById('fileTagName').textContent = f.name;
   document.getElementById('fileTag').classList.remove('hidden');
-  $start.disabled = false;
   $meta.textContent = f.name;
+  updateStartAvailability();
+}
+
+function updateStartAvailability() {
+  const hasResume = Boolean($file.files[0]) || Boolean(selectedReuseResumeId);
+  $start.disabled = !hasResume;
+  if (!hasResume) $meta.textContent = '请选择简历文件';
+}
+
+async function loadReuseOptions() {
+  if (!getToken()) return;
+  try {
+    const r = await fetch('/api/v1/upload/reuse-options', { headers: getAuthHeaders(false) });
+    if (!r.ok) throw new Error('加载历史材料失败');
+    reuseOptions = await r.json();
+    renderReuseOptions();
+  } catch (e) {
+    document.getElementById('reuseResumeHint').textContent = e.message;
+  }
+}
+
+function renderReuseOptions() {
+  const currentResume = selectedReuseResumeId;
+  const currentJd = selectedReuseJdId;
+  $reuseResume.innerHTML = '<option value="">上传新的简历</option>';
+  $reuseJd.innerHTML = '<option value="">粘贴新的 JD</option>';
+  (reuseOptions.resumes || []).forEach(item => {
+    const opt = document.createElement('option');
+    opt.value = item.session_id;
+    opt.textContent = item.candidate_name || item.created_at || item.session_id;
+    $reuseResume.appendChild(opt);
+  });
+  (reuseOptions.jds || []).forEach(item => {
+    const opt = document.createElement('option');
+    opt.value = item.session_id;
+    opt.textContent = item.jd_preview || item.created_at || item.session_id;
+    $reuseJd.appendChild(opt);
+  });
+  $reuseResume.value = currentResume;
+  $reuseJd.value = currentJd;
+  document.getElementById('reuseResumeHint').textContent = (reuseOptions.resumes || []).length ? '' : '暂无历史简历';
+  document.getElementById('reuseJdHint').textContent = (reuseOptions.jds || []).length ? '' : '暂无历史 JD';
+}
+
+function onReuseResumeChange() {
+  selectedReuseResumeId = $reuseResume.value;
+  const item = (reuseOptions.resumes || []).find(x => x.session_id === selectedReuseResumeId);
+  document.getElementById('reuseResumeHint').textContent = item ? (item.candidate_name || '已选择历史简历') : '';
+  if (selectedReuseResumeId) {
+    $file.value = '';
+    document.getElementById('fileTagName').textContent = (item?.candidate_name || '历史简历') + '（历史）';
+    document.getElementById('fileTag').classList.remove('hidden');
+    $meta.textContent = item?.candidate_name ? '已选择历史简历：' + item.candidate_name : '使用历史简历';
+  } else {
+    document.getElementById('fileTag').classList.add('hidden');
+  }
+  updateStartAvailability();
+}
+
+function onReuseJdChange() {
+  selectedReuseJdId = $reuseJd.value;
+  const item = (reuseOptions.jds || []).find(x => x.session_id === selectedReuseJdId);
+  document.getElementById('reuseJdHint').textContent = item ? (item.jd_preview || '') : '';
+  if (item) document.getElementById('jdText').value = item.jd_text || '';
 }
 
 $start.addEventListener('click', async () => {
   const f = $file.files[0];
-  if (!f) return;
+  if (!f && !selectedReuseResumeId) return;
   const err = document.getElementById('setupErr');
   err.classList.add('hidden');
   $start.disabled = true;
@@ -1078,10 +1365,12 @@ $start.addEventListener('click', async () => {
   try {
     $start.innerHTML = '<span class="ld"></span>解析简历...';
     const fd = new FormData();
-    fd.append('resume', f);
+    if (f) fd.append('resume', f);
+    if (selectedReuseResumeId) fd.append('reuse_resume_session_id', selectedReuseResumeId);
+    if (selectedReuseJdId) fd.append('reuse_jd_session_id', selectedReuseJdId);
     fd.append('jd_text', document.getElementById('jdText').value || '通用技术岗位');
     fd.append('interview_mode', S.interviewMode);
-    const up = await fetch('/api/v1/upload/', { method: 'POST', body: fd });
+    const up = await fetch('/api/v1/upload/', { method: 'POST', headers: getAuthHeaders(false), body: fd });
     if (!up.ok) throw new Error((await up.json()).detail || '上传失败');
     const upD = await up.json();
 
@@ -1091,7 +1380,7 @@ $start.addEventListener('click', async () => {
 
     const st = await fetch('/api/v1/interview/start', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       body: JSON.stringify({ session_id: S.sessionId, tts_enabled: false }),
     });
     if (!st.ok) throw new Error((await st.json()).detail || '启动失败');
@@ -1160,7 +1449,7 @@ async function jumpToPhase(key) {
   try {
     const r = await fetch(`/api/v1/interview/${S.sessionId}/set_phase`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       body: JSON.stringify({ phase: key }),
     });
     if (!r.ok) throw new Error((await r.json()).detail || '跳转失败');
@@ -1264,6 +1553,9 @@ function removeThinking() { document.getElementById('msg-thinking')?.remove(); }
 /* ══════════════════════════════════════════════════════════════
    Text mode turn
 ══════════════════════════════════════════════════════════════ */
+const $input = document.getElementById('userInput');
+const $send  = document.getElementById('btnSend');
+
 function appendTranscriptToInput(current, transcript) {
   const existing = (current || '').trim();
   const next = (transcript || '').trim();
@@ -1271,9 +1563,6 @@ function appendTranscriptToInput(current, transcript) {
   if (!next) return existing;
   return `${existing}\n${next}`;
 }
-
-const $input = document.getElementById('userInput');
-const $send  = document.getElementById('btnSend');
 
 $input.addEventListener('keydown', e => {
   if (e.key === 'Enter' && e.ctrlKey) { e.preventDefault(); sendTurn(); }
@@ -1311,7 +1600,7 @@ async function sendTurn(opts = {}) {
   try {
     const res = await fetch(`/api/v1/interview/${S.sessionId}/turn/stream`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       body: JSON.stringify({ user_text: text, tts_enabled: false }),
     });
     if (!res.ok) throw new Error((await res.json()).detail || '请求失败');
@@ -1394,7 +1683,8 @@ setMode('text');
 ══════════════════════════════════════════════════════════════ */
 function connectWS() {
   const proto = location.protocol === 'https:' ? 'wss' : 'ws';
-  S.ws = new WebSocket(`${proto}://${location.host}/api/v1/ws/audio/${S.sessionId}`);
+  const token = encodeURIComponent(getToken() || '');
+  S.ws = new WebSocket(`${proto}://${location.host}/api/v1/ws/audio/${S.sessionId}?token=${token}`);
   S.ws.binaryType = 'arraybuffer';
 
   S.ws.onopen  = () => { setConn('语音已连接', 'ok'); toast('语音通道建立'); S.player = new PCMPlayer(); };
@@ -1548,7 +1838,7 @@ function stopWave() {
 ══════════════════════════════════════════════════════════════ */
 async function loadReport(retries = 4) {
   try {
-    const r = await fetch(`/api/v1/interview/${S.sessionId}/report`);
+    const r = await fetch(`/api/v1/interview/${S.sessionId}/report`, { headers: getAuthHeaders(false) });
     if (r.status === 409 && retries > 0) {
       // Evaluation still running — retry after a short delay
       await new Promise(res => setTimeout(res, 1500));
@@ -1688,7 +1978,7 @@ async function loadHistory() {
   const el = document.getElementById('histList');
   el.innerHTML = '<div class="hist-empty">加载中...</div>';
   try {
-    const r = await fetch('/api/v1/interview/sessions');
+    const r = await fetch('/api/v1/interview/sessions', { headers: getAuthHeaders(false) });
     if (!r.ok) throw new Error('加载失败');
     const sessions = await r.json();
     renderHistList(sessions);
@@ -1731,7 +2021,7 @@ function renderHistList(sessions) {
 
 async function loadHistoryReport(sessionId) {
   try {
-    const r = await fetch(`/api/v1/interview/${sessionId}/report`);
+    const r = await fetch(`/api/v1/interview/${sessionId}/report`, { headers: getAuthHeaders(false) });
     if (!r.ok) throw new Error((await r.json()).detail || '报告加载失败');
     const data = await r.json();
     PHASES = data.interview_mode === 'hr' ? HR_PHASES : TECH_PHASES;
@@ -1765,7 +2055,7 @@ async function loadTranscript(sessionId) {
   const body = document.getElementById('transcriptBody');
   body.innerHTML = '<div style="color:var(--t2);font-size:13px">加载中...</div>';
   try {
-    const r = await fetch(`/api/v1/interview/${sessionId}/messages`);
+    const r = await fetch(`/api/v1/interview/${sessionId}/messages`, { headers: getAuthHeaders(false) });
     if (!r.ok) throw new Error('对话记录加载失败');
     const msgs = await r.json();
     _transcriptLoaded = true;

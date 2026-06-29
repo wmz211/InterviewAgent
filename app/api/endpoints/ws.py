@@ -11,8 +11,10 @@ import json
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from loguru import logger
 
+from app.auth.utils import decode_access_token
 from app.audio.handler import get_or_create_handler, remove_handler
 from app.core.session_store import get_session_store
+from app.core.session_security import session_belongs_to_user
 
 router = APIRouter()
 
@@ -27,8 +29,14 @@ async def audio_stream(websocket: WebSocket, session_id: str):
     """
     store = get_session_store()
 
-    # Reject if session doesn't exist
-    if not await store.exists(session_id):
+    token = websocket.query_params.get("token", "")
+    user_id = decode_access_token(token) if token else None
+    if user_id is None:
+        await websocket.close(code=4401, reason="Not authenticated")
+        return
+
+    state = await store.get(session_id)
+    if state is None or not session_belongs_to_user(state, user_id):
         await websocket.close(code=4404, reason="Session not found")
         return
 

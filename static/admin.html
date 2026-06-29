@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InterviewAgent Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300;1,9..144,600&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg0:#f7f4ee; --bg1:#efeae1; --bg2:#e8e3d8; --bg3:#dfd9cc;
+  --b0:#e0dace; --b1:#cdc6b8; --t0:#1c1a16; --t1:#5c5449; --t2:#9c9488;
+  --acc:#c96214; --acc-h:#b8570f; --acc-lo:rgba(201,98,20,.1);
+  --ok:#16a34a; --err:#dc2626; --warn:#d97706;
+  --font:'Plus Jakarta Sans', system-ui, sans-serif; --serif:'Fraunces', Georgia, serif;
+  --ease:cubic-bezier(.4,0,.2,1);
+}
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+.hidden { display:none !important; }
+html, body { min-height:100%; }
+body { background:var(--bg0); color:var(--t0); font-family:var(--font); font-size:14px; line-height:1.6; -webkit-font-smoothing:antialiased; }
+button, input { font-family:var(--font); }
+button { border:none; background:none; color:inherit; cursor:pointer; }
+::-webkit-scrollbar { width:5px; }
+::-webkit-scrollbar-thumb { background:var(--b1); border-radius:4px; }
+
+.view { min-height:100vh; opacity:0; pointer-events:none; transition:opacity .25s var(--ease), transform .25s var(--ease); transform:translateY(6px); }
+.view.active { opacity:1; pointer-events:auto; transform:none; }
+
+#v-login { display:flex; align-items:center; justify-content:center; background:var(--bg0); }
+#v-login::before { content:''; position:fixed; inset:0; pointer-events:none; background:radial-gradient(ellipse 70% 50% at 50% 0%, rgba(201,98,20,.06) 0%, transparent 65%); }
+.login-inner { position:relative; z-index:1; width:100%; max-width:408px; padding:48px 28px; display:flex; flex-direction:column; gap:28px; }
+.logo { text-align:center; }
+.logo h1 { font-family:var(--serif); font-size:38px; font-weight:300; letter-spacing:-.02em; line-height:1; }
+.logo h1 em { font-style:italic; color:var(--acc); }
+.logo p { margin-top:8px; color:var(--t1); font-size:13px; font-weight:300; }
+.login-card { background:var(--bg1); border:1px solid var(--b0); border-radius:16px; padding:28px 24px; display:flex; flex-direction:column; gap:16px; }
+.card-title { font-size:15px; font-weight:600; color:var(--t0); }
+.field { display:flex; flex-direction:column; gap:6px; }
+.field label { font-size:11.5px; font-weight:600; color:var(--t2); letter-spacing:.05em; text-transform:uppercase; }
+.field input { padding:10px 13px; background:var(--bg0); border:1px solid var(--b1); border-radius:8px; outline:none; font-size:13.5px; color:var(--t0); transition:border-color .18s; }
+.field input:focus { border-color:var(--acc); }
+.err { padding:9px 13px; background:rgba(248,113,113,.08); border:1px solid rgba(248,113,113,.2); border-radius:7px; color:var(--err); font-size:12.5px; }
+.btn-primary { padding:10px 18px; background:var(--acc); color:#fff; font-size:13.5px; font-weight:600; border-radius:8px; transition:background .18s, transform .15s; white-space:nowrap; }
+.btn-primary:hover:not(:disabled) { background:var(--acc-h); transform:translateY(-1px); }
+.btn-primary:disabled { background:var(--b1); color:var(--t2); cursor:not-allowed; }
+.btn-ghost { padding:8px 12px; border:1px solid var(--b1); border-radius:8px; color:var(--t1); font-size:12.5px; transition:background .18s, color .18s; }
+.btn-ghost:hover { background:var(--bg2); color:var(--t0); }
+.ld { display:inline-block; width:12px; height:12px; border:2px solid rgba(255,255,255,.3); border-top-color:#fff; border-radius:50%; animation:spin .65s linear infinite; vertical-align:middle; margin-right:7px; }
+@keyframes spin { to { transform:rotate(360deg); } }
+
+#v-dashboard { background:var(--bg0); }
+.shell { min-height:100vh; display:grid; grid-template-columns:248px minmax(0, 1fr); }
+.sidebar { background:var(--bg1); border-right:1px solid var(--b0); display:flex; flex-direction:column; }
+.sb-top { padding:20px 18px 14px; border-bottom:1px solid var(--b0); }
+.sb-app { font-family:var(--serif); font-size:17px; font-weight:600; letter-spacing:-.01em; margin-bottom:10px; }
+.sb-app em { font-style:italic; color:var(--acc); }
+.sb-user { display:flex; align-items:center; gap:8px; min-width:0; }
+.avatar { width:28px; height:28px; border-radius:50%; background:var(--acc-lo); border:1px solid rgba(207,120,32,.25); display:flex; align-items:center; justify-content:center; font-size:12px; color:var(--acc); flex-shrink:0; }
+.user-text { min-width:0; }
+.user-name { font-size:13px; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.user-role { font-size:11.5px; color:var(--t2); }
+.nav-block { padding:18px; display:flex; flex-direction:column; gap:8px; }
+.nav-label { font-size:10.5px; font-weight:600; letter-spacing:.07em; text-transform:uppercase; color:var(--t2); margin-bottom:6px; }
+.nav-item { display:flex; align-items:center; gap:9px; padding:8px 9px; border-radius:8px; color:var(--t1); font-size:13px; }
+.nav-item.active { background:var(--bg3); color:var(--t0); }
+.sidebar-bottom { margin-top:auto; padding:18px; border-top:1px solid var(--b0); display:flex; flex-direction:column; gap:10px; }
+.main { min-width:0; padding:28px 34px 42px; overflow:auto; }
+.topbar { display:flex; align-items:flex-end; justify-content:space-between; gap:18px; margin-bottom:24px; }
+.kicker { font-size:11px; font-weight:600; letter-spacing:.08em; color:var(--t2); text-transform:uppercase; margin-bottom:4px; }
+.page-title { font-family:var(--serif); font-size:30px; font-weight:300; letter-spacing:-.015em; line-height:1.15; }
+.page-sub { color:var(--t1); font-size:13px; margin-top:5px; }
+.actions { display:flex; align-items:center; gap:10px; }
+.grid { display:grid; gap:14px; }
+.metrics { grid-template-columns:repeat(6, minmax(0, 1fr)); margin-bottom:18px; }
+.metric { background:var(--bg1); border:1px solid var(--b0); border-radius:10px; padding:15px 14px; min-width:0; }
+.metric-label { color:var(--t2); font-size:11px; font-weight:600; letter-spacing:.05em; text-transform:uppercase; }
+.metric-value { font-family:var(--serif); font-size:28px; font-weight:300; line-height:1.1; margin-top:8px; overflow-wrap:anywhere; }
+.metric-hint { color:var(--t1); font-size:12px; margin-top:6px; min-height:18px; }
+.section { margin-top:18px; }
+.section-head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px; }
+.section-title { font-size:13px; font-weight:600; color:var(--t0); }
+.section-meta { font-size:12px; color:var(--t2); }
+.two-col { grid-template-columns:minmax(0, 1.25fr) minmax(320px, .75fr); }
+.panel { background:var(--bg1); border:1px solid var(--b0); border-radius:10px; overflow:hidden; }
+.panel-pad { padding:15px; }
+.domain-list, .bank-list, .phase-list { display:flex; flex-direction:column; }
+.row { display:grid; grid-template-columns:minmax(0, 1fr) auto; gap:14px; padding:14px 15px; border-top:1px solid var(--b0); }
+.row:first-child { border-top:none; }
+.row-title { font-size:13.5px; font-weight:600; color:var(--t0); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.row-sub { color:var(--t1); font-size:12.5px; margin-top:3px; overflow-wrap:anywhere; }
+.pill-line { display:flex; flex-wrap:wrap; gap:6px; margin-top:9px; }
+.pill { padding:3px 7px; border-radius:999px; background:var(--bg2); border:1px solid var(--b0); color:var(--t1); font-size:11.5px; }
+.count { color:var(--acc); font-size:13px; font-weight:600; white-space:nowrap; }
+.status-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.mini-stat { background:var(--bg0); border:1px solid var(--b0); border-radius:8px; padding:12px; }
+.mini-stat b { display:block; font-family:var(--serif); font-size:22px; font-weight:300; line-height:1.1; }
+.mini-stat span { display:block; color:var(--t2); font-size:11.5px; margin-top:5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.empty { padding:18px 15px; color:var(--t2); font-size:13px; }
+#toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%) translateY(8px); padding:9px 18px; background:var(--bg1); border:1px solid var(--b1); border-radius:8px; font-size:13px; color:var(--t0); opacity:0; transition:all .3s var(--ease); pointer-events:none; white-space:nowrap; z-index:10; }
+#toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+#toast.err { border-color:rgba(248,113,113,.4); color:var(--err); }
+
+@media (max-width:1100px) {
+  .metrics { grid-template-columns:repeat(3, minmax(0, 1fr)); }
+  .two-col { grid-template-columns:1fr; }
+}
+@media (max-width:760px) {
+  .shell { grid-template-columns:1fr; }
+  .sidebar { display:none; }
+  .main { padding:22px 18px 34px; }
+  .topbar { align-items:flex-start; flex-direction:column; }
+  .metrics { grid-template-columns:repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width:460px) {
+  .metrics { grid-template-columns:1fr; }
+  .actions { width:100%; }
+  .actions button { flex:1; }
+}
+</style>
+</head>
+<body>
+<div id="v-login" class="view active">
+  <div class="login-inner">
+    <div class="logo">
+      <h1>Interview<em>Agent</em></h1>
+      <p>管理员后台</p>
+    </div>
+    <div class="login-card">
+      <div class="card-title">管理员登录</div>
+      <div class="field">
+        <label>邮箱</label>
+        <input type="email" id="loginEmail" placeholder="admin@example.com" autocomplete="email">
+      </div>
+      <div class="field">
+        <label>密码</label>
+        <input type="password" id="loginPassword" placeholder="请输入密码" autocomplete="current-password">
+      </div>
+      <div class="err hidden" id="loginErr"></div>
+      <button class="btn-primary" id="btnLogin">登录后台</button>
+    </div>
+  </div>
+</div>
+
+<div id="v-dashboard" class="view">
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="sb-top">
+        <div class="sb-app">Interview<em>Agent</em></div>
+        <div class="sb-user">
+          <div class="avatar">A</div>
+          <div class="user-text">
+            <div class="user-name" id="sideUser">Admin</div>
+            <div class="user-role">System Admin</div>
+          </div>
+        </div>
+      </div>
+      <div class="nav-block">
+        <div class="nav-label">Overview</div>
+        <div class="nav-item active">系统概览</div>
+        <div class="nav-item">覆盖领域</div>
+        <div class="nav-item">面试流程</div>
+      </div>
+      <div class="sidebar-bottom">
+        <button class="btn-ghost" onclick="location.href='/'">返回面试端</button>
+        <button class="btn-ghost" onclick="logout()">退出登录</button>
+      </div>
+    </aside>
+    <main class="main">
+      <div class="topbar">
+        <div>
+          <div class="kicker">Admin Console</div>
+          <h1 class="page-title">系统覆盖与运行概览</h1>
+          <div class="page-sub">查看当前面试系统覆盖领域、题库、知识图谱和会话数据。</div>
+        </div>
+        <div class="actions">
+          <button class="btn-ghost" onclick="location.href='/'">面试端</button>
+          <button class="btn-primary" id="btnRefresh">刷新</button>
+        </div>
+      </div>
+
+      <div class="grid metrics" id="metrics"></div>
+
+      <div class="grid two-col">
+        <section class="section">
+          <div class="section-head">
+            <div class="section-title">覆盖领域</div>
+            <div class="section-meta" id="domainMeta"></div>
+          </div>
+          <div class="panel domain-list" id="domains"></div>
+        </section>
+
+        <section class="section">
+          <div class="section-head">
+            <div class="section-title">运行分布</div>
+            <div class="section-meta">Sessions</div>
+          </div>
+          <div class="panel panel-pad">
+            <div class="status-grid" id="sessionStatus"></div>
+          </div>
+          <div class="section-head" style="margin-top:14px">
+            <div class="section-title">知识节点类型</div>
+            <div class="section-meta">Graph</div>
+          </div>
+          <div class="panel panel-pad">
+            <div class="status-grid" id="nodeTypes"></div>
+          </div>
+        </section>
+      </div>
+
+      <div class="grid two-col">
+        <section class="section">
+          <div class="section-head">
+            <div class="section-title">题库概览</div>
+            <div class="section-meta" id="bankMeta"></div>
+          </div>
+          <div class="panel bank-list" id="questionBanks"></div>
+        </section>
+
+        <section class="section">
+          <div class="section-head">
+            <div class="section-title">面试阶段</div>
+            <div class="section-meta">Tech / HR</div>
+          </div>
+          <div class="panel phase-list" id="phases"></div>
+        </section>
+      </div>
+    </main>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const TOKEN_KEY = 'ia_admin_token';
+const USER_KEY = 'ia_admin_user';
+
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function getToken() {
+  return localStorage.getItem(TOKEN_KEY) || '';
+}
+
+function authHeaders(json = true) {
+  const headers = {};
+  const token = getToken();
+  if (token) headers.Authorization = 'Bearer ' + token;
+  if (json) headers['Content-Type'] = 'application/json';
+  return headers;
+}
+
+function toast(message, isError = false) {
+  const el = document.getElementById('toast');
+  el.textContent = message;
+  el.classList.toggle('err', isError);
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+function saveAdmin(token, user) {
+  localStorage.setItem(TOKEN_KEY, token);
+  localStorage.setItem(USER_KEY, JSON.stringify(user || {}));
+}
+
+function clearAdmin() {
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(USER_KEY);
+}
+
+function logout() {
+  clearAdmin();
+  showView('v-login');
+}
+
+function setLoading(button, loadingText) {
+  button.disabled = true;
+  button.dataset.oldText = button.textContent;
+  button.innerHTML = `<span class="ld"></span>${loadingText}`;
+}
+
+function unsetLoading(button) {
+  button.disabled = false;
+  button.textContent = button.dataset.oldText || '确定';
+}
+
+function renderMetrics(metrics) {
+  document.getElementById('metrics').innerHTML = metrics.map(item => `
+    <div class="metric">
+      <div class="metric-label">${escapeHtml(item.label)}</div>
+      <div class="metric-value">${escapeHtml(String(item.value))}</div>
+      <div class="metric-hint">${escapeHtml(item.hint || '')}</div>
+    </div>
+  `).join('');
+}
+
+function renderDomains(domains) {
+  document.getElementById('domainMeta').textContent = `${domains.length} 个领域`;
+  document.getElementById('domains').innerHTML = domains.length ? domains.map(domain => `
+    <div class="row">
+      <div>
+        <div class="row-title">${escapeHtml(domain.label)}</div>
+        <div class="row-sub">${escapeHtml(domain.id)}</div>
+        <div class="pill-line">${(domain.sample_topics || []).map(topic => `<span class="pill">${escapeHtml(topic)}</span>`).join('')}</div>
+      </div>
+      <div class="count">${domain.node_count}</div>
+    </div>
+  `).join('') : '<div class="empty">暂无领域数据</div>';
+}
+
+function renderQuestionBanks(banks) {
+  const total = banks.reduce((sum, bank) => sum + bank.question_count, 0);
+  document.getElementById('bankMeta').textContent = `${total} 道题`;
+  document.getElementById('questionBanks').innerHTML = banks.length ? banks.map(bank => `
+    <div class="row">
+      <div>
+        <div class="row-title">${escapeHtml(bank.name)}</div>
+        <div class="row-sub">${formatDifficulty(bank.difficulties)}</div>
+        <div class="pill-line">${(bank.topics || []).map(topic => `<span class="pill">${escapeHtml(topic)}</span>`).join('')}</div>
+      </div>
+      <div class="count">${bank.question_count}</div>
+    </div>
+  `).join('') : '<div class="empty">暂无题库数据</div>';
+}
+
+function renderPhases(phases) {
+  document.getElementById('phases').innerHTML = phases.map(phase => `
+    <div class="row">
+      <div>
+        <div class="row-title">${escapeHtml(phase.label)}</div>
+        <div class="row-sub">${escapeHtml(phase.description)}</div>
+      </div>
+      <div class="count">${escapeHtml(phase.track)}</div>
+    </div>
+  `).join('');
+}
+
+function renderCountMap(id, counts) {
+  const entries = Object.entries(counts || {});
+  document.getElementById(id).innerHTML = entries.length ? entries.map(([key, value]) => `
+    <div class="mini-stat"><b>${value}</b><span>${escapeHtml(key)}</span></div>
+  `).join('') : '<div class="empty">暂无数据</div>';
+}
+
+function formatDifficulty(difficulties) {
+  const entries = Object.entries(difficulties || {});
+  if (!entries.length) return '未标注难度';
+  return entries.map(([key, value]) => `${key}: ${value}`).join(' / ');
+}
+
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, ch => ({
+    '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
+  }[ch]));
+}
+
+async function loadOverview() {
+  const button = document.getElementById('btnRefresh');
+  setLoading(button, '刷新中...');
+  try {
+    const r = await fetch('/api/v1/admin/overview', { headers: authHeaders(false) });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.detail || '无法加载后台数据');
+    saveAdmin(getToken(), data.admin);
+    document.getElementById('sideUser').textContent = data.admin.username || data.admin.email;
+    renderMetrics(data.metrics || []);
+    renderDomains(data.domains || []);
+    renderQuestionBanks(data.question_banks || []);
+    renderPhases(data.phases || []);
+    renderCountMap('sessionStatus', data.session_status || {});
+    renderCountMap('nodeTypes', data.node_types || {});
+    showView('v-dashboard');
+  } catch (e) {
+    if (/Admin privileges|required|Not authenticated|Invalid/i.test(e.message)) {
+      clearAdmin();
+      showView('v-login');
+    }
+    toast(e.message, true);
+  } finally {
+    unsetLoading(button);
+  }
+}
+
+document.getElementById('btnLogin').addEventListener('click', async () => {
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const errEl = document.getElementById('loginErr');
+  errEl.classList.add('hidden');
+  if (!email || !password) {
+    errEl.textContent = '请填写邮箱和密码';
+    errEl.classList.remove('hidden');
+    return;
+  }
+  const button = document.getElementById('btnLogin');
+  setLoading(button, '登录中...');
+  try {
+    const r = await fetch('/api/v1/auth/login', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json' },
+      body:JSON.stringify({ email, password }),
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.detail || '登录失败');
+    localStorage.setItem(TOKEN_KEY, data.access_token);
+    await loadOverview();
+  } catch (e) {
+    errEl.textContent = e.message;
+    errEl.classList.remove('hidden');
+  } finally {
+    unsetLoading(button);
+  }
+});
+
+document.getElementById('btnRefresh').addEventListener('click', loadOverview);
+document.getElementById('loginPassword').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('btnLogin').click();
+});
+
+window.addEventListener('DOMContentLoaded', async () => {
+  if (getToken()) await loadOverview();
+});
+</script>
+</body>
+</html>

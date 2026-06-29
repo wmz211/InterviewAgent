@@ -11,7 +11,8 @@ class InterviewState(TypedDict):
     session_id: str
     candidate_name: str
 
-    # ── Document context ──────────────────────────────────────────
+    # ── Document context ───────
+    # ───────────────────────────────────
     resume_summary: str           # Parsed resume text (for LLM context)
     jd_text: str                  # Raw JD text (for CS_Fundamentals topic selection)
 
@@ -32,3 +33,5 @@ class InterviewState(TypedDict):
     should_transition: bool
     interview_complete: bool
     interview_mode: str           # "tech" | "hr"
+    practice_mode: bool
+    selected_phase: str

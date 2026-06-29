@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InterviewAgent — 评估报告</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300;1,9..144,600&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg0: #f7f4ee; --bg1: #efeae1; --bg2: #e8e3d8; --bg3: #dfd9cc;
+  --b0: #e0dace; --b1: #cdc6b8;
+  --t0: #1c1a16; --t1: #5c5449; --t2: #9c9488;
+  --acc: #c96214; --acc-h: #b8570f; --acc-lo: rgba(201,98,20,.1);
+  --ok: #16a34a; --warn: #d97706; --err: #dc2626;
+  --font: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --serif: 'Fraunces', Georgia, serif;
+  --ease: cubic-bezier(.4,0,.2,1);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  background: var(--bg0); color: var(--t0); font-family: var(--font);
+  font-size: 14px; line-height: 1.6; -webkit-font-smoothing: antialiased;
+  display: flex; flex-direction: column;
+}
+::selection { background: rgba(201,98,20,.15); }
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-thumb { background: var(--b1); border-radius: 4px; }
+
+.proto-nav {
+  height: 30px; flex-shrink: 0;
+  background: var(--bg1); border-bottom: 1px solid var(--b0);
+  display: flex; align-items: center; gap: 4px;
+  padding: 0 24px; font-size: 11px; font-weight: 500; color: var(--t2);
+}
+.proto-nav a { color: var(--t2); text-decoration: none; padding: 0 5px; transition: color .15s; }
+.proto-nav a:hover { color: var(--acc); }
+.proto-nav .sep { color: var(--b1); }
+.proto-nav .tag { font-size: 10px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--acc); border: 1px solid rgba(201,98,20,.3); padding: 1px 7px; border-radius: 99px; }
+.proto-nav .current { color: var(--t1); font-weight: 600; }
+.proto-nav .next-link { margin-left: auto; display: flex; align-items: center; gap: 5px; color: var(--acc); font-weight: 600; text-decoration: none; padding: 0; }
+.proto-nav .next-link:hover { color: var(--acc-h); }
+
+/* Page */
+.rp-page-wrap { flex: 1; overflow-y: auto; background: #fff; }
+.rp-page { max-width: 820px; width: 100%; margin: 0 auto; padding: 36px 24px 72px; display: flex; flex-direction: column; gap: 24px; }
+
+/* Top nav */
+.rp-nav { display: flex; align-items: center; justify-content: space-between; }
+.rp-nav-left { display: flex; align-items: center; gap: 10px; }
+.btn-ghost { padding: 7px 14px; border: 1px solid var(--b1); border-radius: 8px; font-size: 12.5px; color: var(--t1); background: transparent; cursor: pointer; font-family: var(--font); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: all .18s; }
+.btn-ghost:hover { border-color: var(--acc); color: var(--acc); }
+.btn-primary { padding: 8px 18px; background: var(--acc); color: #fff; border-radius: 8px; border: none; font-size: 12.5px; font-weight: 600; cursor: pointer; font-family: var(--font); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: background .18s; }
+.btn-primary:hover { background: var(--acc-h); }
+
+/* Hero */
+.rp-hero { background: var(--bg0); border: 1px solid var(--b0); border-radius: 16px; padding: 28px 32px; display: flex; gap: 28px; align-items: flex-start; }
+.rp-score {
+  flex-shrink: 0; width: 80px; height: 80px; border-radius: 50%;
+  background: conic-gradient(var(--ok) 0% 78%, var(--b0) 78% 100%);
+  display: grid; place-items: center;
+}
+.rp-score-inner { width: 60px; height: 60px; background: var(--bg0); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.rp-score-num { font-size: 20px; font-weight: 700; color: var(--ok); line-height: 1; font-family: var(--serif); }
+.rp-score-denom { font-size: 10px; color: var(--t2); }
+
+.rp-hero-info { flex: 1; }
+.rp-name { font-family: var(--serif); font-size: 22px; font-weight: 600; letter-spacing: -.01em; margin-bottom: 6px; }
+.rp-meta { font-size: 12px; color: var(--t2); display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 14px; }
+.rp-meta span { display: flex; align-items: center; gap: 5px; }
+.rp-recommend {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 5px 14px; border-radius: 99px; font-size: 12px; font-weight: 600;
+  background: rgba(22,163,74,.08); color: var(--ok); border: 1px solid rgba(22,163,74,.2);
+}
+.rp-recommend.warn { background: rgba(217,119,6,.08); color: var(--warn); border-color: rgba(217,119,6,.2); }
+.rp-recommend.err  { background: rgba(220,38,38,.08); color: var(--err); border-color: rgba(220,38,38,.2); }
+.rp-recommend-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+.rp-summary { font-size: 13.5px; color: var(--t1); line-height: 1.7; background: var(--bg1); border: 1px solid var(--b0); border-radius: 10px; padding: 14px 18px; }
+
+/* Section label */
+.sec-label { font-size: 10.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--t2); margin-bottom: 14px; }
+
+/* Dimensions */
+.dim-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
+.dim-card { background: var(--bg0); border: 1px solid var(--b0); border-radius: 10px; padding: 15px 16px; }
+.dim-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+.dim-name { font-size: 12.5px; font-weight: 600; color: var(--t0); }
+.dim-score { font-size: 14px; font-weight: 700; }
+.dim-score.hi { color: var(--ok); }
+.dim-score.md { color: var(--warn); }
+.dim-score.lo { color: var(--err); }
+.dim-bar { height: 3px; background: var(--b0); border-radius: 99px; overflow: hidden; margin-bottom: 9px; }
+.dim-fill { height: 100%; border-radius: 99px; }
+.dim-fill.hi { background: var(--ok); }
+.dim-fill.md { background: var(--warn); }
+.dim-fill.lo { background: var(--err); }
+.dim-note { font-size: 11.5px; color: var(--t2); line-height: 1.45; }
+
+/* Phase accordion */
+.phase-acc { display: flex; flex-direction: column; gap: 8px; }
+.ph-acc-item { background: var(--bg0); border: 1px solid var(--b0); border-radius: 10px; overflow: hidden; }
+.ph-acc-head {
+  padding: 13px 16px; cursor: pointer; display: flex; align-items: center; gap: 10px;
+  transition: background .15s;
+}
+.ph-acc-head:hover { background: var(--bg1); }
+.ph-badge { font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; padding: 2px 8px; border-radius: 99px; background: var(--acc-lo); color: var(--acc); border: 1px solid rgba(201,98,20,.2); }
+.ph-acc-title { flex: 1; font-size: 13px; font-weight: 600; color: var(--t0); }
+.ph-acc-score { font-size: 13px; font-weight: 700; }
+.ph-chevron { color: var(--t2); transition: transform .2s; }
+.ph-acc-body { display: none; border-top: 1px solid var(--b0); padding: 0 16px; }
+.ph-acc-body.open { display: block; }
+
+.qa-item { padding: 13px 0; border-bottom: 1px solid var(--b0); }
+.qa-item:last-child { border-bottom: none; }
+.qa-q { font-size: 12.5px; font-weight: 600; color: var(--acc); margin-bottom: 5px; }
+.qa-a { font-size: 12.5px; color: var(--t1); line-height: 1.6; margin-bottom: 6px; }
+.qa-foot { display: flex; align-items: center; gap: 12px; font-size: 11.5px; color: var(--t2); }
+.qa-score-val { font-weight: 700; }
+.score-hi { color: var(--ok); }
+.score-md { color: var(--warn); }
+.score-lo { color: var(--err); }
+
+/* Weak items */
+.weak-list { display: flex; flex-direction: column; gap: 10px; }
+.weak-item { background: var(--bg0); border: 1px solid rgba(220,38,38,.15); border-radius: 10px; padding: 16px; }
+.weak-topic { font-size: 13px; font-weight: 600; color: var(--err); margin-bottom: 5px; }
+.weak-feedback { font-size: 12.5px; color: var(--t1); line-height: 1.6; margin-bottom: 10px; }
+.weak-study { background: var(--bg1); border: 1px solid var(--b0); border-radius: 7px; padding: 10px 13px; font-size: 12px; color: var(--t1); line-height: 1.55; }
+.weak-study strong { display: block; font-size: 10.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--t2); margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<nav class="proto-nav">
+  <span class="tag">Prototype</span>
+  <span class="sep">·</span>
+  <a href="index.html">Overview</a>
+  <span class="sep">/</span>
+  <a href="wrapup.html">Wrap-up</a>
+  <span class="sep">/</span>
+  <span class="current">Report</span>
+  <a class="next-link" href="sessions.html">
+    Sessions
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="m4 2 4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </a>
+</nav>
+
+<div class="rp-page-wrap">
+<div class="rp-page">
+
+  <!-- Nav -->
+  <div class="rp-nav">
+    <div class="rp-nav-left">
+      <a class="btn-ghost" href="sessions.html">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M10 6.5H3m3 3-3-3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        历史记录
+      </a>
+    </div>
+    <a class="btn-primary" href="setup.html">新建面试</a>
+  </div>
+
+  <!-- Hero -->
+  <div class="rp-hero">
+    <div class="rp-score">
+      <div class="rp-score-inner">
+        <div class="rp-score-num">7.8</div>
+        <div class="rp-score-denom">/10</div>
+      </div>
+    </div>
+    <div class="rp-hero-info">
+      <div class="rp-name">张伟</div>
+      <div class="rp-meta">
+        <span>技术面试</span>
+        <span>·</span>
+        <span>2026-03-29 &nbsp;14:30</span>
+        <span>·</span>
+        <span>约 45 分钟</span>
+        <span>·</span>
+        <span>高级后端工程师</span>
+      </div>
+      <div class="rp-recommend">
+        <div class="rp-recommend-dot"></div>
+        建议通过
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary -->
+  <div class="rp-summary">
+    候选人在 RAG 系统设计与分布式架构方面展现出扎实的工程实践能力，能清晰阐述技术选型的权衡理由，回答结构化程度较高。算法能力中等偏上，滑动窗口类题型处理流畅。主要薄弱点在 CS 基础部分（操作系统内存管理）和编码题边界条件处理上，建议在最终录用前安排一轮深度基础面。
+  </div>
+
+  <!-- Dimensions -->
+  <div>
+    <div class="sec-label">五维度评分</div>
+    <div class="dim-grid">
+      <div class="dim-card">
+        <div class="dim-top"><span class="dim-name">技术深度</span><span class="dim-score hi">8.5</span></div>
+        <div class="dim-bar"><div class="dim-fill hi" style="width:85%"></div></div>
+        <div class="dim-note">RAG 系统设计思路完整，能从工程角度量化分析方案 trade-off</div>
+      </div>
+      <div class="dim-card">
+        <div class="dim-top"><span class="dim-name">CS 基础</span><span class="dim-score md">6.5</span></div>
+        <div class="dim-bar"><div class="dim-fill md" style="width:65%"></div></div>
+        <div class="dim-note">操作系统内存管理部分答题不完整，缺乏 TLB 与虚拟内存细节</div>
+      </div>
+      <div class="dim-card">
+        <div class="dim-top"><span class="dim-name">编码能力</span><span class="dim-score hi">8.0</span></div>
+        <div class="dim-bar"><div class="dim-fill hi" style="width:80%"></div></div>
+        <div class="dim-note">滑动窗口解法正确，复杂度分析准确，边界条件遗漏一处</div>
+      </div>
+      <div class="dim-card">
+        <div class="dim-top"><span class="dim-name">表达沟通</span><span class="dim-score hi">8.2</span></div>
+        <div class="dim-bar"><div class="dim-fill hi" style="width:82%"></div></div>
+        <div class="dim-note">思路清晰，善用类比，回答结构化，能有效控制时间</div>
+      </div>
+      <div class="dim-card">
+        <div class="dim-top"><span class="dim-name">JD 匹配度</span><span class="dim-score hi">7.8</span></div>
+        <div class="dim-bar"><div class="dim-fill hi" style="width:78%"></div></div>
+        <div class="dim-note">LLM 应用经验与 JD 高度吻合，分布式系统经验略低于要求</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phase details -->
+  <div>
+    <div class="sec-label">各阶段详情</div>
+    <div class="phase-acc">
+
+      <div class="ph-acc-item">
+        <div class="ph-acc-head" onclick="toggleAcc(this)">
+          <span class="ph-badge">Greeting</span>
+          <span class="ph-acc-title">开场寒暄</span>
+          <span class="ph-acc-score" style="color:var(--t2)">—</span>
+          <svg class="ph-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="m3 5 4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="ph-acc-body">
+          <div class="qa-item">
+            <div class="qa-q">自我介绍</div>
+            <div class="qa-a">候选人提供了清晰的自我介绍，覆盖工作年限、技术栈方向与核心项目背景。</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ph-acc-item">
+        <div class="ph-acc-head" onclick="toggleAcc(this)">
+          <span class="ph-badge">Resume Dive</span>
+          <span class="ph-acc-title">简历深挖</span>
+          <span class="ph-acc-score score-hi">8.3</span>
+          <svg class="ph-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="m3 5 4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="ph-acc-body open">
+          <div class="qa-item">
+            <div class="qa-q">FAISS vs 专用向量数据库的选型理由？</div>
+            <div class="qa-a">从部署成本、查询延迟、单机数据量三个维度分析，并主动提到亿级后迁移的经历。</div>
+            <div class="qa-foot"><span class="qa-score-val score-hi">8.5</span><span>答题完整，有实际量化场景支撑</span></div>
+          </div>
+          <div class="qa-item">
+            <div class="qa-q">增量索引更新策略如何设计？</div>
+            <div class="qa-a">分片策略 + 版本号控制思路清晰，未深入讨论一致性保证机制。</div>
+            <div class="qa-foot"><span class="qa-score-val score-hi">8.0</span><span>主思路正确，缺乏一致性细节</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ph-acc-item">
+        <div class="ph-acc-head" onclick="toggleAcc(this)">
+          <span class="ph-badge">JD Tech</span>
+          <span class="ph-acc-title">JD 技术考察</span>
+          <span class="ph-acc-score score-md">7.0</span>
+          <svg class="ph-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="m3 5 4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="ph-acc-body">
+          <div class="qa-item">
+            <div class="qa-q">操作系统内存管理 — TLB 工作原理？</div>
+            <div class="qa-a">仅描述 TLB 是快表，未阐述 TLB miss 处理流程和多级页表关系。</div>
+            <div class="qa-foot"><span class="qa-score-val score-lo">5.0</span><span>答题不完整，缺少关键机制</span></div>
+          </div>
+          <div class="qa-item">
+            <div class="qa-q">RAG 召回率与精确率 trade-off？</div>
+            <div class="qa-a">two-stage 方案（ANN + cross-encoder rerank），并量化了延迟分布，专业性强。</div>
+            <div class="qa-foot"><span class="qa-score-val score-hi">9.0</span><span>工程视角完整，有延迟数据支撑</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ph-acc-item">
+        <div class="ph-acc-head" onclick="toggleAcc(this)">
+          <span class="ph-badge">Coding</span>
+          <span class="ph-acc-title">算法编程</span>
+          <span class="ph-acc-score score-hi">8.0</span>
+          <svg class="ph-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="m3 5 4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="ph-acc-body">
+          <div class="qa-item">
+            <div class="qa-q">最长无重复子串（LeetCode #3）</div>
+            <div class="qa-a">滑动窗口 + 哈希表，O(n) 时间，O(min(m,n)) 空间。未提及 Unicode 边界情况。</div>
+            <div class="qa-foot"><span class="qa-score-val score-hi">8.0</span><span>主解法正确，边界条件有遗漏</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Weak items -->
+  <div>
+    <div class="sec-label">薄弱项 &amp; 学习建议</div>
+    <div class="weak-list">
+      <div class="weak-item">
+        <div class="weak-topic">操作系统 — 虚拟内存与 TLB</div>
+        <div class="weak-feedback">对 TLB 工作机制描述不完整，缺少 TLB miss 的处理流程（Page Walk → 操作系统异常处理）以及多级页表与 TLB 交互的细节说明。</div>
+        <div class="weak-study">
+          <strong>建议学习路径</strong>
+          《深入理解计算机系统》第 9 章（虚拟内存） &nbsp;·&nbsp; Linux 内核 mm/ 模块源码阅读
+        </div>
+      </div>
+      <div class="weak-item">
+        <div class="weak-topic">算法题 — 边界条件处理</div>
+        <div class="weak-feedback">未考虑输入字符串包含多字节 Unicode 字符时哈希表 key 类型的选择，以及空字符串输入的边界处理。</div>
+        <div class="weak-study">
+          <strong>建议学习路径</strong>
+          LeetCode 滑动窗口专题（#3, #76, #239） &nbsp;·&nbsp; 边界条件 Checklist 方法论
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+function toggleAcc(head) {
+  const body = head.nextElementSibling;
+  const ch = head.querySelector('.ph-chevron');
+  const open = body.classList.toggle('open');
+  ch.style.transform = open ? 'rotate(180deg)' : '';
+}
+</script>
+</body>
+</html>

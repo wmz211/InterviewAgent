@@ -1,22 +1,17 @@
-version: "3.9"
-
 services:
-  # ── Neo4j 5.x (Graph DB) ───────────────────────────────────────
   neo4j:
     image: neo4j:5.26-community
     container_name: interview_neo4j
     ports:
-      - "7474:7474"     # Browser UI  → http://localhost:7474
-      - "7687:7687"     # Bolt protocol
+      - "7474:7474"
+      - "7687:7687"
     environment:
-      NEO4J_AUTH: neo4j/interviewagent123
-      # Auto-download APOC plugin at first startup (requires internet)
+      NEO4J_AUTH: "neo4j/${NEO4J_PASSWORD:?Set NEO4J_PASSWORD in .env}"
       NEO4J_PLUGINS: '["apoc"]'
       NEO4J_dbms_security_procedures_unrestricted: "apoc.*"
       NEO4J_dbms_security_procedures_allowlist: "apoc.*"
       NEO4J_apoc_export_file_enabled: "true"
       NEO4J_apoc_import_file_enabled: "true"
-      # Memory tuning (adjust for your machine)
       NEO4J_server_memory_heap_initial__size: "512m"
       NEO4J_server_memory_heap_max__size: "1g"
       NEO4J_server_memory_pagecache__size: "512m"
@@ -30,9 +25,22 @@ services:
       interval: 15s
       timeout: 10s
       retries: 10
-      start_period: 40s    # Neo4j needs time to download APOC on first run
+      start_period: 40s
 
-  # ── FastAPI App ─────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: interview_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
   api:
     build: .
     container_name: interview_api
@@ -44,6 +52,8 @@ services:
     depends_on:
       neo4j:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     command: python -m app.main
 
 volumes:
@@ -51,3 +61,4 @@ volumes:
   neo4j_logs:
   neo4j_plugins:
   neo4j_import:
+  redis_data:
